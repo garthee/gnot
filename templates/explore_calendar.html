@@ -16,26 +16,26 @@
 	  stroke-width: 2px;
 	}
 	
-
 </style>
 
 <h1>Explore Date</h1>
 
 <div id="container" class="container">
-<div id="main-container"><div id="svg-box"></div></div>
-<div  id="side-container">
-<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-<div class="side-container" id="side-container-0">{{title}}</div>
-<div class="side-container" id="side-container-1"  >
-	<p>Calendar week starts on Sunday and ends on Saturday. Values range from <span class="limit-values" id="val_min"></span> to <span id="val_max"></span>.</p>
-	<p>Hover over a cell to see it's value.</p> 
-</div>
-<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a></div>
-</div>
+	<div id="main-container"><div id="svg-box"></div></div>
+	<div  id="side-container">
+		<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container" id="side-container-0">{{title}}</div>
+		<div class="side-container" id="side-container-1"  >
+			<p>Calendar week starts on Sunday and ends on Saturday. Values range from <span class="limit-values" id="val_min"></span> to <span id="val_max"></span>.</p>
+			<p>Hover over a cell to see it's value.</p> 
+		</div>
+		<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a></div>
+	</div>
 </div>
 
 
 <script>
+	// d3 based JS script that prints calendar view using the data from datfile
 	var width = 960,
 	    height = 136,
 	    cellSize = 17; // cell size
