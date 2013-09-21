@@ -1,0 +1,307 @@
+{% extends "layout.html" %}
+{% block title %}Time Series{% endblock %}
+{% block body %}
+
+	<link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
+	<link type="text/css" rel="stylesheet" href="static/css/rickshaw.min.css">
+	<link type="text/css" rel="stylesheet" href="static/css/extensions.css">
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+	<script src="static/js/rickshaw.min.js"></script>
+	<script src="static/js/extensions.js"></script>
+
+<style>
+    .ui-slider .ui-slider-handle {
+		width: 12px; border-radius: 2px; 
+		border: 1px solid #adadad; height: 16px; 
+		background-color: #efefef; cursor: pointer; 
+	}
+	.ui-slider-horizontal {
+		 background-color: #aaa; height: 1px; border-bottom: 1px solid #efefef;
+	}
+
+	.side-container {
+		width:240px;
+	}
+	#side-container-4{
+		background:#cbcbcb;
+	}
+	section{
+		border:0px;
+		padding:5px 0;
+	}
+	#legend{
+		background:inherit;
+		height:inherit;
+	}
+	#side_panel{
+		padding:0px;
+	}
+	.rickshaw_annotation_timeline .annotation .content {
+		width:240px;
+	}
+</style>
+
+<h1>Explore Time Series</h1>
+<div id="container">
+	
+<div id="main-container" style="width:840px;">
+	
+<div id="svg-box"></div>
+<div id="timeline" class="rickshaw_annotation_timeline"></div>
+<div id="slider" style="width: 800px;" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+<div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div>
+<a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a>
+<a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a>
+</div>
+</div>
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-4"  >
+	<form id="side_panel">
+		<section>
+			<div id="renderer_form" class="toggler">
+				<input type="radio" name="renderer" id="area" value="area" >
+				<label for="area">area</label>
+				<input type="radio" name="renderer" id="bar" value="bar">
+				<label for="bar">bar</label>
+				<input type="radio" name="renderer" id="line" value="line" checked="">
+				<label for="line">line</label>
+				<input type="radio" name="renderer" id="scatter" value="scatterplot">
+				<label for="scatter">scatter</label>
+			</div>
+		</section>
+		<section>
+			<div id="offset_form">
+				<label for="stack">
+					<input type="radio" name="offset" id="stack" value="zero" >
+					<span>stack</span>
+				</label>
+				<label for="stream">
+					<input type="radio" name="offset" id="stream" value="wiggle">
+					<span>stream</span>
+				</label>
+				<label for="pct">
+					<input type="radio" name="offset" id="pct" value="expand">
+					<span>pct</span>
+				</label>
+				<label for="value">
+					<input type="radio" name="offset" id="value" value="value" checked="">
+					<span>value</span>
+				</label>
+			</div>
+			<div id="interpolation_form">
+				<label for="cardinal">
+					<input type="radio" name="interpolation" id="cardinal" value="cardinal" checked="">
+					<span>cardinal</span>
+				</label>
+				<label for="linear">
+					<input type="radio" name="interpolation" id="linear" value="linear">
+					<span>linear</span>
+				</label>
+				<label for="step">
+					<input type="radio" name="interpolation" id="step" value="step-after">
+					<span>step</span>
+				</label>
+			</div>
+		</section>
+		<section>
+			<h6>Smoothing</h6>
+			<div id="smoother" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a></div>
+		</section>
+		<section><h6>Legend</h6><div id="legend"></div></section>
+	</form>
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+
+<script>
+
+	function isNumber(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
+	
+	var str2int = function(d){return +d;};
+	var month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0)).getTime() / 1000;};
+	var date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2])).getTime() / 1000;};
+	var time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]).getTime() / 1000;};
+
+	var palette = new Rickshaw.Color.Palette( { scheme: 'spectrum2000' } );
+
+	
+	d3.text('{{datfile}}', 'text/csv', function(text) {
+	    var data = d3.csv.parseRows(text);
+
+	    var names = data[0].slice(1, data[0].length);
+	    var currData = [];
+	    for (j=0; j < names.length; j++) {
+	    	currData.push([])
+	    }
+		var annotate = false;
+		if (names[names.length-1] == 'annotate'){
+			names = names.slice(0, names.length-1);
+			annotate = true;
+		}
+		
+		// identify x axis
+		var parseX = str2int;
+		var XisInt = 1
+		if (!isNumber(data[1][0])){
+			var lx = data[1][0].split(/[- :]/).length;
+			if (lx >= 6) {
+				parseX = time2int;
+				XisInt = 0;
+			}
+			else if (lx >= 3){
+				parseX = date2int;
+				XisInt = 0;
+			}
+			else if (lx >= 2){
+				parseX = month2int;
+				XisInt = 0;
+			}
+			
+		}
+		
+	
+	    for (i=1; i < data.length; i++) {
+	        var row = data[i];
+
+			var d = parseX(row[0]);
+
+	        for (j=1; j < row.length; j++) {
+	            if (row[j] != '') {
+	            	if (annotate && j == row.length-1)
+	                	currData[j-1].push({ x: d, y: row[j] });
+	                else
+	                	currData[j-1].push({ x: d, y: +row[j] });
+	        	}
+	       }
+	        
+	    }
+	    
+	    var series = []
+	    for (j=0; j < names.length; j++) {
+		    series.push({
+				color: palette.color(),
+				data: currData[j],
+				name: names[j]
+			})
+	    }
+	    
+	    var graph = new Rickshaw.Graph( {
+			element: document.getElementById("svg-box"),
+			width: 840,
+			height: 500,
+			renderer: 'line',
+			stroke: true,
+			preserve: true,
+			series: series
+		} );
+	    
+			    
+			    
+		graph.render();
+		
+		var slider = new Rickshaw.Graph.RangeSlider( {
+			graph: graph,
+			element: $('#slider')
+		} );
+		
+		
+		
+		var annotator = new Rickshaw.Graph.Annotate( {
+			graph: graph,
+			element: document.getElementById('timeline')
+		} );
+		
+		var legend = new Rickshaw.Graph.Legend( {
+			graph: graph,
+			element: document.getElementById('legend')
+		
+		} );
+		
+		var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+			graph: graph,
+			legend: legend
+		} );
+		
+		var order = new Rickshaw.Graph.Behavior.Series.Order( {
+			graph: graph,
+			legend: legend
+		} );
+		
+		var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight( {
+			graph: graph,
+			legend: legend
+		} );
+		
+		var smoother = new Rickshaw.Graph.Smoother( {
+			graph: graph,
+			element: $('#smoother')
+		} );
+		
+		var ticksTreatment = 'glow';
+		
+		if (XisInt) {
+			var xAxis = new Rickshaw.Graph.Axis.X( {
+				graph: graph,
+				ticksTreatment: ticksTreatment,
+				tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+			});
+			var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+				graph: graph,
+				xFormatter: function(x) {
+					return x;
+				}
+				} );
+		}
+		else {
+			var xAxis = new Rickshaw.Graph.Axis.Time( {
+				graph: graph,
+				ticksTreatment: ticksTreatment,
+				timeFixture: new Rickshaw.Fixtures.Time.Local()
+			});
+			
+			var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+				graph: graph,
+				xFormatter: function(x) {
+					return new Date(x * 1000).toString();
+				}
+			} );
+				
+		}
+		
+		xAxis.render();
+		
+		var yAxis = new Rickshaw.Graph.Axis.Y( {
+			graph: graph,
+			tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+			ticksTreatment: ticksTreatment
+		} );
+		
+		yAxis.render();
+		
+		
+		var controls = new RenderControls( {
+			element: document.getElementById('side_panel'),
+			graph: graph
+		} );
+		
+	    
+	    if (annotate) {
+	    	var at = currData[currData.length-1];
+	    	for (var i = 0; i < at.length; i++) {
+	    		annotator.add(at[i].x, at[i].y);
+	    	}
+	    	graph.update();
+	    }
+	    
+	});  
+
+</script>
+{% endblock %}

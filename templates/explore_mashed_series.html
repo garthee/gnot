@@ -1,0 +1,271 @@
+{% extends "layout.html" %}
+{% block title %}Mashed Series{% endblock %}
+{% block body %}
+
+<script type="text/javascript" src="static/js/jquery-1.10.2.min.js"></script>
+<style>
+#side-container{
+	width:110px;
+}
+
+aside {
+  font-size: small;
+  position: absolute;
+  width: 180px;
+  	left:-50px;
+	-moz-box-shadow: 0 0 30px 5px #999;
+	-webkit-box-shadow: 0 0 30px 5px #999;
+	border: 0px;
+	margin-left: 145px;
+	margin-top: 120px;
+}
+
+aside p{
+ padding:10px;
+}
+
+
+#blur p.gold_mark{
+	background: #B59D47;
+	padding:5px;
+	margin:0px;
+}
+
+#blurb h2{
+	background: #4682B4;
+	padding:5px;	
+	margin:0px;
+	text-align:center;
+}
+#blurb p{
+	background: #B1DCFE;
+	padding:10px;
+	margin:0px;
+}
+#content {
+    width: 925px;
+    margin: 0 auto;
+}
+
+#vis {
+    min-height: 550px;
+}
+#blurb {
+
+}
+#blurb .h2{
+	margin:2px;
+}
+
+path {
+    stroke: #bbb;
+    stroke-width: 1.1;
+	fill: none;
+}
+
+path.current, path.highlight.current {
+    stroke: #000;
+    stroke-width: 1.7;
+}
+
+line {
+    stroke: black;
+}
+
+
+.axis {
+    stroke-width: 0.8;
+    stroke: #000;
+}
+.xTicks, .yTicks {
+    stroke-width: 0.6;
+    stroke: #000;
+}
+
+
+</style>
+
+
+
+
+<h1>Explore Mashed Series</h1>
+<div id="container">
+	
+<div id="main-container" style="width:840px;">
+	<aside id="blurb" class="float">
+	<div >
+        <div id="blurb-content">
+        	<h2>Field</h2><p>Trend over time.</p>
+        </div>
+    </div>
+</aside>
+<div id="svg-box"></div>
+</div>
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-1"  >
+	<p>Similar to flat series, but plot multi-dimensional time series as string of lines.
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+
+<script>
+
+limit = typeof limit !== 'undefined' ? limit : 100;
+var temp = d3.select("svg").remove();
+
+ 
+var w = 840,
+	h = 550,
+	margin = 25;
+
+var startEnd = {}, dataCodes = {};
+    
+d3.text('{{datfile}}', 'text/csv', function(text) {
+    var data = d3.csv.parseRows(text);
+    
+    var years = data[0].slice(1, data[0].length),
+    endAge = d3.max(data.slice(1, data.length), function(array) {return d3.max(array.slice(1, array.length), function(d){return +d;});}),
+	startAge= +d3.min(data.slice(1, data.length), function(array) {return d3.min(array.slice(1, array.length), function(d){return +d;});}),
+	startYear = +years[0],
+	endYear =  +years[years.length-1]+1,
+	x = d3.scale.linear().domain([startYear, endYear]).range([0 + margin -5, w-margin]),
+	y = d3.scale.linear().domain([endAge, startAge]).range([0 + margin, h - margin]);
+	
+	var vis = d3.select("#svg-box")
+	    .append("svg:svg")
+	    .attr("width", w)
+	    .attr("height", h)
+	    .append("svg:g")
+	    // .attr("transform", "translate(0, 600)");
+	
+				
+	var line = d3.svg.line()
+	    .x(function(d,i) { return x(d.x); })
+	    .y(function(d) { return y(d.y); });
+        
+    for (i=1; i < data.length; i++) {
+        var values = data[i].slice(1, data[i].length);
+        var currData = [];
+        dataCodes[data[i][0]] = data[i][0];
+        
+        var started = false;
+        for (j=0; j < values.length; j++) {
+            if (values[j] != '') {
+                currData.push({ x: +years[j], y: +values[j] });
+            
+                if (!started) {
+                    startEnd[data[i][0]] = { 'startYear': +years[j], 'startVal': +values[j] };
+                    started = true;
+                } else if (j == values.length-1) {
+                    startEnd[data[i][0]]['endYear'] = +years[j];
+                    startEnd[data[i][0]]['endVal'] = +values[j];
+                }
+                
+            }
+        }
+        vis.append("svg:path")
+            .data([currData])
+            .attr("datum", data[i][0])
+            .attr("d", line)
+            .on("mouseover", onmouseover)
+            .on("mouseout", onmouseout);
+    }
+    
+    
+    vis.append("svg:line")
+	    .attr("x1", x(startYear))
+	    .attr("y1", y(startAge))
+	    .attr("x2", x(endYear))
+	    .attr("y2", y(startAge))
+	    .attr("class", "axis")
+	
+	vis.append("svg:line")
+	    .attr("x1", x(startYear))
+	    .attr("y1", y(startAge))
+	    .attr("x2", x(startYear))
+	    .attr("y2", y(endAge))
+	    .attr("class", "axis")
+				
+	vis.selectAll(".xLabel")
+	    .data(x.ticks(10))
+	    .enter().append("svg:text")
+	    .attr("class", "xLabel")
+	    .text(String)
+	    .attr("x", function(d) { return x(d) })
+	    .attr("y", h-10)
+	    .attr("text-anchor", "middle")
+	
+	vis.selectAll(".yLabel")
+	    .data(y.ticks(10))
+	    .enter().append("svg:text")
+	    .attr("class", "yLabel")
+	    .text(String)
+		.attr("x", 0)
+		.attr("y", function(d) { return y(d) })
+		.attr("text-anchor", "right")
+		.attr("dy", 3)
+				
+	vis.selectAll(".xTicks")
+	    .data(x.ticks(10))
+	    .enter().append("svg:line")
+	    .attr("class", "xTicks")
+	    .attr("x1", function(d) { return x(d); })
+	    .attr("y1", y(startAge))
+	    .attr("x2", function(d) { return x(d); })
+	    .attr("y2", y(startAge)+7)
+		
+	vis.selectAll(".yTicks")
+	    .data(y.ticks(10))
+	    .enter().append("svg:line")
+	    .attr("class", "yTicks")
+	    .attr("y1", function(d) { return y(d); })
+	    .attr("x1", x(startYear-0.5))
+	    .attr("y2", function(d) { return y(d); })
+	    .attr("x2", x(startYear))
+});  
+    
+
+
+function onclick(d, i) {
+    var currClass = d3.select(this).attr("class");
+    if (d3.select(this).classed('selected')) {
+        d3.select(this).attr("class", currClass.substring(0, currClass.length-9));
+    } else {
+        d3.select(this).classed('selected', true);
+    }
+}
+
+function onmouseover(d, i) {
+    var currClass = d3.select(this).attr("class");
+    d3.select(this)
+        .attr("class", currClass + " current");
+    
+    var dataCode = $(this).attr("datum");
+    var countryVals = startEnd[dataCode];
+    var percentChange = 100 * (countryVals['endVal'] - countryVals['startVal']) / countryVals['startVal'];
+    
+    var blurb = '<h2>' + dataCodes[dataCode] + '</h2>';
+    blurb += "<p>On average: a average count of " + Math.round(countryVals['startVal']) + " times in " + countryVals['startYear'] + " and " + Math.round(countryVals['endVal']) + " times in " + countryVals['endYear'] + ", ";
+    if (percentChange >= 0) {
+        blurb += "an increase of " + Math.round(percentChange) + " percent."
+    } else {
+        blurb += "a decrease of " + -1 * Math.round(percentChange) + " percent."
+    }
+    blurb += "</p>";
+    
+    $("#blurb-content").html(blurb);
+    $("#blurb").fadeIn();
+}
+function onmouseout(d, i) {
+    var currClass = d3.select(this).attr("class");
+    var prevClass = currClass.substring(0, currClass.length-8);
+    d3.select(this).attr("class", prevClass);
+    $("#blurb").fadeOut('slow');
+}
+</script>
+
+{% endblock %}

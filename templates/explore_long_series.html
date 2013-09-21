@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+{% block title %}Time Series{% endblock %}
+{% block body %}
+
+<script type="text/javascript" src="static/js/dygraph-combined.js"></script>
+<script type="text/javascript" src="static/js/jquery-1.10.2.min.js"></script>
+
+<style>
+	#side-container {
+		width:110px;
+	}
+	
+</style>
+
+<h1>Explore Time Series</h1>
+<div id="container">
+<script src="/static/js/dependencies.js"></script>
+	<script src="/static/js/visualsearch.js"></script>
+<div id="annottation">
+	<form id="form_annottate" name="module_tables" action="" method="get" target="_selfs">
+    <div id="annottate_box_container"></div>
+    <input id="form-annottate-submit" class="submit-button" type="submit" value="submit" name="submit" tabindex="12">
+    <div id="annottate_query">&nbsp;</div>
+	</form>
+</div>
+
+<div id="main-container" style="width:950px;"><div id="svg-box"></div></div>
+
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-1"  >
+	<p>Time series with zoom-in feature. Use the controls zoom and pan. Hover over to see the point value.</p> 
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+	
+<script>
+	
+	jQuery.noConflict();
+	(function( $ ) {
+
+
+	var g = new Dygraph(document.getElementById("svg-box"), "{{datfile}}", {
+		legend: 'always',
+		showRoller: true,
+		rollPeriod: 14,
+		width:940,
+		height:500,
+		labelsDivStyles: { 'textAlign': 'right' },
+		showRangeSelector: true,
+		ylabel: 'y',
+	});
+
+	$("#form_annottate").submit(function() {
+
+		d3.csv("render?query=module%3A+explore_anot+" + window.visualAnnotate.searchBox.value(),
+			 function(error, data) {
+			  var series = []
+			  data.forEach(function(d) {
+				 series.push({series: d.TargetField,
+		  					x: d.Date,
+		  					shortText: d.ShortText,
+		  					text: d.Text});
+			  });
+			  g.setAnnotations(series);
+		});		
+		return false;
+	});
+	
+	Array.prototype.diff = function(a) {
+	    return this.filter(function(i) {return !(a.indexOf(i) > -1);});
+	};
+	
+	d3.json("render?query=module%3A+explore_db", function(error, data) {
+	    window.visualAnnotate = VS.init({
+	      container  : $('#annottate_box_container'),
+	      query      : '',
+	      showFacets : true,
+	      unquotable : [
+	        'table',
+	        'reload',
+	         'start',
+	        'limit'
+	      ],
+		  placeholder : "Make your choices ... ",
+	      callbacks  : {
+	        search : function(query, searchCollection) {
+	        },
+	        valueMatches : function(category, searchTerm, callback) {
+	        	  var sq = window.visualAnnotate.searchBox.app.searchQuery.facets();
+		          switch (category) {
+					case 'table':
+						callback(data['table']);
+						break;
+					case 'TargetField':
+						var sqa = window.visualSearch.searchBox.app.searchQuery.facets();
+						var fields = [];
+						sqa.forEach(function (d) { if('field' in d) fields.push(d['field']) });
+						callback(fields);
+						break;
+					case 'Date':
+					case 'ShortText':
+					case 'Text':
+						var table = 0;
+						sq.forEach(function (d) { if('table' in d) table = d['table'] });
+						var fields = [];
+						if  (table && table in data)fields = data[table]
+						callback(fields);
+						break;
+					case 'reload':
+						callback(['0', '1']);
+		          }
+	        },
+	        facetMatches : function(callback) {
+	        	var sq = window.visualAnnotate.searchBox.app.searchQuery.facets();
+				var module = 0; sq.forEach(function (d) { if('module' in d) module = d['module']; });
+				
+				var options = ['table', 'Date', 'TargetField' , 'ShortText', 'Text', 'where', 'start', 'limit', 'reload'];
+				var uniqueOptions = ['table', 'Date', 'TargetField',  'ShortText', 'Text', 'where', 'start', 'limit', 'reload'];
+				
+				var rOptions = [];
+				for (var i=0; i<options.length; i++) {
+					if ($.inArray(options[i], uniqueOptions) >= 0) {
+						var present = 0; sq.forEach(function (d) { if(options[i] in d) present=1; });
+						if (!present) {
+							if (options[i] != 'xField' || (module && module in data && data[module]['xField']))
+								rOptions.push(options[i]);
+						}
+					}
+					else{
+						rOptions.push(options[i]);
+					}
+				}
+				callback(rOptions,{preserveOrder: true});
+	        }
+	      }
+	    });
+	  });
+	})( jQuery );
+
+</script>
+{% endblock %}

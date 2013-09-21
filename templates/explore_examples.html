@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block title %}Examples{% endblock %}
+{% block body %}
+<style>
+	
+	a {
+	  display:list-item;
+	  clear:both;
+	  margin:5px;
+	  margin-left:-10px;
+	  font-size:16px;
+	  list-style-type: square;
+	  text-rendering: optimizeLegibility;
+	  text-decoration:none;	
+	  target-name:new;
+	  target-new:tab;
+	}
+	
+	a:hover{
+		text-decoration:underline;
+	}
+	a:visited{
+	 color:#ccc;
+	}
+	
+	#main-container{
+	    font-family: 'Josefin Sans', Helvetica, sans-serif;
+		margin:50px;
+		padding-left:50px;
+		color : #aaa;
+	}
+</style>
+
+<h1>Explore Examples</h1>
+
+<div id="container" class="container">
+<div id="main-container">
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_raw+table%3A+finance.twitter_feed+field%3A+%22*%22+limit%3A+10" />
+What's in the data : Raw module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_calendar+table%3A+finance.twitter_feed+xField%3A+%22date%28to_date%28day%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22count%28*%29%22"/ >
+Counts : Calendar Module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field+table%3A+finance.twitter_feed+field%3A+%22author_id%22+limit%3A+100" />
+Distribution of authors : Field Module
+</a>
+If you want to see all
+<ul><li>Distribution of hashtags</li><li>Distribution of stocks</li></ul>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns+xField%3A+%22date%28to_date%28day%2C%27YYYYMMDD%27%29%29%22+reload%3A+1+field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2006%22" />
+AAPL returns compared to SP500 returns : Diff module
+</a>
+Visualizing long time series: do all years
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_graph+table%3A+finance.twitter_feed+field%3A+%22author_id%2Cstock%22+limit%3A+1000" />
+Who is covering what stock : Graph module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word+table%3A+finance.twitter_feed+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27%22" />
+What people are tweeting about AAPL : Word module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field_series+table%3A+finance.interday_returns+xField%3A+%22to_char%28to_date%28day%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22ticker%2Csum%28vol%29%22+where%3A+%22extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2000%22+limit%3A+10">
+What are the most traded stocks in each month in 2012 : Field Series Module
+</a>
+
+This graph is not not convenient if you want to get a high-level picture - e.g., of all stocks by year
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field_mashed_series+table%3A+finance.interday_returns+xField%3A+%22extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22ticker%2Csum%28vol%29%22">
+What are the most traded stocks in each month in 2012 : Field Mashed series Module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_series+table%3A+finance.twitter_feed+xField%3A+%22to_char%28to_date%28day%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2012%22+limit%3A+5" >
+How does it change over time : Word series module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_mashed_series+table%3A+finance.twitter_feed+xField%3A+%22extract%28month+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2012%22+reload%3A+1" >
+Again if you would like to get a high level picture : Word Mashed series module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_scatter+field%3A+%22extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29+as+year%22+field%3A+%22avg%28openprc%29%22+field%3A+%22sum%28vol%29%22+field%3A+%22ticker%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+group+by+1%2C4%22+reload%3A+1">
+Scatter plot module
+</a>
+
+Most interesting for us
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_corr+xField%3A+%22ticker%22+field%3A+%22ret%22+field%3A+%22openprc%22+field%3A+%22vol%22+field%3A+%22numtrd%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2011+and+random%28%29+%3C+0.1%22+limit%3A+100+reload%3A+1">
+Visual Classification : Corr Module
+</a>
+
+</div>
+</div>
+
+
+
+
+{% endblock %}

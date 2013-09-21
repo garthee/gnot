@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+{% block title %}Fields{% endblock %}
+{% block body %}
+
+
+<style>
+	.arc path {
+	  stroke: #fff;
+	}
+
+
+  	.pp-slider { width: 150px; float:left;  -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -o-user-select: none; user-select: none; height: 30px; }
+    .pp-slider .pp-slider-scale { background-color: #aaa; height: 1px; border-bottom: 1px solid #efefef; width: 120px; margin-top: 6px; float: left; }
+    .pp-slider .pp-slider-scale .pp-slider-button { width: 12px; border-radius: 2px; border: 1px solid #adadad; height: 16px; position: relative; top: -7px; left: 0px; background-color: #efefef; cursor: pointer; }
+    .pp-slider .pp-slider-scale .pp-slider-button .pp-slider-divies { border-left: 1px solid #adadad; border-right: 1px solid #adadad; position: relative; left: 3px; top: 3px; width: 4px; height: 10px; }
+    .pp-slider .pp-slider-scale .pp-slider-button:hover { border-color: #777; background-color: #eee;  }
+    .pp-slider .pp-slider-scale .pp-slider-tooltip { width: 24px; height: 20px; position: relative; top: -5px; left: 0px; text-align: center; font-size: 10px; color: #aaa; }
+    .pp-slider .pp-slider-min { float: left; width: 15px; color: #aaa; font-size: 10px; }
+    .pp-slider .pp-slider-max { float: left; width: 15px; color: #aaa; font-size: 10px; text-align: right; }
+    
+    
+</style>
+
+<h1>Explore Field</h1>
+<div id="container">
+<div id="main-container" style="width:800px;">
+<div id="svg-box"></div><div style="padding: 10px;"><input type="hidden" value="40" id="slider1"/></div>
+</div>
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-1"  >
+	<p>Relative frequency of field values .</p>
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+
+<script>
+var chart1 = function (limit){
+	limit = typeof limit !== 'undefined' ? limit : 100;
+	
+	var temp = d3.select("svg").remove();
+	
+	var diameter = 800,
+	    format = d3.format(",d"),
+	    color = d3.scale.category20c();
+	
+	var bubble = d3.layout.pack()
+	    .sort(null)
+	    .size([diameter, diameter])
+	    .padding(1.5);
+	
+	var svg = d3.select("#svg-box").append("svg")
+	    .attr("width", diameter)
+	    .attr("height", diameter)
+	    .attr("class", "bubble");
+	
+	d3.json("{{datfile}}", function(error, root) {
+	
+	  var node = svg.selectAll(".node")
+	      .data(bubble.nodes(classes(root))
+	      .filter(function(d) { return !d.children; }))
+	       .enter().append("g")
+	      .attr("class", "node")
+	      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	
+	  node[0] = node[0].slice(0, node[0].length*limit/100);
+	  
+	  node.append("circle")
+	      .attr("r", function(d) { return d.r; })
+	      .style("fill", function(d) { return color(d.packageName); });
+	
+		
+	  node.append("title")
+	      .text(function(d) { return d.className + " : " + format(d.value);  });
+		
+	  node.append("text")
+	      .attr("dy", ".3em")
+	      .style("text-anchor", "middle")
+	      .text(function(d) { return d.className;});
+	   
+		  
+	});
+	
+	// Returns a flattened hierarchy containing all leaf nodes under the root.
+	function classes(root) {
+	  var classes = [];
+	
+	  function recurse(name, node) {
+	    if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
+	    else classes.push({packageName: name, className: node.name, value: node.size});
+	  }
+	
+	  recurse(null, root);
+	  return {children: classes};
+	}
+	
+	d3.select(self.frameElement).style("height", diameter + "px");
+
+
+};
+chart1();
+(function ($) {
+
+    var PPSliderClass = function (el, opts) {
+        var element = $(el);
+        var options = opts;
+        var isMouseDown = false;
+        var currentVal = 100;
+		
+        element.wrap('<div/>')
+        var container = $(el).parent();
+
+        container.addClass('pp-slider');
+        container.addClass('clearfix');
+
+        container.append('<div class="pp-slider-min">-</div><div class="pp-slider-scale"><div class="pp-slider-button"><div class="pp-slider-divies"></div></div><div class="pp-slider-tooltip"></div></div><div class="pp-slider-max">+</div>');
+        
+        if (typeof(options) != 'undefined' && typeof(options.hideTooltip) != 'undefined' && options.hideTooltip == true)
+        {
+          container.find('.pp-slider-tooltip').hide();
+        }
+
+        if (typeof(options.width) != 'undefined')
+        {
+          container.css('width',(options.width+'px'));
+        }
+        container.find('.pp-slider-scale').css('width',(container.width()-30)+'px');
+
+        var startSlide = function (e) {            
+          
+          isMouseDown = true;
+          var pos = getMousePosition(e);
+          startMouseX = pos.x;
+          
+          lastElemLeft = ($(this).offset().left - $(this).parent().offset().left);
+          updatePosition(e);
+
+          return false;
+        };
+        
+        var getMousePosition = function (e) {
+          //container.animate({ scrollTop: rowHeight }, options.scrollSpeed, 'linear', ScrollComplete());
+          var posx = 0;
+          var posy = 0;
+
+          if (!e) var e = window.event;
+
+          if (e.pageX || e.pageY) {
+            posx = e.pageX;
+            posy = e.pageY;
+          }
+          else if (e.clientX || e.clientY) {
+            posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+            posy = e.clientY + document.body.scrollTop  + document.documentElement.scrollTop;
+          }
+
+          return { 'x': posx, 'y': posy };
+        };
+
+        var updatePosition = function (e) {
+          var pos = getMousePosition(e);
+
+          var spanX = (pos.x - startMouseX);
+
+          var newPos = (lastElemLeft + spanX)
+          var upperBound = (container.find('.pp-slider-scale').width()-container.find('.pp-slider-button').width());
+          newPos = Math.max(0,newPos);
+          newPos = Math.min(newPos,upperBound);
+          currentVal = Math.round((newPos/upperBound)*100,0);
+
+          container.find('.pp-slider-button').css("left", newPos);
+          container.find('.pp-slider-tooltip').html(currentVal+'%');
+          container.find('.pp-slider-tooltip').css('left', newPos-6);
+        };
+
+        var moving = function (e) {
+          if(isMouseDown){
+            updatePosition(e);
+            return false;
+          }
+        };
+        
+        var initPosition = function() {
+        	var upperBound = (container.find('.pp-slider-scale').width()-container.find('.pp-slider-button').width());
+        	var newPos = currentVal*upperBound/100;
+        	container.find('.pp-slider-button').css("left", newPos);
+          	container.find('.pp-slider-tooltip').html(currentVal+'%');
+          	container.find('.pp-slider-tooltip').css('left', newPos-6);
+          	chart1(currentVal);
+        };
+
+        var dropCallback = function (e) {
+          isMouseDown = false;
+          element.val(currentVal);
+		  chart1(currentVal);
+        };
+
+        container.find('.pp-slider-button').bind('mousedown',startSlide);
+
+        $(document).mousemove(function(e) { moving(e); });
+        $(document).mouseup(function(e){ dropCallback(e); });
+        
+        initPosition();
+        
+    };
+
+    /*******************************************************************************************************/
+
+    $.fn.PPSlider = function (options) {
+        var opts = $.extend({}, $.fn.PPSlider.defaults, options);
+
+        return this.each(function () {
+            new PPSliderClass($(this), opts);
+        });
+    }
+
+    $.fn.PPSlider.defaults = {
+        width: 150
+    };
+
+
+})(jQuery);
+
+
+$("#slider1").PPSlider({width: 750});
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block title %}Graph{% endblock %}
+{% block body %}
+
+<style>
+line {
+  stroke: #000;
+}
+ 
+.node {
+  stroke: #fff;
+}
+</style>
+
+<h1>Explore Graph</h1>
+<div id="container">
+	
+<div id="main-container" style="width:800px;"><div id="svg-box"></div></div>
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-1"  >
+	<p>Use the pointer to select a node.</p> 
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+
+<script>
+	
+	var width = 800,
+	    height = 800,
+		r = 6;
+	var color = d3.scale.category20();
+	
+	var force = d3.layout.force()
+	    .charge(-25)
+	    .linkDistance(100)
+	    .size([width, height]);
+	
+	var svg = d3.select("#svg-box").append("svg")
+	    .attr("width", width)
+	    .attr("height", height);
+	
+	d3.csv("{{ datfile }}", function(error, links) {
+	
+		  var nodesByName = {};
+	 
+		  // Create nodes for each unique source and target.
+		  links.forEach(function(link) {
+		    link.source = nodeByName(link.source, 0);
+		    link.target = nodeByName(link.target, 1);
+		  });
+		  
+		  var max_link = d3.max(links, function(d){return +d.value;});
+	 
+		  // Extract the array of nodes from the map by name.
+		  var nodes = d3.values(nodesByName);
+	 
+		  // Create the link lines.
+		  var link = svg.selectAll(".link")
+		      .data(links)
+		      .enter().append("line")
+		      .attr("class", "link")
+		      .style("stroke-width", function(d) { return +d.value/max_link; });
+	      link.append("svg:title")
+		      .text(function(d) { return d.value; });
+		
+		  force
+		      .nodes(nodes)
+		      .links(links)
+	      	  .start();
+		  
+		  var node = svg.selectAll(".node")
+		      .data(nodes)
+		      .enter().append("circle")
+		      .attr("class", "node")
+			  .attr("class", "clickable")
+		      .attr("r", r-.75)
+		      .call(force.drag)
+		      .style("fill", function(d) { return color(d.group); });
+	
+		  node.append("svg:title")
+		      .text(function(d) { return d.name; });
+		  
+		  force.on("tick", function() {
+		    link.attr("x1", function(d) { return d.source.x; })
+		        .attr("y1", function(d) { return d.source.y; })
+		        .attr("x2", function(d) { return d.target.x; })
+		        .attr("y2", function(d) { return d.target.y; });
+		
+			node.attr("cx", function(d) { return d.x = Math.max(r, Math.min(width - r, d.x)); })
+				.attr("cy", function(d) { return d.y = Math.max(r, Math.min(height - r, d.y)); });
+		
+		  });
+	  
+		  function nodeByName(name, group) {
+		    return nodesByName[name] || (nodesByName[name] = {name: name, group:group});
+		  }
+		  
+	});
+
+</script>
+
+{% endblock %}

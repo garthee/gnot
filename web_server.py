@@ -1,0 +1,131 @@
+#!/usr/bin/python
+
+# libraries from werkzeug
+from werkzeug.wrappers import Request, Response
+from werkzeug.routing import Map, Rule
+from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.wsgi import SharedDataMiddleware
+from jinja2 import Environment, FileSystemLoader, Markup
+
+import json, urlparse
+import sys, os, inspect, re
+from collections import defaultdict
+
+isProduction = False
+
+def get_hostname(url):
+	return urlparse.urlparse(url).netloc
+
+# our webserver implementation
+class Visulizer(object):
+
+	def __init__(self):
+
+		template_path = os.path.join(os.path.dirname(__file__), 'templates')
+		self.jinja_env = Environment(loader=FileSystemLoader(template_path),  autoescape=True)
+		self.jinja_env.filters['hostname'] = get_hostname
+
+		self.url_map = Map([
+			Rule('/', endpoint='home'),
+			Rule('/headless', endpoint='render'),
+			Rule('/render', endpoint='render')
+		])
+		
+		self.config = json.loads(open(os.path.realpath(os.path.expanduser('~/.gnot_config')), 'r').read())
+
+		# add modules directory to search path
+		cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0], "modules")))
+		if cmd_subfolder not in sys.path:
+			sys.path.insert(0, cmd_subfolder)
+
+	def _parse_query(self, request):
+		query = request.args.get('query', '')
+		#matches = re.findall(r'([^:]+):\s(?=[^\s]+)', query)
+		reg = r'\s*([^:]+):\s+((?=\")\"[^\"]+\"|[^\s]+)'
+		matches = re.findall(reg, query)
+		
+		if not isProduction : print matches
+		
+		entries = defaultdict(list)
+		for (key, value) in matches:
+			if value or len(value) > 0:
+				entries[key].append(value.encode('ascii', 'ignore').strip('"'))
+				
+		if type(entries['view'] == 'str') and len(entries['view']) > 0:
+			schema = self.config.get('db_schema', '')
+			if len(schema) > 0 : schema += '.'
+			entries['table'] = [schema+'custom_view']
+			
+		r = {}
+		for (key, value) in entries.iteritems():
+			r[key] = ','.join(value)
+		
+		request.args = r
+		return entries['module'][0]
+	
+	def on_render(self, request, headLess = False):
+
+		module_name = self._parse_query(request)
+		try:
+			info = {}
+			renderer = __import__(module_name)
+			result = renderer.render(self, request, info)
+			
+			if result: # some modules might generate their own outputs
+				return result
+			else:
+				return self.render_template('%s.html'%(module_name), **info)
+			
+		except ImportError, e:
+			print "module not found %s"%e
+			raise NotFound()
+
+	# home window
+	def on_home(self, request):
+		return self.render_template('index.html')
+		
+	# following are standard werkzeug methods	
+	def error_404(self, error = None):
+		response = self.render_template('404.html')
+		response.status_code = 404
+		return response
+
+	def render_template(self, template_name, **context):
+		t = self.jinja_env.get_template(template_name)
+		return Response(t.render(context), mimetype='text/html')
+
+	def dispatch_request(self, request):
+		adapter = self.url_map.bind_to_environ(request.environ)
+		try:
+			endpoint, values = adapter.match()
+			return getattr(self, 'on_' + endpoint)(request, **values)
+		except NotFound as e:
+			return self.error_404(e)
+		except HTTPException, e:
+			return e
+
+	def wsgi_app(self, environ, start_response):
+		request = Request(environ)
+		response = self.dispatch_request(request)
+		return response(environ, start_response)
+
+	def __call__(self, environ, start_response):
+		return self.wsgi_app(environ, start_response)
+
+
+def create_app():
+	app = Visulizer()
+	
+	# set up static paths with direct access
+	app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+		'/static':  os.path.join(os.path.dirname(__file__), 'static'),
+		'/cache':  os.path.join(os.path.dirname(__file__), 'cache'),
+	})
+	return app
+
+
+if __name__ == '__main__':
+	from werkzeug.serving import run_simple
+	# disable debugger if put in operation
+	app = create_app()
+	run_simple(app.config['web_host'], app.config['web_port'], app, use_debugger=True, use_reloader=True, threaded=True)

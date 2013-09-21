@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block title %}Raw{% endblock %}
+{% block body %}
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+<script src="/static/js/jquery-1.10.2.min.js"></script>
+
+<style>
+.db-row{
+	margin:10px;
+	display:block;
+	font-family: "Roboto",Arial,sans-serif;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 2.1;
+	clear:both;
+	border-left: 1px solid #ddd;
+	padding-left: 3px;
+	word-wrap: break-word;
+}
+.db-row span{
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	-moz-box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+	-ms-box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+	-webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+	border:0px;
+	
+	min-height:15px;
+	min-width:15px;
+	padding:3px;
+}
+.db-entry-key{
+	color: #333333;
+	background: #a1c4fe;
+	margin:0px;
+	margin-top:5px;	
+}
+
+.db-entry-value{
+	color: #000;
+	background: #ddd;
+	margin:0px;
+	margin-top:5px;	
+	margin-right:5px;
+}
+</style>
+
+<h1>Explore Raw</h1>
+<div id="container">
+	
+<div id="main-container" style="width:800px;"><div id="svg-box"></div></div>
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-1"  >
+	<p>Raw data.</p> 
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+
+<script>
+	d3.csv("{{ datfile }}", function(error, data) {
+		  var header = d3.keys(data[0]);
+		  for (var i = 0; i<data.length; i++){
+		     var entry = '<div class="db-row">';
+		  	 for (var j = 0; j<header.length; j++) {
+		  	 	entry += '<span class="db-entry-key">' + header[j] + '</span>';
+		  	 	entry += '<span class="db-entry-value">' + data[i][header[j]] + '</span>';
+		  	 }
+		  	 entry += '</div>';
+		  	 $('#svg-box').append(entry);
+		  }
+	});
+
+</script>
+
+{% endblock %}
