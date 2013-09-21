@@ -1,7 +1,3 @@
 .pydevproject
 .project
-<<<<<<< HEAD
 cache/*.csv
-=======
-cache/*
->>>>>>> eeddd3a7256aa3fdf08ca41be6dcf959728f2869
