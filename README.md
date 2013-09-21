@@ -14,4 +14,5 @@ Module Development
 ====
 1. A module consists of two files: modules/mymodule.py, templates/mymodule.html
 2. Requires an entry in modules/modules.json (with the details of the fields required and supported by mymodule)
-3. Look at a module (e.g. explore_calendar) for ideas
+3. Look at explore_calendar module for ideas. It is well commented.
+4. Make sure mymodule.html extends layout.html (as in explore_calendar.html) to follow uniform templates and load standard .js libraries automatically.
