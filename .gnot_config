@@ -1,0 +1,10 @@
+{
+"db_port":"db_port",
+"db_schema":"db_schema",
+"db_system":"psql",
+"db_host":"db_host_url", 
+"db_database":"db_db",
+ "db_user":"db_user",
+ "web_host":"host_url", 
+ "web_port": 5000
+}
