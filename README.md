@@ -1,4 +1,4 @@
-gnot
+GNoT
 ====
 
-Rapid DB Visualization
+Rapid DB Visualization by Garthee
