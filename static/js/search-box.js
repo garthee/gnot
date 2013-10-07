@@ -111,7 +111,7 @@ jQuery.noConflict();
 				var module = 0; sq.forEach(function (d) { if('module' in d) module = d['module']; });
 				
 				var options = ['module', 'table', 'field', 'where', 'start', 'limit', 'reload', 'view']; 
-				var uniqueOptions = ['module', 'table', 'field', 'where', 'start', 'limit', 'reload', 'view'];
+				var uniqueOptions = ['module', 'table', 'where', 'start', 'limit', 'reload', 'view'];
 				
 				if (module) {
 					var moduleOptions = getKeys(data['modules'][module]);

@@ -1,4 +1,6 @@
-{"explore_calendar": {"xField":{"n":1, "values": "fields"}}, 
+{"explore_examples":{},
+"explore_calendar": {"xField":{"n":1, "values": "fields"}},
+"explore_crossfilter": {"xField":{"n":1, "values": "fields"}, "groupBy":{"n":1, "values": "fields"}}, 
 "explore_corr": {"xField":{"n":1, "values": "fields"}},
 "explore_diff": {"xField":{"n":1, "values": "fields"}},
 "explore_series": {"xField":{"n":1, "values": "fields"}},
@@ -9,6 +11,7 @@
 "explore_word_mashed_series": {"xField":{"n":1, "values": "fields"}},
 "explore_raw":{},
 "explore_field":{},
+"explore_bar":{},
 "explore_graph":{},
 "explore_scatter":{},
 "explore_word":{}			
