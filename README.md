@@ -3,10 +3,15 @@ GNoT
 
 Rapid DB Visualization by Garthee
 
+Required
+===
+1. Python (preferably 2.7)
+2. werkzeug and jinja2 (available in PIP)
+3. ML SVM module also requires sklearn (available in PIP). Sklearn requires numpy and scipy.
 
 Setup
 ====
-1. Install werkzeug python library (werkzeug.pocoo.org)
+1. Install werkzeug python library (werkzeug.pocoo.org), and other required libraries.
 2. Move .gnot_config to user home directory and edit the parameters
 3. Start the webserver (python webserver.py)
 
