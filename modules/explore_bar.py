@@ -32,7 +32,7 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 	
-	field = [re.compile(r'as').split(f)[-1].strip() for f in field.split(',')]
+	field = [re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')]
 	info["fieldY"] = field[1] if len(field) > 1 else "Y"
 	field = ','.join(field)
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))

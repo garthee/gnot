@@ -44,7 +44,7 @@ def render(vis, request, info):
 	
 		#sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)
 		
-		field = [re.compile(r'as').split(f)[0].strip() for f in field.split(',')]
+		field = [re.compile(r' as ').split(f)[0].strip() for f in field.split(',')]
 		
 		sql = "select t, %s, n from ( \
 		select *,row_number() over (partition by 1,2 order by 3 desc) as rank from  \

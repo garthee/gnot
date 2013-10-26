@@ -14,5 +14,6 @@
 "explore_bar":{},
 "explore_graph":{},
 "explore_scatter":{},
-"explore_word":{}			
+"explore_word":{},
+"ml_svm_linear":{"ratio":{"n":1}, "orderBy":{"n":1, "values":"fields"}, "ratio":{"n":1}, "regularizer":{"n":1}, "pre_process":{"n":1, "values":["Z-Score","PCA", "Whitened PCA"]}}		
 }

@@ -1,71 +1,72 @@
-{% extends "layout.html" %}
-{% block title %}Correlations{% endblock %}
+{% extends "layout.html" %} {% block title %}Correlations{% endblock %}
 {% block body %}
 
 <style type="text/css">
-	
-	svg {
-	  font-size: 14px;
-	}
-	
-	.axis {
-	  shape-rendering: crispEdges;
-	}
-	
-	.axis line {
-	  stroke: #ddd;
-	  stroke-width: .5px;
-	}
-	
-	.axis path {
-	  display: none;
-	}
-	
-	rect.extent {
-	  fill: #000;
-	  fill-opacity: .125;
-	  stroke: #fff;
-	}
-	
-	rect.frame {
-	  fill: #fff;
-	  fill-opacity: .5;
-	  stroke: #aaa;
-	}
-	
-	circle {
-	  fill: #ccc;
-	  fill-opacity: .3;
-	}
-	
-	.legend circle {
-	  fill-opacity: 1;
-	}
-	
-	.legend text {
-	  font-size: 18px;
-	  font-style: oblique;
-	}
-	
-	.cell text {
-	  pointer-events: none;
-	}
+svg {
+	font-size: 12px;
+}
 
+.axis {
+	shape-rendering: crispEdges;
+}
 
+.axis line {
+	stroke: #ddd;
+	stroke-width: .5px;
+}
+
+.axis path {
+	display: none;
+}
+
+rect.extent {
+	fill: #000;
+	fill-opacity: .125;
+	stroke: #fff;
+}
+
+rect.frame {
+	fill: #fff;
+	fill-opacity: .5;
+	stroke: #aaa;
+}
+
+circle {
+	fill: #ccc;
+	fill-opacity: .3;
+}
+
+.legend circle {
+	fill-opacity: 1;
+}
+
+.legend text {
+	font-size: 18px;
+	font-style: oblique;
+}
+
+.cell text {
+	pointer-events: none;
+}
 </style>
 
 <h1>Explore Correlations</h1>
 <div id="container">
-	
-<div id="main-container" style="width:800px;"><div id="svg-box"></div></div>
-<div  id="side-container">
-<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-<div class="side-container" id="side-container-0">{{title}}</div>
-<div class="side-container" id="side-container-1"  >
-	<p>Use the pointer to select a region and see the corresponding distribution of predicates.</p> 
-</div>
-<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
-</div>
+
+	<div id="main-container" style="width: 800px;">
+		<div id="svg-box"></div>
+	</div>
+	<div id="side-container">
+		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container" id="side-container-0">{{title}}</div>
+		<div class="side-container" id="side-container-1">
+			<p>Use the pointer to select a region and see the corresponding
+				distribution of predicates.</p>
+		</div>
+		<div class="side-container" id="side-container-2">
+			Built with <a href="http://d3js.org/">d3.js</a>.
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -89,8 +90,8 @@ d3.csv("{{datfile}}", function(data) {
     var value = function(d) { return d[trait]; },
         domain = [d3.min(data, value), d3.max(data, value)],
         range = [padding / 2, size - padding / 2];
-    x[trait] = d3.scale.linear().domain(domain).range(range);
-    y[trait] = d3.scale.linear().domain(domain).range(range.reverse());
+    	x[trait] = d3.scale.linear().domain(domain).range(range);
+    	y[trait] = d3.scale.linear().domain(domain).range(range.reverse());
   });
 
   // Axes.
@@ -108,7 +109,7 @@ d3.csv("{{datfile}}", function(data) {
   var svg = d3.select("#svg-box").append("svg:svg")
       .attr("width", 800)
       .attr("height", 800)
-    .append("svg:g")
+	.append("svg:g")
       .attr("transform", "translate(40,40)");
 
   // Legend.

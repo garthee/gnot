@@ -2,14 +2,14 @@
 {% block title %}Time Series{% endblock %}
 {% block body %}
 
-	<link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
-	<link type="text/css" rel="stylesheet" href="static/css/rickshaw.min.css">
-	<link type="text/css" rel="stylesheet" href="static/css/extensions.css">
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-	<script src="static/js/rickshaw.min.js"></script>
-	<script src="static/js/extensions.js"></script>
+<link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
+<link type="text/css" rel="stylesheet" href="static/css/rickshaw.min.css">
+<link type="text/css" rel="stylesheet" href="static/css/extensions.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+<script src="static/js/rickshaw.min.js"></script>
+<script src="static/js/extensions.js"></script>
 
 <style>
     .ui-slider .ui-slider-handle {
@@ -22,7 +22,7 @@
 	}
 
 	.side-container {
-		width:240px;
+		width:220px;
 	}
 	#side-container-4{
 		background:#cbcbcb;
@@ -200,6 +200,7 @@
 			renderer: 'line',
 			stroke: true,
 			preserve: true,
+			min:'auto',
 			series: series
 		} );
 	    

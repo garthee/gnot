@@ -13,9 +13,6 @@ from collections import defaultdict
 
 isProduction = False
 
-def get_hostname(url):
-	return urlparse.urlparse(url).netloc
-
 # our webserver implementation
 class Visulizer(object):
 
@@ -23,7 +20,7 @@ class Visulizer(object):
 
 		template_path = os.path.join(os.path.dirname(__file__), 'templates')
 		self.jinja_env = Environment(loader=FileSystemLoader(template_path),  autoescape=True)
-		self.jinja_env.filters['hostname'] = get_hostname
+		self.jinja_env.filters['hostname'] = lambda x: urlparse.urlparse(x).netloc
 
 		self.url_map = Map([
 			Rule('/', endpoint='home'),
@@ -31,20 +28,50 @@ class Visulizer(object):
 			Rule('/render', endpoint='render')
 		])
 		
-		self.config = json.loads(open(os.path.realpath(os.path.expanduser('~/.gnot_config')), 'r').read())
-
+		self.loadConfig()
+		
 		# add modules directory to search path
 		cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0], "modules")))
 		if cmd_subfolder not in sys.path:
 			sys.path.insert(0, cmd_subfolder)
 
+	def loadConfig(self):
+		config = json.loads(open(os.path.realpath(os.path.expanduser('~/.gnot_config')), 'r').read())
+		
+		user = config.get('db_user', '')
+		if len(user) > 0: config["user"] = '--username %s'%user
+		
+		passwd = config.get('db_pass', '')
+		if len(passwd) > 0: config["passwd"] = '-p %s'%passwd
+		
+		host = config.get('db_host', '')
+		if len(host) > 0: config["host"] = '-h %s'%host
+		
+		port = config.get('db_port', '')
+		if len(port): config["port"] = '-p %s'%port
+		
+		schema = config.get('db_schema', '')
+		if len(schema) > 0 : schema += '.'	
+		config["schema"] = schema
+		
+		config["database"] = config.get("db_database", '')
+		
+		import subprocess
+		p = subprocess.Popen(['/bin/ps', '-o', 'comm,pid,user'],stdout=subprocess.PIPE)
+		config["uid"] = hex(hash(p.stdout.read()) & 0xffffffff) #32 bit
+		
+		config["isProduction"] = isProduction
+		
+		self.config = config
+		
+		
 	def _parse_query(self, request):
 		query = request.args.get('query', '')
 		#matches = re.findall(r'([^:]+):\s(?=[^\s]+)', query)
 		reg = r'\s*([^:]+):\s+((?=\")\"[^\"]+\"|[^\s]+)'
 		matches = re.findall(reg, query)
 		
-		if not isProduction : print matches
+		if not self.config["isProduction"] : print matches
 		
 		entries = defaultdict(list)
 		for (key, value) in matches:
@@ -59,7 +86,7 @@ class Visulizer(object):
 		r = {}
 		for (key, value) in entries.iteritems():
 			r[key] = ','.join(value)
-		
+		r['query'] = query
 		request.args = r
 		return entries['module'][0]
 	
@@ -128,4 +155,4 @@ if __name__ == '__main__':
 	from werkzeug.serving import run_simple
 	# disable debugger if put in operation
 	app = create_app()
-	run_simple(app.config['web_host'], app.config['web_port'], app, use_debugger=True, use_reloader=True, threaded=True)
+	run_simple(app.config['web_host'], app.config['web_port'], app, use_debugger=(not isProduction), use_reloader=True, threaded=True)

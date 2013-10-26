@@ -1,71 +1,73 @@
-{% extends "layout.html" %}
-{% block title %}Word Distribution{% endblock %}
-{% block body %}
+{% extends "layout.html" %} {% block title %}Word Distribution{%
+endblock %} {% block body %}
 
 <script src="static/js/d3.layout.cloud.js"></script>
 
 
 <h1>Explore Word</h1>
 <div id="container">
-<div id="main-container" style="width:800px;">
-<div id="svg-box"></div><div style="padding: 10px;"><input type="hidden" value="40" id="slider1"/></div>
-</div>
-<div  id="side-container">
-<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-<div class="side-container" id="side-container-0">{{title}}</div>
-<div class="side-container" id="side-container-1"  >
-	<p>Relative frequency of words.</p>
-</div>
-<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
-</div>
+	<div id="main-container" style="width: 800px;">
+		<div id="svg-box"></div>
+		<div style="padding: 10px;">
+			<input type="hidden" value="40" id="slider1" />
+		</div>
+	</div>
+	<div id="side-container">
+		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container" id="side-container-0">{{title}}</div>
+		<div class="side-container" id="side-container-1">
+			<p>Relative frequency of words.</p>
+		</div>
+		<div class="side-container" id="side-container-2">
+			Built with <a href="http://d3js.org/">d3.js</a>.
+		</div>
+	</div>
 </div>
 
 
 <script>
+	d3.csv("{{datfile}}", function(error, data) {
+		//var fill = d3.scale.linear().domain([0,100]).range(["#bbe", "#223"]);
+		var fill = d3.scale.linear().domain([ 0, 100 ]).range(
+				[ "#000", "#bbb" ]);
 
-d3.csv("{{datfile}}", function(error, data) {
-//	var fill = d3.scale.linear().domain([0,100]).range(["#bbe", "#223"]);
-	var fill = d3.scale.linear().domain([0,100]).range(["#000", "#bbb"]);
+		var min_size = d3.min(data, function(d) {return +d.size;});
+		var range_size = d3.max(data, function(d) {return +d.size;}) - min_size;
 
-	var min_size = d3.min(data, function(d){return +d.size;});
-	var range_size = d3.max(data, function(d){return +d.size;}) - min_size;
-	
-	var change_size = function(d){
-	  var r = ~~((d-min_size)*120/range_size)+10;
-	  return r; 
-	 };
-	 data.forEach(function(d) { d['size'] = change_size(+d['size']) });
-	
-	d3.layout.cloud().size([800, 500])
-	      .words(data)
-	      .padding(5)
-	      .rotate(function() { return ~~(Math.random() * 2) * 90; })
-	      .font("helvetica-neue")
-	      .fontSize(function(d) { return d.size; })
-	      .on("end", draw)
-	      .start();
-	
-	  function draw(words) {
-	    d3.select("#svg-box").append("svg")
-	        .attr("width", 800)
-	        .attr("height", 500)
-	       .append("g")
-	        .attr("transform", "translate(400,250)")
-	      .selectAll("text")
-	        .data(words)
-	      .enter().append("text")
-	        .style("font-size", function(d) { return d.size + "px"; })
-	        .style("font-family", "helvetica-neue")
-	        .style("fill", function(d, i) { return fill(i); })
-	        .attr("text-anchor", "middle")
-	        .attr("transform", function(d) {
-	          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-	        })
-	        .text(function(d) { return d.text; });
-	  }
-	  
-	  
-});
+		var change_size = function(d) {
+			var r = ~~((d - min_size) * 120 / range_size) + 10;
+			return r;
+		};
+		data.forEach(function(d) {d['size'] = change_size(+d['size'])});
 
+		d3.layout.cloud()
+			.size([ 800, 500 ])
+			.words(data)
+			.padding(5)
+			.rotate(function() {return ~~(Math.random() * 2) * 90;})
+			.font("helvetica-neue")
+			.fontSize(function(d) {return d.size;})
+			.on("end", draw)
+			.start();
+
+		function draw(words) {
+			d3.select("#svg-box")
+				.append("svg")
+					.attr("width", 800)
+					.attr("height", 500)
+				.append("g")
+					.attr("transform","translate(400,250)")
+				.selectAll("text")
+					.data(words)
+					.enter()
+				.append("text")
+					.style("font-size", function(d) {return d.size + "px";})
+					.style("font-family", "helvetica-neue").style("fill",function(d, i) {return fill(i);})
+					.attr("text-anchor", "middle")
+					.attr("transform",function(d) {return "translate(" + [ d.x, d.y ] + ")rotate(" + d.rotate + ")";})
+					.text(function(d) {return d.text;});
+		}
+
+	});
 </script>
 {% endblock %}

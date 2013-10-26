@@ -40,7 +40,7 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 	
-	field = [re.compile(r'as').split(f)[-1].strip() for f in field.split(',')]
+	field = [re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')]
 	divs = ['<div class="chart"><div class="title">%s<a href="javascript:reset(%d)" class="reset" style="display: none;">reset</a></div></div>'%(field[d], d) for d in range(len(field))]
 	info["fieldY"] = field[1] if len(field) > 1 else "Y"
 	field = ', '.join(field)

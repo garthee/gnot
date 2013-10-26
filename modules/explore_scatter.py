@@ -14,7 +14,7 @@ def render(vis, request, info):
 
 	
 	field = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
-	rfield = [re.compile(r'as').split(f)[-1].strip() for f in field]
+	rfield = [re.compile(r' as ').split(f)[-1].strip() for f in field]
 	if len(table) == 0 or len(field) == 0:
 		info["message"].append("Table  or field missing.")
 		info["message_class"] = "failure"

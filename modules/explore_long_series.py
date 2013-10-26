@@ -20,7 +20,7 @@ def render(vis, request, info):
 		info["message_class"] = "failure"
 	else:
 		sql = "select %s, %s from %s where %s group by 1 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)
-		field = ','.join([re.compile(r'as').split(f)[-1].strip() for f in field.split(',')])
+		field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')])
 		header = "Date,%s"%(field)
 		
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)

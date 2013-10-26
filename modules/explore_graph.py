@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from db import export_sql
 from jinja2 import Markup
 import re

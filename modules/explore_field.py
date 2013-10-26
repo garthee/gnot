@@ -49,6 +49,6 @@ def render(vis, request, info):
 		info["message_class"] = "success"
 		info["datfile"] = json_file
 	
-	field = ','.join([re.compile(r'as').split(f)[-1].strip() for f in field.split(',')])
+	field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')])
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
 	info["title"] = "%s from %s"%(field, table)		

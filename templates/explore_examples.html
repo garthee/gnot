@@ -40,7 +40,7 @@
 What's in the data : Raw module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_calendar+table%3A+finance.twitter_feed+xField%3A+%22date%28to_date%28day%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22count%28*%29%22"/ >
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_calendar+table%3A+finance.twitter_feed+xField%3A+%22date%28to_date%28date%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22count%28*%29%22"/ >
 Counts : Calendar Module
 </a>
 
@@ -50,7 +50,7 @@ Distribution of authors : Field Module
 If you want to see all
 <ul><li>Distribution of hashtags</li><li>Distribution of stocks</li></ul>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns+xField%3A+%22date%28to_date%28day%2C%27YYYYMMDD%27%29%29%22+reload%3A+1+field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2006%22" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns+xField%3A+%22date%28to_date%28date%2C%27YYYYMMDD%27%29%29%22+reload%3A+1+field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2006%22" />
 AAPL returns compared to SP500 returns : Diff module
 </a>
 Visualizing long time series: do all years
@@ -63,31 +63,39 @@ Who is covering what stock : Graph module
 What people are tweeting about AAPL : Word module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field_series+table%3A+finance.interday_returns+xField%3A+%22to_char%28to_date%28day%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22ticker%2Csum%28vol%29%22+where%3A+%22extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2000%22+limit%3A+10">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field_series+table%3A+finance.interday_returns+xField%3A+%22to_char%28to_date%28date%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22ticker%2Csum%28vol%29%22+where%3A+%22extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2000%22+limit%3A+10">
 What are the most traded stocks in each month in 2012 : Field Series Module
 </a>
 
 This graph is not not convenient if you want to get a high-level picture - e.g., of all stocks by year
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field_mashed_series+table%3A+finance.interday_returns+xField%3A+%22extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22ticker%2Csum%28vol%29%22">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field_mashed_series+table%3A+finance.interday_returns+xField%3A+%22extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22ticker%2Csum%28vol%29%22">
 What are the most traded stocks in each month in 2012 : Field Mashed series Module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_series+table%3A+finance.twitter_feed+xField%3A+%22to_char%28to_date%28day%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2012%22+limit%3A+5" >
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_series+table%3A+finance.twitter_feed+xField%3A+%22to_char%28to_date%28date%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+limit%3A+5" >
 How does it change over time : Word series module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_mashed_series+table%3A+finance.twitter_feed+xField%3A+%22extract%28month+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2012%22+reload%3A+1" >
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_mashed_series+table%3A+finance.twitter_feed+xField%3A+%22extract%28month+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+reload%3A+1" >
 Again if you would like to get a high level picture : Word Mashed series module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_scatter+field%3A+%22extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29+as+year%22+field%3A+%22avg%28openprc%29%22+field%3A+%22sum%28vol%29%22+field%3A+%22ticker%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+group+by+1%2C4%22+reload%3A+1">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_scatter+field%3A+%22extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29+as+year%22+field%3A+%22avg%28openprc%29%22+field%3A+%22sum%28vol%29%22+field%3A+%22ticker%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+group+by+1%2C4%22+reload%3A+1">
 Scatter plot module
 </a>
 
 Most interesting for us
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_corr+xField%3A+%22ticker%22+field%3A+%22ret%22+field%3A+%22openprc%22+field%3A+%22vol%22+field%3A+%22numtrd%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+and+extract%28year+from+to_date%28day%2C+%27YYYYMMDD%27%29%29%3D2011+and+random%28%29+%3C+0.1%22+limit%3A+100+reload%3A+1">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_corr+xField%3A+%22ticker%22+field%3A+%22ret%22+field%3A+%22openprc%22+field%3A+%22vol%22+field%3A+%22numtrd%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2011+and+random%28%29+%3C+0.1%22+limit%3A+100+reload%3A+1">
 Visual Classification : Corr Module
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_bar+table%3A+finance.twitter_feed2+field%3A+%22stock%2Cavg%28char_length%28text%29%29+as+average_tweet_length%22+limit%3A+25" >
+Histogram : average tweet length for few stocks
+</a>
+
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_crossfilter+table%3A+finance.twitter_feed2+xField%3A+%22stock%22+field%3A+%22date%28created_at%29+as+date%2Ccount%28*%29+as+count%2C+avg%28char_length%28text%29%29+as+lengths%22+groupBy%3A+%22stock%2Cdate%28created_at%29%22+field%3A+%22avg%28retweet_count%29%22">
+Cross filter on few twitter related features
 </a>
 
 </div>

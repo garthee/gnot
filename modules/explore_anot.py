@@ -1,3 +1,4 @@
+#!/usr/bin/python
 
 from db import export_sql
 from werkzeug.wrappers import Request, Response

@@ -42,14 +42,7 @@ aside p{
 	padding:10px;
 	margin:0px;
 }
-#content {
-    width: 925px;
-    margin: 0 auto;
-}
 
-#vis {
-    min-height: 550px;
-}
 #blurb {
 
 }
@@ -64,7 +57,7 @@ path {
 }
 
 path.current, path.highlight.current {
-    stroke: #000;
+    stroke: steelblue;
     stroke-width: 1.7;
 }
 
@@ -91,7 +84,7 @@ line {
 <h1>Explore Mashed Series</h1>
 <div id="container">
 	
-<div id="main-container" style="width:840px;">
+<div id="main-container" style="width:940px;">
 	<aside id="blurb" class="float">
 	<div >
         <div id="blurb-content">
@@ -118,9 +111,7 @@ limit = typeof limit !== 'undefined' ? limit : 100;
 var temp = d3.select("svg").remove();
 
  
-var w = 840,
-	h = 550,
-	margin = 25;
+var w = 940,h = 550,margin = 25;
 
 var startEnd = {}, dataCodes = {};
     
@@ -199,6 +190,7 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
 	    .attr("y", h-10)
 	    .attr("text-anchor", "middle")
 	
+	var format = d3.format('.2s');
 	vis.selectAll(".yLabel")
 	    .data(y.ticks(10))
 	    .enter().append("svg:text")
@@ -264,7 +256,7 @@ function onmouseout(d, i) {
     var currClass = d3.select(this).attr("class");
     var prevClass = currClass.substring(0, currClass.length-8);
     d3.select(this).attr("class", prevClass);
-    $("#blurb").fadeOut('slow');
+   // $("#blurb").fadeOut('slow');
 }
 </script>
 

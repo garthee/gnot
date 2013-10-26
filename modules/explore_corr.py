@@ -29,7 +29,7 @@ def render(vis, request, info):
 			info["message"].append("Too many fields. Only last 4 are used.")
 			field = field[-4:]
 		
-		field = ','.join([re.compile(r'as').split(f)[-1].strip() for f in field])
+		field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field])
 		header = "labels,%s"%(field)
 		
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)

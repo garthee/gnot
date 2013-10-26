@@ -1,135 +1,135 @@
-{% extends "layout.html" %}
-{% block title %}Calendar{% endblock %}
-{% block body %}
+{% extends "layout.html" %} {% block title %}Calendar{% endblock %} {%
+block body %}
 <style>
-	.day {
-	  fill: #fff;
-	  stroke: #ccc;
-	}
-	#side-container{
-		width:110px;
-	}
-	
-	.month {
-	  fill: none;
-	  stroke: #000;
-	  stroke-width: 2px;
-	}
-	
+.day {
+	fill: #fff;
+	stroke: #ccc;
+}
+
+#side-container {
+	width: 110px;
+}
+
+#main-container {
+	width: 960px;
+}
+
+.month {
+	fill: none;
+	stroke: #000;
+	stroke-width: 2px;
+}
 </style>
 
 <h1>Explore Date</h1>
 
 <div id="container" class="container">
-	<div id="main-container"><div id="svg-box"></div></div>
-	<div  id="side-container">
-		<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+	<div id="main-container">
+		<div id="svg-box"></div>
+	</div>
+	<div id="side-container">
+		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div class="side-container" id="side-container-1"  >
-			<p>Calendar week starts on Sunday and ends on Saturday. Values range from <span class="limit-values" id="val_min"></span> to <span id="val_max"></span>.</p>
-			<p>Hover over a cell to see it's value.</p> 
+		<div class="side-container" id="side-container-1">
+			<p>
+				Calendar week starts on Sunday and ends on Saturday. Values range
+				from <span class="limit-values" id="val_min"></span> to <span
+					class="limit-values" id="val_max"></span>.
+			</p>
+			<p>Hover over a cell to see it's value.</p>
 		</div>
-		<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a></div>
+		<div class="side-container" id="side-container-2">
+			Built with <a href="http://d3js.org/">d3.js</a>
+		</div>
 	</div>
 </div>
 
 
 <script>
 	// d3 based JS script that prints calendar view using the data from datfile
-	var width = 960,
-	    height = 136,
-	    cellSize = 17; // cell size
-	
-	var year = d3.time.format("%Y"),
-		day = d3.time.format("%w"),
-	    week = d3.time.format("%U"),
-	    percent = d3.format(".1%"),
-	    format = d3.time.format("%Y-%m-%d");
-	
+	var width = 960, height = 136, cellSize = 17; // cell size
 
+	var year = d3.time.format("%Y"), day = d3.time.format("%w"), week = d3.time
+			.format("%U"), percent = d3.format(".1%"), format = d3.time
+			.format("%Y-%m-%d");
 
 	d3.csv("{{datfile}}", function(error, csv) {
-	  	var data = d3.nest()
-		    .key(function(d) { return d.Date; })
-		    .rollup(function(d) { return +d[0].Field; })
-		    .map(csv);
-	    
-	    var miny = d3.min(d3.keys(data)); miny = +year(format.parse(miny));
-	   	var maxy = d3.max(d3.keys(data)); maxy = +year(format.parse(maxy));
-	   
-	   
-		var mind = d3.min(d3.values(data));
-	   	var maxd = d3.max(d3.values(data)); 
-	   
-		var svg = d3.select("#svg-box").selectAll("svg")
-		    .data(d3.range(miny, maxy +1))
-		  .enter().append("svg")
-		    .attr("width", width)
-		    .attr("height", height)
-		    .attr("class", "GnBu")
-		  .append("g")
-		    .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + (height - cellSize * 7 - 1) + ")");
-		
-		svg.append("text")
-		    .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
-		    .style("text-anchor", "middle")
-		    .text(function(d) { return d; });
-		
-		var rect = svg.selectAll(".day")
-		    .data(function(d) { return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
-		  .enter().append("rect")
-		    .attr("class", "day")
-		    .attr("width", cellSize)
-		    .attr("height", cellSize)
-		    .attr("x", function(d) { return week(d) * cellSize; })
-		    .attr("y", function(d) { return day(d) * cellSize; })
-		    .datum(format);
-		
-		rect.append("title")
-		    .text(function(d) { return d; });
-		
-		svg.selectAll(".month")
-		    .data(function(d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
-		  .enter().append("path")
-		    .attr("class", "month")
-		    .attr("d", monthPath);
-	   
-	   var theDiv = document.getElementById("val_max"); theDiv.innerHTML += maxd;
-	   var theDiv = document.getElementById("val_min"); theDiv.innerHTML += mind;
-	 	 
+		var data = d3.nest().key(function(d) {
+			return d.Date;
+		}).rollup(function(d) {
+			return +d[0].Field;
+		}).map(csv);
 
-	  var quantize = d3.scale.quantile().domain([mind, maxd]).range(d3.range(9));
-	  
-	   var color = d3.scale.quantize()
-	    .domain([mind, maxd])
-	    .range(d3.range(11).map(function(d) { return "q" + d + "-11"; }));
-	   
-	   var names = d3.scale.quantize()
-	    .domain([mind, maxd])
-	    .range(d3.range(11).map(function(d) { return "" + d ; }));
-	   
-	   
-	  rect.filter(function(d) { return d in data; })
-	      .attr("class", function(d) { return "day q" + quantize(data[d]-mind) + "-9"; })
-	    .select("title")
-	      .text(function(d) { return d + ": " + data[d]; });
-	      
+		var miny = d3.min(d3.keys(data));
+		miny = +year(format.parse(miny));
+		var maxy = d3.max(d3.keys(data));
+		maxy = +year(format.parse(maxy));
+
+		var mind = d3.min(d3.values(data));
+		var maxd = d3.max(d3.values(data));
+
+		var svg = d3.select("#svg-box").selectAll("svg").data(
+				d3.range(miny, maxy + 1)).enter().append("svg").attr("width",
+				width).attr("height", height).attr("class", "PuBu").append("g")
+				.attr(
+						"transform",
+						"translate(" + ((width - cellSize * 53) / 2) + ","
+								+ (height - cellSize * 7 - 1) + ")");
+
+		svg.append("text").attr("transform",
+				"translate(-6," + cellSize * 3.5 + ")rotate(-90)").style(
+				"text-anchor", "middle").text(function(d) {
+			return d;
+		});
+
+		var rect = svg.selectAll(".day").data(function(d) {
+			return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1));
+		}).enter().append("rect").attr("class", "day").attr("width", cellSize)
+				.attr("height", cellSize).attr("x", function(d) {
+					return week(d) * cellSize;
+				}).attr("y", function(d) {
+					return day(d) * cellSize;
+				}).datum(format);
+
+		rect.append("title").text(function(d) {
+			return d;
+		});
+
+		svg.selectAll(".month").data(function(d) {
+			return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1));
+		}).enter().append("path").attr("class", "month").attr("d", monthPath);
+
+		var theDiv = document.getElementById("val_max");
+		theDiv.innerHTML += maxd;
+		var theDiv = document.getElementById("val_min");
+		theDiv.innerHTML += mind;
+
+		//var quantize = d3.scale.quantile().domain([mind, maxd]).range(d3.range(9));
+		var names = d3.scale.quantize().domain([ mind, maxd ]).range(
+				d3.range(11).map(function(d) {
+					return "" + d;
+				}));
+
+		rect.filter(function(d) {
+			return d in data;
+		}).attr("class", function(d) {
+			return "day q" + names(data[d]) + "-9";
+		}).select("title").text(function(d) {
+			return d + ": " + data[d];
+		});
+
 	});
-	
+
 	function monthPath(t0) {
-	  var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
-	      d0 = +day(t0), w0 = +week(t0),
-	      d1 = +day(t1), w1 = +week(t1);
-	  return "M" + (w0 + 1) * cellSize + "," + d0 * cellSize
-	      + "H" + w0 * cellSize + "V" + 7 * cellSize
-	      + "H" + w1 * cellSize + "V" + (d1 + 1) * cellSize
-	      + "H" + (w1 + 1) * cellSize + "V" + 0
-	      + "H" + (w0 + 1) * cellSize + "Z";
+		var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0), d0 = +day(t0), w0 = +week(t0), d1 = +day(t1), w1 = +week(t1);
+		return "M" + (w0 + 1) * cellSize + "," + d0 * cellSize + "H" + w0
+				* cellSize + "V" + 7 * cellSize + "H" + w1 * cellSize + "V"
+				+ (d1 + 1) * cellSize + "H" + (w1 + 1) * cellSize + "V" + 0
+				+ "H" + (w0 + 1) * cellSize + "Z";
 	}
-	
+
 	d3.select(self.frameElement).style("height", "2910px");
 	d3.selectAll("svg").attr("class", "Blues");
-
 </script>
 
 {% endblock %}

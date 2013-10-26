@@ -143,7 +143,7 @@ d3.text("{{datfile}}", function(text) {
 			maxX  = Math.max(maxX, parseX(flights[i][j]));
 			minX  = Math.min(minX, parseX(flights[i][j]));
 		}
-		var dxx = Math.floor((maxX-minX)/num_bins);
+		var dxx = ((maxX-minX)/num_bins);
 		var groupint = function(d){return Math.floor(d / dxx) * dxx;}
 		
 		if (type == 3) {
@@ -158,7 +158,7 @@ d3.text("{{datfile}}", function(text) {
 			var bar = barChart()
         	.dimension(row)
         	.group(row.group(function(d) { return groupint(d); }))
-      		.x(d3.scale.linear().domain([minX, maxX]).rangeRound([0, chart_width]));
+        	.x(d3.scale.linear().domain([minX-0.1*Math.abs(minX), maxX+0.1*Math.abs(maxX)]).rangeRound([0, chart_width]))
 			charts.push(bar);
 			
 		}
