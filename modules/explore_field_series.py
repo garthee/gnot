@@ -10,7 +10,7 @@ def _array2mat(fl, flo):
 	for r in f:
 		
 		(year, word, item) = r.rstrip().split(',')
-		table[year][word] = item
+		table[num_if_is_number(year)][word] = item
 		words.add(word)
 		
 	f.close()
@@ -19,10 +19,16 @@ def _array2mat(fl, flo):
 	years = sorted(table.keys())
 	for year in years:
 		row = [table[year].get(word, '0') for word in words]
-		fo.write('%s,%s\n'%(year, ','.join(row)))
+		fo.write('%s,%s\n'%(str(year), ','.join(row)))
 	fo.close()
 	return years[0], years[-1]
 
+def num_if_is_number(s):
+	try:
+		return float(s)
+	except ValueError:
+		return s
+	
 def render(vis, request, info):
 	info["message"] = []
 	table = request.args.get("table", '')
@@ -34,6 +40,7 @@ def render(vis, request, info):
 	start = request.args.get("start", '0') # start at 0
 	xField = request.args.get("xField", '')
 	splitfield = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
+	
 	if len(table) == 0 or len(xField) == 0:
 		info["message"].append("Table or xfield missing.")
 		info["message_class"] = "failure"
@@ -67,10 +74,15 @@ def render(vis, request, info):
 		info["datfile"] = datfilen
 		
 		(startYear, endYear) = _array2mat(datfile, datfilen)
-		info["title"] = "%s from %s to %s"%(','.join(field), startYear, endYear)
+		
 
 	
+	pfield = request.args.get("pfield", [])
+	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(pfield), table)
+	info["title"] = Markup(info["title"])		
+	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
+
 	
 
 	return vis.render_template('explore_series.html', **info)

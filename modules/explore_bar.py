@@ -9,11 +9,12 @@ def render(vis, request, info):
 	table = request.args.get("table", '')
 	where = request.args.get("where", '1=1')
 	field = request.args.get("field", '')
+	
 	view = request.args.get("view", '')
 	start = request.args.get("start", '0') # start at 0
 	limit = request.args.get("limit", '100')
 	
-	if len(table) == 0 or len(field) < 2:
+	if len(table) == 0 or not field:
 		info["message"].append("table or field missing.")
 		info["message_class"] = "failure"
 	else:
@@ -32,8 +33,10 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 	
-	field = [re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')]
-	info["fieldY"] = field[1] if len(field) > 1 else "Y"
-	field = ','.join(field)
+	pfield = request.args.get("pfield", [])
+
+	info["fieldY"] = pfield[1] if len(pfield) > 1 else "Y"
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
-	info["title"] = "%s from %s"%(field, table)		
+	
+	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(', '.join(pfield), table)
+	info["title"] = Markup(info["title"])		

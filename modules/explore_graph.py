@@ -14,16 +14,25 @@ def render(vis, request, info):
 	start = request.args.get("start", '0') # start at 0
 	limit = request.args.get("limit", '1000')#1000 links max
 	
-	if len(table) == 0 or len(field) == 0:
-		info["message"].append("table or field missing.")
+	
+	source = request.args.get("source", '')
+	target = request.args.get("target", '')
+	orderBy = request.args.get("orderBy", '')
+	if orderBy and len(orderBy)>0: orderBy = ' order by %s '%orderBy
+			
+	if len(table) == 0 or not source or not target or not field:
+		info["message"].append("table, source, target, or field missing.")
 		info["message_class"] = "failure"
 	else:
 		field = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
-		(fieldA, fieldB) = field[:2]
-		sql = "select %s, %s, count(*) from (select * from %s where %s)"%(fieldA,fieldB, table, where) + \
-		 " as a where %s is not null and %s is not null group by 1,2 order by 3 desc limit %s offset %s"%(fieldA, fieldB, limit, start)
+		if not field or len(field) == 0: 
+			field = 'count(*)'
+		else:
+			field = field[0]
+		sql = "select %s, %s, %s from (select * from %s where %s %s limit %s offset %s)"%(source, target, field, table, where, orderBy, limit, start) + \
+		 " as a where %s is not null and %s is not null group by 1,2 "%(source, target)
 		
-		info["title"] = "Interactions between %s on %s in %s"%(fieldA, fieldB, table)
+		info["title"] = "Interactions between %s and %s as %s in %s"%(source, target, field, table)
 		
 		header = "source,target,value"
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)

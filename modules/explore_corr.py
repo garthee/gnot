@@ -12,25 +12,25 @@ def render(vis, request, info):
 	start = request.args.get("start", '0') # start at 0
 	limit = request.args.get("limit", '1000')
 	
-	
-	xField = request.args.get("xField", '')
-	
-	info["title"] = "%s against %s from %s"%(xField, field, table)
-	info["fieldValue"] =  xField
-	
-	if len(table) == 0 or len(field) == 0:
+	sfield = request.args.get("sfield", [])
+	pfield = request.args.get("pfield", [])
+
+	if len(table) == 0 or not field or len(sfield) < 2:
 		info["message"].append("Table  or field missing.")
 		info["message_class"] = "failure"
 	else:
-		sql = "select %s,%s from %s where %s order by 1 limit %s offset %s"%(xField,field, table, where, limit, start)
-
-		field = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
-		if len(field) > 4:
-			info["message"].append("Too many fields. Only last 4 are used.")
-			field = field[-4:]
 		
-		field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field])
-		header = "labels,%s"%(field)
+		if len(sfield) > 5:
+			info["message"].append("Too many fields. Only first 5 are used.")
+			sfield = sfield[:5]
+			pfield = pfield[:5]
+			
+		info["fieldValue"] =  pfield[0]
+		info["title"] = "FIELD_1: <em>%s</em> against <br />OTHER FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[0], ', '.join(pfield[1:]), table)
+		
+		sql = "select %s from %s where %s order by 1 limit %s offset %s"%(','.join(sfield), table, where, limit, start)
+
+		header = "labels,%s"%(','.join(pfield[1:]))
 		
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
 		if len(result) > 0:
@@ -45,6 +45,7 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 	
+	info["title"]  = Markup(info["title"])
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
 
 	

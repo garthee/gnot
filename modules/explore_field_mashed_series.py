@@ -11,19 +11,25 @@ def _array2mat(fl, flo):
 		
 		(year, word, item) = r.rstrip().split(',')
 		
-		table[year][word] = item
+		table[num_if_is_number(year)][word] = item
 		words.add(word)
 		
 	f.close()
 	fo = open(flo, 'w')
-	years = sorted(table.keys(), key=lambda y: int(y))
-	fo.write('Words,%s\n'%(','.join(years)))
+	years = sorted(table.keys())
+	fo.write('Words,%s\n'%(','.join( [str(year) for year in years])))
 	for word in words:
 		row = [table[year].get(word, '0') for year in years]
 		fo.write('%s,%s\n'%(word, ','.join(row)))
 	fo.close()
 	
 	return years[0], years[-1]
+
+def num_if_is_number(s):
+	try:
+		return float(s)
+	except ValueError:
+		return s
 
 def render(vis, request, info):
 	info["message"] = []
@@ -65,7 +71,13 @@ def render(vis, request, info):
 		info["datfile"] = datfilen
 		
 		(startYear, endYear) = _array2mat(datfile, datfilen)
-		info["title"] = "%s from %s to %s"%(field, startYear, endYear)
+		
+	
+	pfield = request.args.get("pfield", [])
+	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(pfield), table)
+	info["title"] = Markup(info["title"])		
+	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
+
 
 	return vis.render_template('explore_mashed_series.html', **info)

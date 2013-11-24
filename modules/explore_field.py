@@ -14,11 +14,17 @@ def render(vis, request, info):
 	limit = request.args.get("limit", '1000')
 	groupby = field
 	
-	if len(table) == 0 or len(field) == 0:
+	sfield = request.args.get("sfield", [])
+	pfield = request.args.get("pfield", [])
+	if len(sfield) == 1:
+		sfield.append(' count(*) ')
+		pfield.append(' count(*) ')
+	
+	if len(table) == 0 or not sfield or len(sfield) < 2:
 		info["message"].append("table or field missing.")
 		info["message_class"] = "failure"
 	else:
-		sql = "select %s, count(*) as n from %s where %s group by %s order by 2 desc limit %s offset %s"%(field, table, where, groupby, limit, start)
+		sql = "select %s, %s as n from %s where %s group by %s order by 2 desc limit %s offset %s"%(sfield[0], sfield[1], table, where, groupby, limit, start)
 
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
 		if len(result) > 0:
@@ -49,6 +55,9 @@ def render(vis, request, info):
 		info["message_class"] = "success"
 		info["datfile"] = json_file
 	
-	field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')])
+	
+	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(', '.join(pfield[:2]), table)
+	info["title"] = Markup(info["title"])		
+	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
-	info["title"] = "%s from %s"%(field, table)		
+			

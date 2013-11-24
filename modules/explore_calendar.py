@@ -15,10 +15,10 @@ def render(vis, request, info):
 	
 	#module dependent user inputs
 	xField = request.args.get("xField", '')
-	field = request.args.get("field", '')
+	field = request.args.get("field", " count(*) ")
 
 	# verify essential parameter details - smell test
-	if len(table) == 0 or len(xField) == 0:
+	if len(table) == 0 or not xField:
 		info["message"].append("Table or xField missing")
 		info["message_class"] = "failure"
 	else:
@@ -42,9 +42,11 @@ def render(vis, request, info):
 			info["datfile"] = datfile
 
 	# prepare some messages
-	field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')])
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
-	info["title"] = "%s from %s"%(field, table)
+	
+	pfield = request.args.get("pfield", [])
+	info["title"] = "FIELDS: <em>%s</em> along <br />xFIELD: <em>%s</em> from <br />TABLE: <em>%s</em>"%(', '.join(pfield), xField, table)
+	info["title"] = Markup(info["title"])		
 	
 	# format the message to encode HTML characters
 	info['query']= Markup(request.args.get('query', ''))

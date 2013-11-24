@@ -129,12 +129,12 @@ d3.csv("{{datfile}}", function(data) {
       .text(function(d) { return "{{fieldValue}} " + d; });
 
   // X-axis.
-  svg.selectAll("g.x.axis")
-      .data(traits)
-    .enter().append("svg:g")
-      .attr("class", "x axis")
-      .attr("transform", function(d, i) { return "translate(" + i * size + ",0)"; })
-      .each(function(d) { d3.select(this).call(axis.scale(x[d]).orient("bottom")); });
+  //svg.selectAll("g.x.axis")
+  //    .data(traits)
+  //  .enter().append("svg:g")
+  //    .attr("class", "x axis")
+  //    .attr("transform", function(d, i) { return "translate(" + i * size + ",0)"; })
+  //    .each(function(d) { d3.select(this).call(axis.scale(x[d]).orient("bottom")); });
 
   // Y-axis.
   svg.selectAll("g.y.axis")

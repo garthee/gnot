@@ -13,13 +13,15 @@ def render(vis, request, info):
 	limit = request.args.get("limit", '100000')
 	
 	xField = request.args.get("xField", '')
-	info["title"] = "%s from %s"%(field, table)
-	
+	groupby =  request.args.get("groupBy", '')
+	if groupby and len(groupby) > 0:
+		groupby = ' group by ' + groupby
+
 	if len(table) == 0 or len(xField) == 0 or len(field) == 0:
 		info["message"].append("Table  or field missing.")
 		info["message_class"] = "failure"
 	else:
-		sql = "select %s, %s from %s where %s group by 1 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)
+		sql = "select %s, %s from %s where %s %s order by 1 limit %s offset %s"%(xField, field, table, where, groupby, limit, start)
 		field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')])
 		header = "Date,%s"%(field)
 		
@@ -35,6 +37,10 @@ def render(vis, request, info):
 				info["message"].append("Loading from cache. Use reload=1 to reload.")
 			
 			info["datfile"] = datfile
+
+	pfield = request.args.get("pfield", [])
+	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(pfield), table)
+	info["title"] = Markup(info["title"])		
 	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
 

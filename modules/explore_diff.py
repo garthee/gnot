@@ -40,7 +40,10 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 	
-	field = [re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')]
-	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))	
-	field = 'diff of %s on %s'%(field[1], field[0])
-	info["title"] = "%s from %s"%(field, table)
+	
+	pfield = request.args.get("pfield", [])
+	info["title"] = "Diff of <br />FIELD: <em>%s</em> on <br />FIELD: <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[1], pfield[2], table)
+	info["title"] = Markup(info["title"])		
+	
+	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
+

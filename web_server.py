@@ -86,6 +86,16 @@ class Visulizer(object):
 		r = {}
 		for (key, value) in entries.iteritems():
 			r[key] = ','.join(value)
+
+		#split fields
+		sfield = re.sub(r',(?=[^"]*"(?:[^"]*"[^"]*")*[^"]*$)', '___', r.get('field', '')) # remove commas between quotation marks and replace them with _
+		sfield = re.sub(r",(?=[^']*'(?:[^']*'[^']*')*[^']*$)", '___', sfield) # remove commas between quotation marks and replace them with _
+		sfield = re.split(r',(?![^(]*\))', sfield)
+		sfield = [re.sub(r'___', ',',s) for s in sfield] #put comma's back
+		pfield = [re.compile(r' as ').split(f)[-1].strip() for f in sfield]
+		r['sfield'] = sfield
+		r['pfield'] = pfield
+		
 		r['query'] = query
 		request.args = r
 		return entries['module'][0]

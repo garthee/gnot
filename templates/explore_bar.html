@@ -33,8 +33,7 @@
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
 			<p>Relative values in bar chart .</p>
-			<span><label><input type="checkbox"> Sort
-					values</label></span>
+			<span><label><input type="checkbox"> Sort values</label></span>
 		</div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>.
@@ -67,101 +66,75 @@
 			height + margin.top + margin.bottom).append("g").attr("transform",
 			"translate(" + margin.left + "," + margin.top + ")");
 
-	d3
-			.csv(
-					"{{datfile}}",
-					function(error, data) {
-						var l = data.length;
+	d3.csv("{{datfile}}", function(error, data) {
+		var l = data.length;
 
-						data.forEach(function(d) {
-							d.frequency = +d.frequency;
-						});
+		data.forEach(function(d) {
+			d.frequency = +d.frequency;
+		});
 
-						x.domain(data.map(function(d) {
-							return d.letter;
-						}));
-						y.domain([ 0, d3.max(data, function(d) {
-							return d.frequency;
-						}) ]);
+		x.domain(data.map(function(d) {
+			return d.letter;
+		}));
+		y.domain([ 0, d3.max(data, function(d) {
+			return d.frequency;
+		}) ]);
 
-						svg
-								.append("g")
-								.attr("class", "x axis")
-								.attr("transform",
-										"translate(0," + height + ")")
-								.call(xAxis)
-								.selectAll("text")
-								.style("text-anchor", "end")
-								.attr("dx", "-.8em")
-								.attr("dy", ".15em")
-								.attr(
-										"transform",
-										function(d) {
-											return "rotate(-"
-													+ Math
-															.min(
-																	90,
-																	90 * Math
-																			.max(
-																					l - 10,
-																					1) / 50)
-													+ ")"
-										});
+		svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis)
+			.selectAll("text")
+			.style("text-anchor", "end")
+			.attr("dx", "-.8em")
+			.attr("dy", ".15em")
+			.attr("transform", function(d) {
+				return "rotate(-" + Math.min(90, 90 * Math.max(l - 10, 1) / 50)+ ")"
+			});
 
-						svg.append("g").attr("class", "y axis").call(yAxis)
-								.append("text")
-								.attr("transform", "rotate(-90)").attr("y", 6)
-								.attr("dy", ".71em")
-								.style("text-anchor", "end").text("{{fieldY}}");
+		svg.append("g").attr("class", "y axis").call(yAxis)
+			.append("text")
+			.attr("transform", "rotate(-90)").attr("y", 6)
+			.attr("dy", ".71em")
+			.style("text-anchor", "end").text("{{fieldY}}");
 
-						svg.selectAll(".bar").data(data).enter().append("rect")
-								.attr("class", "bar").attr("x", function(d) {
-									return x(d.letter);
-								}).attr("width", x.rangeBand()).attr("y",
-										function(d) {
-											return y(d.frequency);
-										}).attr("height", function(d) {
-									return height - y(d.frequency);
-								});
+		svg.selectAll(".bar").data(data).enter().append("rect")
+			.attr("class", "bar")
+			.attr("x", function(d) { return x(d.letter);})
+			.attr("width", x.rangeBand())
+			.attr("y", function(d) { return y(d.frequency);})
+			.attr("height", function(d) { return height - y(d.frequency);});
 
-						d3.select("input").on("change", change);
+		d3.select("input").on("change", change);
 
-						var sortTimeout = setTimeout(function() {
-							d3.select("input").property("checked", true).each(
-									change);
-						}, 2000);
+		var sortTimeout = setTimeout(function() {
+			d3.select("input").property("checked", true).each(change);
+		}, 2000);
 
-						function change() {
-							clearTimeout(sortTimeout);
+		function change() {
+			clearTimeout(sortTimeout);
 
-							// Copy-on-write since tweens are evaluated after a delay.
-							var x0 = x.domain(
-									data.sort(
-											this.checked ? function(a, b) {
-												return b.frequency
-														- a.frequency;
-											} : function(a, b) {
-												return d3.ascending(a.letter,
-														b.letter);
-											}).map(function(d) {
-										return d.letter;
-									})).copy();
+			// Copy-on-write since tweens are evaluated after a delay.
+			var x0 = x.domain(
+					data.sort(
+							this.checked ? function(a, b) {
+								return b.frequency - a.frequency;
+							} : function(a, b) {
+								return d3.ascending(a.letter, b.letter);
+							}).map(function(d) {
+						return d.letter;
+					})).copy();
 
-							var transition = svg.transition().duration(750), delay = function(
-									d, i) {
-								return i * 50;
-							};
+			var transition = svg.transition().duration(750), delay = function(d, i) {return i * 50;};
 
-							transition.selectAll(".bar").delay(delay).attr("x",
-									function(d) {
-										return x0(d.letter);
-									});
+			transition.selectAll(".bar").delay(delay).attr("x",function(d) {return x0(d.letter);});
 
-							transition.select(".x.axis").call(xAxis).selectAll(
-									"text").style("text-anchor", "end").attr(
-									"dx", "-.8em").attr("dy", ".15em")
-									.selectAll("g").delay(delay);
-						}
-					});
+			transition.select(".x.axis").call(xAxis)
+				.selectAll("text").style("text-anchor", "end")
+				.attr("dx", "-.8em")
+				.attr("dy", ".15em")
+				.selectAll("g").delay(delay);
+		}
+	});
 </script>
 {% endblock %}

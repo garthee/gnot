@@ -42,6 +42,16 @@
 	jQuery.noConflict();
 	(function( $ ) {
 
+	function getKeys(obj) {
+	  var name, result = [];
+	
+	  for (name in obj) {
+	    if (obj.hasOwnProperty(name)) {
+	      result[result.length] = name;
+	    }
+	  }
+	  return result;
+	}
 
 	var g = new Dygraph(document.getElementById("svg-box"), "{{datfile}}", {
 		legend: 'always',
@@ -93,7 +103,7 @@
 	        	  var sq = window.visualAnnotate.searchBox.app.searchQuery.facets();
 		          switch (category) {
 					case 'table':
-						callback(data['table']);
+						callback(getKeys(data['tables']));
 						break;
 					case 'TargetField':
 						var sqa = window.visualSearch.searchBox.app.searchQuery.facets();
@@ -107,7 +117,7 @@
 						var table = 0;
 						sq.forEach(function (d) { if('table' in d) table = d['table'] });
 						var fields = [];
-						if  (table && table in data)fields = data[table]
+						if  (table && table in data['tables']) fields = data['tables'][table]
 						callback(fields);
 						break;
 					case 'reload':

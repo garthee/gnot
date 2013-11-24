@@ -10,32 +10,34 @@ def render(vis, request, info):
 	view = request.args.get("view", '')
 	limit = request.args.get("limit", '1000')#max 5000 data points
 	start = request.args.get("start", '0') # start at 0
-	info["title"] = "%s from %s"%(field, table)
 
+	pfield = request.args.get("pfield", [])
+	sfield = request.args.get("sfield", [])
 	
 	field = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
 	rfield = [re.compile(r' as ').split(f)[-1].strip() for f in field]
-	if len(table) == 0 or len(field) == 0:
+	
+	if len(table) == 0 or not field:
 		info["message"].append("Table  or field missing.")
 		info["message_class"] = "failure"
-	elif len(field) < 2 :
+	elif len(sfield) < 2 :
 		info["message"].append("Not enough fields.")
 		info["message_class"] = "failure"
 	else:
-		if  len(field) > 4: 
-			info["message"].append("Too many fields. Only last 4 are used.")
-			field = field[-4:]
+		if  len(sfield) > 4: 
+			info["message"].append("Too many fields. Only first 4 are used.")
+			sfield = sfield[:4]
 
-		info["xlabel"] = rfield[0]
-		info["ylabel"] = rfield[1]
+		info["xlabel"] = pfield[0]
+		info["ylabel"] = pfield[1]
 		
 		# if z,c are not provided
-		field.extend(['1']*(4-len(field)))
-		info["field3"] = field[3-1]
-		info["field4"] = field[4-1]
-		field = ','.join(field)
+		sfield.extend(['1']*(4-len(sfield)))
+		pfield.extend(['1']*(4-len(sfield)))
+		info["field3"] = pfield[3-1]
+		info["field4"] = pfield[4-1]
 	
-		sql = "select %s from %s where %s order by 1 limit %s offset %s"%(field, table, where, limit, start)
+		sql = "select %s from %s where %s order by 1 limit %s offset %s"%(','.join(sfield), table, where, limit, start)
 		header = "x,y,z,c"
 		
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
@@ -51,6 +53,11 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 	
+	pfield = request.args.get("pfield", [])
+	info["title"] = "FIELD_X: <em>%s</em>, <br />FIELD_Y: <em>%s</em>, <br />FIELD_Z(size): <em>%s</em>, <br />FIELD_C(color): <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[0],pfield[1],pfield[2],pfield[3], table)
+	info["title"] = Markup(info["title"])		
+	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
+
 
 	

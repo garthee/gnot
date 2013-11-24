@@ -65,10 +65,13 @@ def render(vis, request, info):
 		
 		(startYear, endYear) = _array2mat(datfile, datfilen)
 		print (startYear, endYear)
-		info["title"] = "%s from %s to %s"%(field, startYear, endYear)
+		
 
+	pfield = request.args.get("pfield", [])
+	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(pfield), table)
+	info["title"] = Markup(info["title"])		
 	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
-	
+
 
 	return vis.render_template('explore_series.html', **info)

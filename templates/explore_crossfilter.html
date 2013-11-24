@@ -115,7 +115,11 @@ d3.text("{{datfile}}", function(text) {
 	var sr = flights[1];
   	var charts = [];
   	var flight = crossfilter(flights), all = flight.groupAll();
-  	for (j = 1; j < sr.length; j++){
+  	
+  	var flightId = flight.dimension(function(d){return d[0];});
+  	flightIds = flightId.group()
+  	
+	for (j = 1; j < sr.length; j++){
 		var parseX = str2int;
 		var type = 0; 
 		if (isNumber(sr[j])){
@@ -147,21 +151,30 @@ d3.text("{{datfile}}", function(text) {
 		var groupint = function(d){return Math.floor(d / dxx) * dxx;}
 		
 		if (type == 3) {
+			var group = row.group(function(d) { return groupint(d); });
 			 var bar = barChart()
 		        .dimension(row)
-		        .group(row.group(d3.time.day))
+		        .group(group)
 		        .round(d3.time.day.round)
-		      	.x(d3.time.scale().domain([minX, maxX]).rangeRound([0, chart_width]));
+		      	.x(d3.time.scale().domain([minX, maxX]).rangeRound([0, Math.min(group.size()*11,chart_width)]));
 			 charts.push(bar);
 		}
 		else {
+			var group = row.group(function(d) { return groupint(d); });
 			var bar = barChart()
         	.dimension(row)
-        	.group(row.group(function(d) { return groupint(d); }))
-        	.x(d3.scale.linear().domain([minX-0.1*Math.abs(minX), maxX+0.1*Math.abs(maxX)]).rangeRound([0, chart_width]))
+        	.group(group)
+        	.x(d3.scale.linear()
+        			.domain([minX-0.1*Math.abs(minX), maxX+0.1*Math.abs(maxX)])
+        			.rangeRound([0, Math.min(group.size()*11,chart_width)]))
 			charts.push(bar);
 			
 		}
+		
+		var lastFilterArray = [];
+		flights.forEach(function(d, i){
+			lastFilterArray[i] = 1;
+		});
 			
 		
   }
@@ -173,30 +186,36 @@ d3.text("{{datfile}}", function(text) {
       .data(charts)
       .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
 
-  // Render the initial lists.
-  //var list = d3.selectAll(".list")
-  //    .data([flightList]);
-
-  // Render the total.
-  d3.selectAll("#total")
-      .text(formatNumber(flight.size()));
+   // Render the total.
+  d3.selectAll("#total").text(formatNumber(flight.size()));
 
   renderAll();
 
   // Renders the specified chart or list.
-  function render(method) {
-    d3.select(this).call(method);
-  }
+  function render(method) { d3.select(this).call(method);}
 
+
+
+	
   // Whenever the brush moves, re-rendering everything.
   function renderAll() {
-    chart.each(render);
-   // list.each(render);
+	chart.each(render);
     d3.select("#active").text(formatNumber(all.value()));
+    
+    
+    var filterArray = flightIds.all();
+	filterArray.forEach(function(d, i){
+		if (d.value != lastFilterArray[i]){
+			lastFilterArray[i] = d.value;
+		}
+	})
+	
   }
 
   window.filter = function(filters) {
-    filters.forEach(function(d, i) { charts[i].filter(d); });
+    filters.forEach(function(d, i) { 
+    	charts[i].filter(d); 
+    });
     renderAll();
   };
 
