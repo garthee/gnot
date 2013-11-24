@@ -1,0 +1,857 @@
+{% extends "layout.html" %} {% block title %}SVM Results{% endblock %}
+{% block body %}
+<link href="static/css/nv.d3.css" rel="stylesheet" type="text/css">
+<link type="text/css" rel="stylesheet"
+	href="static/css/jquery.dropdown.css" />
+
+<script src="static/js/nv.d3.min.js"></script>
+<script src="static/js/crossfilter.v1.min.js"></script>
+<script src="static/js/fisheye.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/jquery.dropdown.js"></script>
+
+
+<style>
+	svg {
+		width: 800px;
+	}
+	g {
+		overflow:hidden;
+	}
+	.scatter:after {
+		content: '↓';
+		margin-left: 6px;
+		color: #08C;
+	}
+	
+	.scatter {
+		color: #08C;
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 4px;
+	}
+	
+	.scatter:hover {
+		background: #F2F2F2;
+	}
+
+	g.cat.labels {
+		text-anchor: end;
+	}
+	
+	g.labels text:hover {
+		fill: red;
+		cursor: pointer;
+	}
+
+	.bar {
+		fill: steelblue;
+		fill-opacity: .9;
+	}
+	
+	#svg-box-features .x.axis path {
+		display: none;
+	}
+	
+	.axis text {
+		font: 12px;
+	}
+
+	.axis path,.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+	
+	#svg-box-scatter svg {
+		overflow: hidden;
+		height: 500px;
+	}
+	
+	.chart {
+		width: 800px;
+		display: inline-block;
+		height: 151px;
+		margin-bottom: 20px;
+	}
+	
+	.chart div {
+		padding: 5px;
+	}
+
+	.reset {
+		padding-left: 1em;
+		font-size: smaller;
+		color: #ccc;
+	}
+	
+	.background.bar {
+		fill: #ccc;
+	}
+	
+	.foreground.bar {
+		fill: steelblue;
+	}
+	.foreground.bar.classid0 {
+		fill: rosybrown;
+	}
+	.axis path,.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+	
+
+
+	.brush rect.extent {
+		fill: steelblue;
+		fill-opacity: .125;
+	}
+	
+	.brush .resize path {
+		fill: #eee;
+		stroke: #666;
+	}
+	
+	.nvd3 .nv-axis.nv-x path.domain {
+		stroke-opacity: 0.75;
+	}
+	
+	.line {
+  		fill: none;
+  		stroke: steelblue;
+  		stroke-width: 1.5px;
+	}
+	.separator {
+  		stroke: #aaa;
+	}
+	.area {
+    	fill: lightsteelblue;
+    	stroke-width: 0;
+	}
+	
+</style>
+
+<h1>ML SVM</h1>
+<div id="container">
+	<div id="main-container" style="width: 800px;">
+		{{pca_matrix_divs}}
+		
+		<h2>Feature Weights</h2>
+		<span><label><input type="checkbox"> Sort values</label></span>
+		<div id="svg-box-features"></div>
+		
+		<h2>Area Under ROC: {{auroc_score}}</h2>
+		<div id="svg-box-auroc"></div>
+		
+		<h2>Spread Features</h2>
+		<div id="svg-box-scatter"><svg></svg></div>
+		<div>
+			Pick different fields for <span class="scatter"
+				data-dropdown="#dropdown-1" data-horizontal-offset="0"
+				data-vertical-offset="0">X-axis</span> or <span class="scatter"
+				data-dropdown="#dropdown-2" data-horizontal-offset="0"
+				data-vertical-offset="0">Y-axis</span> here.
+		</div>
+
+		<h2>Provenance</h2>
+		<div id="svg-box-provenance">{{provenance_divs}}</div>
+
+	</div>
+	<div id="side-container">
+		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container" id="side-container-0">{{title}}</div>
+		<div class="side-container" id="side-container-1">{{results}}</div>
+		<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+	</div>
+</div>
+
+
+<script>
+
+var chart_matrix = function() {
+	d3.csv("{{datfile_matrix}}", function(data) {
+		var pca_features =  get_pca_features(data);
+	  	var atts = data.map(function(d){ return d.feature;}).sort();
+	  	var cats = d3.keys(data[0]).filter(function(d) { return d != 'feature'; }).sort();
+	  	var matrix_data = get_matrix_data(pca_features, atts, cats);
+	
+		var rect_width = 16, rect_gap = 1;
+		var maxd = Math.max(d3.max(d3.max(matrix_data)), -1*d3.min(d3.min(matrix_data)));
+		var opacity = d3.scale.linear()
+			.domain([0, maxd])
+			.range([0, 1]);
+	      
+	  var grid = d3.select("#svg-pca_matrix").append("svg:svg")
+		.attr("width", 200 + atts.length*(rect_width+rect_gap))
+		.attr("height", 80 + cats.length*(rect_width+rect_gap))
+		.append("g")
+		.classed("grid", true)
+		.attr("transform", "translate(150, 60)");
+	      
+	  var rows = grid.selectAll("g")
+		.data(matrix_data)
+		.enter().append("g");
+	
+	  rows.selectAll("rect")
+		.data(function(d) {return d;})
+	    .enter().append("rect")
+		.attr("x", function(d, i, j) {return j*(rect_width+rect_gap);})
+		.attr("y", function(d, i, j) {return i*(rect_width+rect_gap);})
+		.attr("width", function(d, i, j) {return rect_width;})
+		.attr("height", function(d, i, j) {return rect_width;})
+		.style("fill", function(d){ if (d > 0){ return 'steelblue'; }else{return '#8B475D';}})
+		.style("opacity", function(d){ return Math.abs(d)/maxd; })
+		.append("svg:title")
+		.text(function(d) { return d; });
+	
+	  var att_labels = d3.select("#svg-pca_matrix svg")
+	  	.append("g")
+	  	.classed("att labels", true)
+	  	.attr("transform", "translate(162, 55)");
+	  att_labels.selectAll("text")
+		.data(atts)
+		.enter().append("text")
+		.attr("transform", function(d, i) {return "translate("+i*(rect_width+rect_gap)+", 0) rotate(270)";})
+		.text(function(d) {return d;})
+		.on("click", sortCatsByAtt);
+	
+	  var cat_labels = d3.select("#svg-pca_matrix svg")
+	  	.append("g")
+	  	.classed("cat labels", true)
+	  	.attr("transform", "translate(50, 72)");
+	  cat_labels.selectAll("text")
+		.data(cats)
+		.enter().append("text")
+		.attr("x", 95)
+		.attr("y", function(d, i) {return i*(rect_width+rect_gap);})
+		.text(function(d) {return d;})
+		.on("click", sortAttsByCat);
+	
+	  function updateGrid() {
+		var matrix_data = get_matrix_data(pca_features, atts, cats);
+	    var rows = d3.select(".grid").selectAll("g")
+			.data(matrix_data);
+	    rows.selectAll("rect")
+	        .data(function(d) {return d;})
+	        .style("fill", function(d){ if (d > 0){ return 'steelblue'; }else{return '#8B475D';}})
+			.style("opacity", function(d){ return Math.abs(d)/maxd; })
+			.select("title").text(function(d) { return d; });
+		
+	
+	    var cat_labels = d3.select(".cat.labels");
+	    cat_labels.selectAll("text")
+	        .data(cats)
+	        .text(function(d) {return d;});
+	
+	    var att_labels = d3.select(".att.labels");
+	    att_labels.selectAll("text")
+	        .data(atts)
+	        .text(function(d) {return d;});
+	  }
+	
+	  function get_pca_features(data) {
+	    var pca_features = {}; 
+	    for(var i=0; i<data.length; i++) {
+			pca_features[data[i].feature] = data[i];
+	    }
+	    return pca_features;
+	  }
+	
+	  function get_matrix_data(pca_features, atts, cats) {
+	    var data = [];
+	    for(var a=0; a<atts.length; a++) {
+	      data[a] = [];
+	      for(var c=0; c<cats.length; c++) {
+	        var freq = pca_features[atts[a]][cats[c]] === undefined? 0 : pca_features[atts[a]][cats[c]];
+	        data[a][c] = (freq === undefined) ? 0 : freq; 
+	      }
+	    }
+	    return data;
+	  }
+	
+	  function sortAttsByCat(d) {
+	    //sort atts by weight of attendence to category d and refresh
+	    atts.sort(function(a, b) {
+	      a_freq = pca_features[a][d] === undefined ? 0 : pca_features[a][d];
+	      b_freq = pca_features[b][d] === undefined ? 0 : pca_features[b][d];
+	      if(a_freq === b_freq)
+	        return a<b?-1:1;
+	      return b_freq-a_freq;
+	    });
+	    updateGrid();
+	    console.log(atts);
+	  }
+	
+	  function sortCatsByAtt(d) {
+	    //sort topics by weight of attendence by attendee d and refresh
+	    cats.sort(function(a, b) {
+	      a_freq = pca_features[d][a] === undefined ? 0 : pca_features[d][a];
+	      b_freq = pca_features[d][b] === undefined ? 0 : pca_features[d][b];
+	      if(a_freq === b_freq)
+	        return a<b?-1:1;
+	      return b_freq-a_freq;
+	    });
+	    updateGrid();
+	  }
+	});
+};
+chart_matrix();
+
+{{weights_data}}
+var chart_bar = function (){
+	var margin = {top: 20, right: 20, bottom: 80, left: 80},
+		width = 800 - margin.left - margin.right,
+		height = 300 - margin.top - margin.bottom;
+	
+	var x = d3.scale.ordinal().rangeRoundBands([0, width], .1, 1);
+	var y = d3.scale.linear().range([height, 0]);
+	
+	var xAxis = d3.svg.axis()
+		.scale(x)
+		.orient("bottom");
+	
+	var yAxis = d3.svg.axis()
+		.scale(y)
+		.orient("left");
+	
+	var svg = d3.select("#svg-box-features").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	var l = weights_data.length;
+	x.domain(weights_data.map(function(d) { return d.feature; }));
+	y.domain([Math.min(0,d3.min(weights_data, function(d) { return d.weight; })), d3.max(weights_data, function(d) { return d.weight; })]);
+
+	svg.append("g")
+  		.attr("class", "x axis")
+  		.attr("transform", "translate(0," + height + ")")
+  		.call(xAxis)
+  		.selectAll("text")
+  		.style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) {return "rotate(-" + Math.min(90, 90*Math.max(l, 1)/25) +  ")" });
+	
+	svg.append("g")
+  		.attr("class", "y axis")
+  		.call(yAxis)
+		.append("text")
+  		.attr("transform", "rotate(-90)")
+		.attr("y", 6)
+		.attr("dy", ".71em")
+		.style("text-anchor", "end")
+		.text("Feature Weights");
+
+	svg.selectAll(".bar")
+		.data(weights_data).enter().append("rect")
+		.attr("class", "bar")
+		.attr("x", function(d) { return x(d.feature); })
+		.attr("width", x.rangeBand())
+		.attr("y", function(d) { return y(Math.max(0, d.weight)); })
+		.attr("height", function(d) { return Math.abs(y(d.weight) - y(0)); });
+
+	d3.select("input").on("change", change);
+	
+	var sortTimeout = setTimeout(function() {d3.select("input").property("checked", true).each(change);}, 2000);
+	
+	function change() {
+		clearTimeout(sortTimeout);
+		
+		var x0 = x.domain(weights_data.sort(this.checked
+		    ? function(a, b) { return b.weight - a.weight; }
+		    : function(a, b) { return d3.ascending(a.feature, b.feature); })
+		    .map(function(d) { return d.feature; }))
+		    .copy();
+		
+		var transition = svg.transition().duration(750),
+		    delay = function(d, i) { return i * 50; };
+		
+		transition.selectAll(".bar")
+		    .delay(delay)
+		    .attr("x", function(d) { return x0(d.feature); });
+		
+		transition.select(".x.axis")
+			.call(xAxis)
+			.selectAll("text")
+		  	.style("text-anchor", "end")
+			.attr("dx", "-.8em")
+			.attr("dy", ".15em")
+			.selectAll("g")
+			.delay(delay);
+	}
+};
+chart_bar();
+
+var chart_auroc = function (){
+	var margin = {top: 20, right: 20, bottom: 30, left: 50},
+		width = 800 - margin.left - margin.right,
+		height = 400 - margin.top - margin.bottom;
+
+	var x = d3.scale.linear().domain([0,1]).range([0, width]);
+	var y = d3.scale.linear().domain([0,1]).range([height, 0]);
+
+	var xAxis = d3.svg.axis()
+    	.scale(x)
+    	.orient("bottom");
+
+	var yAxis = d3.svg.axis()
+    	.scale(y)
+    	.orient("left");
+
+	var area = d3.svg.area()
+    	.x(function(d) { return x(d.fpr); })
+    	.y0(height)
+    	.y1(function(d) { return y(d.tpr); });
+    	
+   	var line = d3.svg.line()
+    	.x(function(d) { return x(d.fpr); })
+    	.y(function(d) { return y(d.tpr); });
+
+	var randline = d3.svg.line()
+		.x(function(d) { return x(d.fpr); })
+		.y(function(d) { return y(d.fpr); });
+
+	var svg = d3.select("#svg-box-auroc").append("svg")
+    	.attr("width", width + margin.left + margin.right)
+    	.attr("height", height + margin.top + margin.bottom)
+  		.append("g")
+    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	d3.csv("{{datfile_auroc}}", function(error, data) {
+  		data.forEach(function(d) {
+    		d.fpr = +d.fpr;
+    		d.tpr = +d.tpr;
+  		});
+
+		svg.append("path")
+      		.datum(data)
+      		.attr("class", "area")
+      		.attr("d", area)
+      		.style("opacity", 0.3);
+
+  		svg.append("path")
+      		.datum(data)
+      		.attr("class","line")
+      		.attr("d",line);
+      		
+		svg.append("path")
+			.datum(data)
+			.attr("class","line separator")
+			.style("stroke-dasharray", ("5, 3"))
+			.attr("d",randline);
+
+  		svg.append("g")
+      		.attr("class", "x axis")
+      		.attr("transform", "translate(0," + height + ")")
+      		.call(xAxis)
+      	.append("text")
+      		.text("False Positive Rate")
+      		.attr('dx', 600)
+      		.attr('dy', -10);
+
+  		svg.append("g")
+      		.attr("class", "y axis")
+      		.call(yAxis)
+    	.append("text")
+      		.attr("transform", "rotate(-90)")
+      		.attr("y", 6)
+      		.attr("dy", ".71em")
+      		.style("text-anchor", "end")
+      		.text("True Positive Rate");
+	});
+};
+chart_auroc();
+
+
+scatter_x1_name='{{scatter_x}}'; 
+scatter_x2_name='{{scatter_y}}';
+var chart_scatter = function (){
+	 nv.addGraph(function() {
+	 	var shapes = ['square','cross', 'triangle-down', 'triangle-up',  'diamond', 'circle'],
+	 		margin = {top: 40, right: 20, bottom: 70, left: 90},
+		    width = 800,
+		    height = 500;
+		
+	 	var chart = nv.models.scatterPlusLineChart()
+	 		.showDistX(true)
+	 		.showDistY(true)
+			.width(width)
+			.height(height)
+			.margin(margin)
+	 		.color(['steelblue','#8B475D']);
+	 	
+	 	chart.scatter.onlyCircles(false);
+	 	chart.xAxis.tickFormat(d3.format('.2f')).axisLabel(scatter_x1_name)
+	 	chart.yAxis.tickFormat(d3.format('.2f')).axisLabel(scatter_x2_name)
+	   	chart.tooltipContent(function(key, xVal, yVal, e, chart) {
+	   		return '<h3>' + key + '</h3>';
+	   	});
+
+		d3.text("{{datfile_provenance}}", function(text) {
+			var data = d3.csv.parseRows(text);
+			
+			y = 2; x1  = data[0].indexOf(scatter_x1_name); x2  = data[0].indexOf(scatter_x2_name);
+			correct = []; mistake = [];
+			for (i = 1; i < data.length; i++){
+				if (+data[i][1] >= 0) 
+					correct.push({x:+data[i][x1], y:+data[i][x2], shape:shapes[Number(+data[i][y]>=0)], size:6});
+				else
+					mistake.push({x:+data[i][x1], y:+data[i][x2], shape:shapes[Number(+data[i][y]>0)], size:10});
+			}
+			
+			var x1 = 0; weights_data.forEach(function (d) { if(d.feature == scatter_x1_name) x1 = d.weight;});
+			var x2 = 0; weights_data.forEach(function (d) { if(d.feature == scatter_x2_name) x2 = d.weight;});
+			var intercept = 0; weights_data.forEach(function (d) { if(d.feature == 'intercept') intercept = d.weight;});
+			
+			var intercept = -1.0*intercept/x2;
+			var slope = -1.0*x1/x2;
+			
+			
+			scatter_data = [{key:"correct", slope:slope, intercept:intercept, values:correct},
+							{key:"mistake", slope:slope, intercept:intercept, values:mistake}]
+			d3.select('#svg-box-scatter svg')
+					.datum(scatter_data)
+					.transition().duration(500)
+					.call(chart);
+			
+		});
+		
+		chart.dispatch.on('stateChange', function(e) { ('New State:', JSON.stringify(e)); });
+		nv.utils.windowResize(chart.update);
+		return chart;
+	});
+};
+chart_scatter();
+
+var chart_crossfilter = function (){
+	var num_bins = 70;
+	var chart_width = 760;
+	d3.text("{{datfile_provenance}}", function(text) {
+		var flights = d3.csv.parseRows(text);
+		  // Various formatters.
+	  	var formatNumber = d3.format(",d");
+		var ident = function(d){return d;};
+		var str2int = function(d){return +d;};
+		var month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));};
+		var date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));};;
+	
+		function isNumber(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+		
+	
+		var sr = flights[1];
+	  	var charts = [];
+	  	var flight = crossfilter(flights), all = flight.groupAll();
+	  	for (j = 1; j < sr.length; j++){
+			var parseX = str2int;
+			var type = 0; 
+			if (isNumber(sr[j])){
+				parseX = str2int;
+				type = 1;//int
+			}
+			else {
+				var lx = sr[j].split(/[- :]/).length;
+				if (lx >= 3){
+					parseX = date2int;
+					type = 3; // date
+				}
+				else if (lx >= 2){
+					parseX = month2int;
+					type = 3; // date
+				}
+				else{
+					parseX = ident;
+				}
+			}
+			var row = flight.dimension(function(d) { return parseX(d[j]); });
+			
+			var maxX = parseX(sr[j]), minX = parseX(sr[j]);
+			for (i = 1; i < flights.length; i++){
+				maxX  = Math.max(maxX, parseX(flights[i][j]));
+				minX  = Math.min(minX, parseX(flights[i][j]));
+			}
+			var dxx = ((maxX-minX)/num_bins);
+			var groupint = function(d){return Math.floor(d / dxx) * dxx;}
+			
+			if (type == 3) {
+				 var bar = barChart()
+			        .dimension(row)
+			        .group(row.group(d3.time.day))
+			        .round(d3.time.day.round)
+			      	.x(d3.time.scale().domain([minX, maxX]).rangeRound([0, chart_width]));
+				 charts.push(bar);
+			}
+			else {
+				var bar = barChart()
+	        	.dimension(row)
+	        	.group(row.group(function(d) { return groupint(d); }))
+	      		.x(d3.scale.linear().domain([minX-0.1*Math.abs(minX), maxX+0.1*Math.abs(maxX)]).rangeRound([0, chart_width]));
+				charts.push(bar);
+				
+			}
+				
+			
+	  }
+	
+	  // Given our array of charts, which we assume are in the same order as the
+	  // .chart elements in the DOM, bind the charts to the DOM and render them.
+	  // We also listen to the chart's brush events to update the display.
+	  var chart = d3.selectAll(".chart")
+	      .data(charts)
+	      .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
+	
+	  // Render the initial lists.
+	  //var list = d3.selectAll(".list")
+	  //    .data([flightList]);
+	
+	  // Render the total.
+	  d3.selectAll("#total")
+	      .text(formatNumber(flight.size()));
+	
+	  renderAll();
+	
+	  // Renders the specified chart or list.
+	  function render(method) {
+	    d3.select(this).call(method);
+	  }
+	
+	  // Whenever the brush moves, re-rendering everything.
+	  function renderAll() {
+	    chart.each(render);
+	   // list.each(render);
+	    d3.select("#active").text(formatNumber(all.value()));
+	  }
+	
+	  window.filter = function(filters) {
+	    filters.forEach(function(d, i) { charts[i].filter(d); });
+	    renderAll();
+	  };
+	
+	  window.reset = function(i) {
+	    charts[i].filter(null);
+	    renderAll();
+	  };
+	
+	 
+	  function barChart() {
+	    if (!barChart.id) barChart.id = 0;
+	
+	    var margin = {top: 10, right: 10, bottom: 20, left: 10},
+	        x,
+	        y = d3.scale.linear().range([100, 0]),
+	        id = barChart.id++,
+	        axis = d3.svg.axis().orient("bottom"),
+	        brush = d3.svg.brush(),
+	        brushDirty,
+	        dimension,
+	        group,
+	        round;
+	
+	    function chart(div) {
+	      var width = x.range()[1],
+	          height = y.range()[0];
+	
+	      var temp = group.top(1);
+	      y.domain([0, group.top(1)[0].value]);
+	
+	      div.each(function() {
+	        var div = d3.select(this),
+	            g = div.select("g");
+	
+	        // Create the skeletal chart.
+	        if (g.empty()) {
+	          div.select(".title").append("a")
+	              .attr("href", "javascript:reset(" + id + ")")
+	              .attr("class", "reset")
+	              .text("reset")
+	              .style("display", "none");
+	
+	          g = div.append("svg")
+	              .attr("width", width + margin.left + margin.right)
+	              .attr("height", height + margin.top + margin.bottom)
+	            .append("g")
+	              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	          g.append("clipPath")
+	              .attr("id", "clip-" + id)
+	            .append("rect")
+	              .attr("width", width)
+	              .attr("height", height);
+	
+	          g.selectAll(".bar")
+	              .data(["background", "foreground"])
+	            .enter().append("path")
+	              .attr("class", function(d) { return d + " bar" + " classid"+id; })
+	              .datum(group.all());
+	
+	          g.selectAll(".foreground.bar")
+	              .attr("clip-path", "url(#clip-" + id + ")");
+	
+	          g.append("g")
+	              .attr("class", "axis")
+	              .attr("transform", "translate(0," + height + ")")
+	              .call(axis);
+	
+	          // Initialize the brush component with pretty resize handles.
+	          var gBrush = g.append("g").attr("class", "brush").call(brush);
+	          gBrush.selectAll("rect").attr("height", height);
+	          gBrush.selectAll(".resize").append("path").attr("d", resizePath);
+	        }
+	
+	        // Only redraw the brush if set externally.
+	        if (brushDirty) {
+	          brushDirty = false;
+	          g.selectAll(".brush").call(brush);
+	          div.select(".title a").style("display", brush.empty() ? "none" : null);
+	          if (brush.empty()) {
+	            g.selectAll("#clip-" + id + " rect")
+	                .attr("x", 0)
+	                .attr("width", width);
+	          } else {
+	            var extent = brush.extent();
+	            g.selectAll("#clip-" + id + " rect")
+	                .attr("x", x(extent[0]))
+	                .attr("width", x(extent[1]) - x(extent[0]));
+	          }
+	        }
+	
+	        g.selectAll(".bar").attr("d", barPath);
+	      });
+	
+	      function barPath(groups) {
+	        var path = [],
+	            i = -1,
+	            n = groups.length,
+	            d;
+	        while (++i < n) {
+	          d = groups[i];
+	          path.push("M", x(d.key), ",", height, "V", y(d.value), "h9V", height);
+	        }
+	        return path.join("");
+	      }
+	
+	      function resizePath(d) {
+	        var e = +(d == "e"),
+	            x = e ? 1 : -1,
+	            y = height / 3;
+	        return "M" + (.5 * x) + "," + y
+	            + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
+	            + "V" + (2 * y - 6)
+	            + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
+	            + "Z"
+	            + "M" + (2.5 * x) + "," + (y + 8)
+	            + "V" + (2 * y - 8)
+	            + "M" + (4.5 * x) + "," + (y + 8)
+	            + "V" + (2 * y - 8);
+	      }
+	    }
+	
+	    brush.on("brushstart.chart", function() {
+	      var div = d3.select(this.parentNode.parentNode.parentNode);
+	      div.select(".title a").style("display", null);
+	    });
+	
+	    brush.on("brush.chart", function() {
+	      var g = d3.select(this.parentNode),
+	          extent = brush.extent();
+	      if (round) g.select(".brush")
+				.call(brush.extent(extent = extent.map(round)))
+				.selectAll(".resize")
+				.style("display", null);
+	      g.select("#clip-" + id + " rect")
+	          .attr("x", x(extent[0]))
+	          .attr("width", x(extent[1]) - x(extent[0]));
+	      dimension.filterRange(extent);
+	    });
+	
+	    brush.on("brushend.chart", function() {
+	      if (brush.empty()) {
+	        var div = d3.select(this.parentNode.parentNode.parentNode);
+	        div.select(".title a").style("display", "none");
+	        div.select("#clip-" + id + " rect").attr("x", null).attr("width", "100%");
+	        dimension.filterAll();
+	      }
+	    });
+	
+	    chart.margin = function(_) {
+	      if (!arguments.length) return margin;
+	      margin = _;
+	      return chart;
+	    };
+	
+	    chart.x = function(_) {
+	      if (!arguments.length) return x;
+	      x = _;
+	      axis.scale(x);
+	      brush.x(x);
+	      return chart;
+	    };
+	
+	    chart.y = function(_) {
+	      if (!arguments.length) return y;
+	      y = _;
+	      return chart;
+	    };
+	
+	    chart.dimension = function(_) {
+	      if (!arguments.length) return dimension;
+	      dimension = _;
+	      return chart;
+	    };
+	
+	    chart.filter = function(_) {
+	      if (_) {
+	        brush.extent(_);
+	        dimension.filterRange(_);
+	      } else {
+	        brush.clear();
+	        dimension.filterAll();
+	      }
+	      brushDirty = true;
+	      return chart;
+	    };
+	
+	    chart.group = function(_) {
+	      if (!arguments.length) return group;
+	      group = _;
+	      return chart;
+	    };
+	
+	    chart.round = function(_) {
+	      if (!arguments.length) return round;
+	      round = _;
+	      return chart;
+	    };
+	
+	    return d3.rebind(chart, brush, "on");
+	  }
+	});
+};
+chart_crossfilter();
+
+$(document).ready(function () {
+	$("#scatter_x1 a").click(function(){
+		scatter_x1_name = $(this).text();
+		$('#svg-box-scatter svg').empty();
+		chart_scatter();
+	});
+	$("#scatter_x2 a").click(function(){
+		scatter_x2_name = $(this).text();
+		$('#svg-box-scatter svg').empty();
+		chart_scatter();
+	});
+});
+</script>
+
+
+<div id="dropdown-1" class="dropdown dropdown-tip dropdown-relative">
+	<ul class="dropdown-menu" id="scatter_x1">{{scatter_fields}}</ul>
+</div>
+<div id="dropdown-2" class="dropdown dropdown-tip dropdown-relative">
+	<ul class="dropdown-menu" id="scatter_x2">{{scatter_fields}}</ul>
+</div>
+{% endblock %}
