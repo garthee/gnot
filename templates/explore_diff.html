@@ -1,14 +1,6 @@
 {% extends "layout.html" %} {% block title %}Diff series{% endblock %}
 {% block body %}
 <style>
-#side-container {
-	width: 110px;
-}
-
-#main-container {
-	width: 960px;
-}
-
 .x.axis path {
 	display: none;
 }
@@ -45,32 +37,21 @@
 
 
 <script>
-	function isNumber(n) {
-		return !isNaN(parseFloat(n)) && isFinite(n);
-	}
-	var str2int = function(d) {
-		return +d;
-	};
-	var date2int = function(d) {
-		d = d.split(/[- :]/);
-		return (new Date(d[0], d[1] - 1, d[2])).getTime();
-	};
-	var time2int = function(d) {
-		d = d.split(/[- :]/);
-		return new Date(d[0], d[1] - 1, d[2], d[3], d[4], d[5]).getTime();
-	};
+	function isNumber(n) { return !isNaN(parseFloat(n)) && isFinite(n);}
+	var str2int = function(d) { return +d; };
+	var date2int = function(d) { d = d.split(/[- :]/); return (new Date(d[0], d[1] - 1, d[2])).getTime();};
+	var time2int = function(d) {d = d.split(/[- :]/); return new Date(d[0], d[1] - 1, d[2], d[3], d[4], d[5]).getTime();};
+	var month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));};
+	
+	var margin = {top : 20, right : 20, bottom : 30, left : 50},
+		width = 800 - margin.left - margin.right, 
+		height = 500 - margin.top - margin.bottom;
 
-	var margin = {
-		top : 20,
-		right : 20,
-		bottom : 30,
-		left : 50
-	}, width = 960 - margin.left - margin.right, height = 500 - margin.top - margin.bottom;
-
-	var svg = d3.select("#svg-box").append("svg").attr("width",
-			width + margin.left + margin.right).attr("height",
-			height + margin.top + margin.bottom).append("g").attr("transform",
-			"translate(" + margin.left + "," + margin.top + ")");
+	var svg = d3.select("#svg-box").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height",height + margin.top + margin.bottom)
+		.append("g")
+			.attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
 	d3.csv("{{datfile}}", function(error, data) {
 
@@ -86,31 +67,28 @@
 				parseX = date2int;
 				XisInt = 0;
 			}
-
+			else if (lx >= 2){
+				parseX = month2int;
+				type = 3; // date
+			}
 		}
 
-		if (XisInt) {
+		if (XisInt)
 			var x = d3.scale.linear().range([ 0, width ]);
-		} else {
+		else
 			var x = d3.time.scale().range([ 0, width ]);
-		}
+			
 		var y = d3.scale.linear().range([ height, 0 ]);
-
 		var xAxis = d3.svg.axis().scale(x).orient("bottom");
-
 		var yAxis = d3.svg.axis().scale(y).orient("left");
 
-		var line = d3.svg.area().interpolate("basis").x(function(d) {
-			return x(d.date);
-		}).y(function(d) {
-			return y(d["A"]);
-		});
+		var line = d3.svg.area().interpolate("basis")
+			.x(function(d) { return x(d.date);})
+			.y(function(d) {return y(d["A"]);});
 
-		var area = d3.svg.area().interpolate("basis").x(function(d) {
-			return x(d.date);
-		}).y1(function(d) {
-			return y(d["A"]);
-		});
+		var area = d3.svg.area().interpolate("basis")
+			.x(function(d) {return x(d.date);})
+			.y1(function(d) {return y(d["A"]);});
 
 		data.forEach(function(d) {
 			d.date = parseX(d.Date);

@@ -2,11 +2,11 @@
 {% block title %}Mashed Series{% endblock %}
 {% block body %}
 
-<script type="text/javascript" src="static/js/jquery-1.10.2.min.js"></script>
+<script src="static/js/jquery.min.js"></script>
+<script src="static/js/jquery-ui.min.js"></script>
+
 <style>
-#side-container{
-	width:110px;
-}
+
 
 aside {
   font-size: small;
@@ -84,7 +84,7 @@ line {
 <h1>Explore Mashed Series</h1>
 <div id="container">
 	
-<div id="main-container" style="width:940px;">
+<div id="main-container" style="width:800px;">
 	<aside id="blurb" class="float">
 	<div >
         <div id="blurb-content">
@@ -111,27 +111,56 @@ limit = typeof limit !== 'undefined' ? limit : 100;
 var temp = d3.select("svg").remove();
 
  
-var w = 940,h = 550,margin = 25;
+var w = 800, h = 500, margin = 35, mleft = 100;
 
-var startEnd = {}, dataCodes = {};
+var startEnd = {}, dataCodes = {}, formatX = Math.round;
     
 d3.text('{{datfile}}', 'text/csv', function(text) {
     var data = d3.csv.parseRows(text);
     
-    var years = data[0].slice(1, data[0].length),
-    endAge = d3.max(data.slice(1, data.length), function(array) {return d3.max(array.slice(1, array.length), function(d){return +d;});}),
-	startAge= +d3.min(data.slice(1, data.length), function(array) {return d3.min(array.slice(1, array.length), function(d){return +d;});}),
-	startYear = +years[0],
-	endYear =  +years[years.length-1]+1,
-	x = d3.scale.linear().domain([startYear, endYear]).range([0 + margin -5, w-margin]),
-	y = d3.scale.linear().domain([endAge, startAge]).range([0 + margin, h - margin]);
+    var years = data[0].slice(1, data[0].length);
+    
+    
+ 	// identify x axis
+    function isNumber(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}	
+	var str2int = function(d){return +d;};
+	var month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));};
+	var date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));};
+	var time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
+	var parseX = str2int, type = 1, tickformat = d3.format('f');
+	if (!isNumber(years[0])){
+		var lx = years[0].split(/[- :]/).length;
+		if (lx >= 6)
+			parseX = time2int;
+		else if (lx >= 3)
+			parseX = date2int;
+		else if (lx >= 2)
+			parseX = month2int;
+		type = 3;
+		tickformat = d3.time.format("%Y-%m-%d");
+		formatX = function(d){return $.datepicker.formatDate('yy-mm-dd',d);};
+	} 	
+	years.forEach(function(d, i){ years[i] = parseX(d);});
+    var endAge = d3.max(data.slice(1, data.length), function(array) {return d3.max(array.slice(1, array.length), function(d){return +d;});}),
+		startAge= d3.min(data.slice(1, data.length), function(array) {return d3.min(array.slice(1, array.length), function(d){return +d;});}),
+		startYear = years[0],
+		endYear =  years[years.length-1];
+    
+	if (type == 1)
+ 		var x = d3.scale.linear().domain([startYear, endYear]).range([0, w-margin-mleft]);
+	else				
+		var x = d3.time.scale().domain([startYear, endYear]).range([0, w-margin-mleft]);
+	var y = d3.scale.linear().domain([endAge, startAge]).range([0 + margin, h - margin]);
+	
 	
 	var vis = d3.select("#svg-box")
 	    .append("svg:svg")
 	    .attr("width", w)
 	    .attr("height", h)
 	    .append("svg:g")
-	    // .attr("transform", "translate(0, 600)");
+	    .attr("transform", "translate(" + mleft + ", 0)");
 	
 				
 	var line = d3.svg.line()
@@ -146,13 +175,13 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
         var started = false;
         for (j=0; j < values.length; j++) {
             if (values[j] != '') {
-                currData.push({ x: +years[j], y: +values[j] });
+                currData.push({ x: (years[j]), y: +values[j] });
             
                 if (!started) {
-                    startEnd[data[i][0]] = { 'startYear': +years[j], 'startVal': +values[j] };
+                    startEnd[data[i][0]] = { 'startYear': (years[j]), 'startVal': +values[j] };
                     started = true;
                 } else if (j == values.length-1) {
-                    startEnd[data[i][0]]['endYear'] = +years[j];
+                    startEnd[data[i][0]]['endYear'] = (years[j]);
                     startEnd[data[i][0]]['endVal'] = +values[j];
                 }
                 
@@ -165,59 +194,28 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
             .on("mouseover", onmouseover)
             .on("mouseout", onmouseout);
     }
-    
-    
-    vis.append("svg:line")
-	    .attr("x1", x(startYear))
-	    .attr("y1", y(startAge))
-	    .attr("x2", x(endYear))
-	    .attr("y2", y(startAge))
-	    .attr("class", "axis")
-	
-	vis.append("svg:line")
-	    .attr("x1", x(startYear))
-	    .attr("y1", y(startAge))
-	    .attr("x2", x(startYear))
-	    .attr("y2", y(endAge))
-	    .attr("class", "axis")
+
 				
-	vis.selectAll(".xLabel")
-	    .data(x.ticks(10))
-	    .enter().append("svg:text")
-	    .attr("class", "xLabel")
-	    .text(String)
-	    .attr("x", function(d) { return x(d) })
-	    .attr("y", h-10)
-	    .attr("text-anchor", "middle")
+	var yAxis = d3.svg.axis()
+    	.scale(y)
+    	.orient('left')
+    	.tickPadding(8);
+
+	var xAxis = d3.svg.axis()
+    	.scale(x)
+    	.orient('bottom')
+    	.ticks(5)
+    	.tickFormat(tickformat)
+    	.tickPadding(8);
 	
-	var format = d3.format('.2s');
-	vis.selectAll(".yLabel")
-	    .data(y.ticks(10))
-	    .enter().append("svg:text")
-	    .attr("class", "yLabel")
-	    .text(String)
-		.attr("x", 0)
-		.attr("y", function(d) { return y(d) })
-		.attr("text-anchor", "right")
-		.attr("dy", 3)
-				
-	vis.selectAll(".xTicks")
-	    .data(x.ticks(10))
-	    .enter().append("svg:line")
-	    .attr("class", "xTicks")
-	    .attr("x1", function(d) { return x(d); })
-	    .attr("y1", y(startAge))
-	    .attr("x2", function(d) { return x(d); })
-	    .attr("y2", y(startAge)+7)
-		
-	vis.selectAll(".yTicks")
-	    .data(y.ticks(10))
-	    .enter().append("svg:line")
-	    .attr("class", "yTicks")
-	    .attr("y1", function(d) { return y(d); })
-	    .attr("x1", x(startYear-0.5))
-	    .attr("y2", function(d) { return y(d); })
-	    .attr("x2", x(startYear))
+	vis.append('svg:g')
+    	.attr('class', 'x axis')
+    	.attr('transform', 'translate(0, ' + (h - margin) + ')')
+    	.call(xAxis);
+	
+	vis.append('svg:g')
+	  	.attr('class', 'y axis')
+	  	.call(yAxis);
 });  
     
 
@@ -241,7 +239,7 @@ function onmouseover(d, i) {
     var percentChange = 100 * (countryVals['endVal'] - countryVals['startVal']) / countryVals['startVal'];
     
     var blurb = '<h2>' + dataCodes[dataCode] + '</h2>';
-    blurb += "<p>On average: a average count of " + Math.round(countryVals['startVal']) + " times in " + countryVals['startYear'] + " and " + Math.round(countryVals['endVal']) + " times in " + countryVals['endYear'] + ", ";
+    blurb += "<p>On average: a average count of " + Math.round(countryVals['startVal']) + " times in " + formatX(countryVals['startYear']) + " and " + Math.round(countryVals['endVal']) + " times in " + formatX(countryVals['endYear']) + ", ";
     if (percentChange >= 0) {
         blurb += "an increase of " + Math.round(percentChange) + " percent."
     } else {

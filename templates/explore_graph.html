@@ -7,7 +7,8 @@ line {
 }
 
 .node {
-	stroke: #fff;
+  stroke: #fff;
+  stroke-width: 1.5px;
 }
 </style>
 
@@ -69,7 +70,7 @@ line {
 				.data(nodes)
 				.enter()
 				.append("circle")
-				.attr("class", "node").attr("class", "clickable")
+				.attr("class", "node clickable")
 				.attr("r", r - .75)
 				.call(force.drag)
 				.style("fill", function(d) {return color(d.group);});

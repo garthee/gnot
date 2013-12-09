@@ -92,7 +92,7 @@ If you would like to get a high level picture : Word Mashed series module
 </a>
 
 <h2>Geo-Location</h2>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_gmap+table%3A+public.pickups_train+longitude%3A+%22longitude%22+latitude%3A+%22latitude%22+xField%3A+%22date%28time%29%22" >
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_gmap+table%3A+public.d_pickup+latitude%3A+%22trunc%28latitude%3A%3Anumeric%2C+3%29%22+longitude%3A+%22trunc%28longitude%3A%3Anumeric%2C+3%29%22+field%3A+%22count%28*%29%22+xField%3A+%22date%28time%29%22" >
 Visualizing Geo-location information : Google Map module
 </a>
 <a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_gmap_crossfilter+table%3A+public.d_pickup+latitude%3A+%22latitude%22+longitude%3A+%22longitude%22+field%3A+%22date%28time%29%22+field%3A+%22extract%28hour+from+time%29%22+field%3A+%22latitude%22+field%3A+%22longitude%22+limit%3A+50000+orderBy%3A+%22random%28%29%22+reload%3A+1" >

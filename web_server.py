@@ -67,6 +67,7 @@ class Visulizer(object):
 		
 	def _parse_query(self, request):
 		query = request.args.get('query', '')
+		print query
 		#matches = re.findall(r'([^:]+):\s(?=[^\s]+)', query)
 		reg = r'\s*([^:]+):\s+((?=\")\"[^\"]+\"|[^\s]+)'
 		matches = re.findall(reg, query)
@@ -87,6 +88,12 @@ class Visulizer(object):
 		for (key, value) in entries.iteritems():
 			r[key] = ','.join(value)
 
+
+		tables = re.split(r',(?![^(]*\))', r.get('table', ''))
+		if len(tables) > 1:
+			tables = [tables[i] + ' as table_%d'%(i+1)  for i in range(len(tables))]
+		r['table'] = ','.join(tables)
+				
 		#split fields
 		sfield = re.sub(r',(?=[^"]*"(?:[^"]*"[^"]*")*[^"]*$)', '___', r.get('field', '')) # remove commas between quotation marks and replace them with _
 		sfield = re.sub(r",(?=[^']*'(?:[^']*'[^']*')*[^']*$)", '___', sfield) # remove commas between quotation marks and replace them with _

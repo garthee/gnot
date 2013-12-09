@@ -16,19 +16,23 @@ def render(vis, request, info):
 	
 	source = request.args.get("source", '')
 	target = request.args.get("target", '')
+	
+	linkGroup = request.args.get("linkGroup", "'1'")
 	orderBy = request.args.get("orderBy", '')
 	if orderBy and len(orderBy)>0: orderBy = ' order by %s '%orderBy
+	
+	
 			
 	if len(table) == 0 or not source or not target or not field:
 		info["message"].append("table, source, target, or field missing.")
 		info["message_class"] = "failure"
 	else:
-		field = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
-		if not field or len(field) == 0: 
-			field = 'count(*)'
+		sfield = request.args.get("sfield", [])
+		if not sfield or len(sfield) == 0: 
+			sfield = ' count(*) '
 		else:
-			field = field[0]
-		sql = "select %s, %s, %s, '1' from (select * from %s where %s %s limit %s offset %s)"%(source, target, field, table, where, orderBy, limit, start) + \
+			sfield = sfield[0]
+		sql = "select %s, %s, %s, %s from (select * from %s where %s %s limit %s offset %s)"%(source, target, sfield, linkGroup, table, where, orderBy, limit, start) + \
 		 " as a where %s is not null and %s is not null group by 1,2 "%(source, target)
 		
 		info["title"] = "Interactions between %s and %s as %s in %s"%(field[0], field[1], field[2], table)
@@ -47,4 +51,8 @@ def render(vis, request, info):
 			
 			info["datfile"] = datfile
 		
+	pfield = request.args.get("pfield", [])
+	info["title"] = "SOURCE: <em>%s</em>, <br />TARGET: <em>%s</em>, on <br />LINK: <em>%s</em> from <br />TABLE: <em>%s</em>"%(source,target,pfield[0], table)
+	info["title"] = Markup(info["title"])	
+	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))

@@ -1,0 +1,163 @@
+{% extends "layout.html" %} {% block title %}K-Means Results{% endblock %}
+{% block body %}
+<link href="static/css/nv.d3.css" rel="stylesheet" type="text/css">
+<link type="text/css" rel="stylesheet" href="static/css/jquery.dropdown.css" />
+<link href="static/css/chart.css" rel="stylesheet" type="text/css">
+
+<script src="static/js/nv.d3.min.js"></script>
+<script src="static/js/box.js"></script>
+<script src="static/js/crossfilter.v1.min.js"></script>
+<script src="static/js/fisheye.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/jquery.dropdown.js"></script>
+
+
+<style>
+	.box {
+  		font: 10px sans-serif;
+	}
+
+	.box line,
+	.box rect,
+	.box circle {
+  		fill: #fff;
+  		stroke: #000;
+  		stroke-width: 1.5px;
+	}
+
+	.box .center {
+  		stroke-dasharray: 3,3;
+	}
+
+	.box .outlier {
+  		fill: none;
+  		stroke: #ccc;
+	}
+	
+	#svg-box-clusters svg{
+		float:left;
+	}
+	#svg-box-clusters {
+		display:block;
+		width:800px;
+		overflow:hidden;
+		clear:both;
+	}
+	
+</style>
+
+<h1>ML K-Means</h1>
+<div id="container">
+	<div id="main-container" style="width: 800px;">
+		{{pca_matrix_divs}}
+		
+		<h2>Within Cluster Error</h2>
+		<div id="svg-box-clusters"></div>
+			
+		<h2>Spread Features</h2>
+		<div id="svg-box-scatter"><svg></svg></div>
+		<div>
+			Pick different fields for <span class="scatter"
+				data-dropdown="#dropdown-1" data-horizontal-offset="0"
+				data-vertical-offset="0">X-axis</span> or <span class="scatter"
+				data-dropdown="#dropdown-2" data-horizontal-offset="0"
+				data-vertical-offset="0">Y-axis</span> here.
+		</div>
+
+		<h2>Provenance</h2>
+		<div id="svg-box-provenance">{{provenance_divs}}</div>
+
+	</div>
+	<div id="side-container">
+		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container" id="side-container-0">{{title}}</div>
+		<div class="side-container" id="side-container-1">{{results}}</div>
+		<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+	</div>
+</div>
+
+
+<script>
+
+var clusters_box = function(){
+	var margin = {top: 40, right: 20, bottom: 70, left: 90},
+    	width = 120 - margin.left - margin.right,
+    	height = 300 - margin.top - margin.bottom;
+
+	var min = Infinity,
+    	max = -Infinity;
+
+	var chart = d3.box()
+    	.whiskers(iqr(1.5))
+    	.width(width)
+    	.height(height);
+    
+    d3.csv("{{datfile_provenance}}", function(error, csv) {
+  		var data = {};
+
+  		csv.forEach(function(x) {
+    		var clust = x.Result,
+        		error = x.Error,
+        		d = data[clust];
+    		if (!d) d = data[clust] = [error];
+    		else d.push(error);
+    		if (error > max) max = error;
+    		if (error < min) min = error;
+  		});
+
+  		chart.domain([min, max]);
+  		var keys = d3.keys(data).sort();
+  		var svg = d3.select("#svg-box-clusters").selectAll("svg")
+  			.data(keys.map(function (d){return data[d];}))
+      	 .enter()
+      	 	.append("svg")
+  			.attr("class", "box")
+      		.attr("width", width + margin.left + margin.right)
+      		.attr("height", height + margin.bottom + margin.top)
+    	 .append("g")
+      		.attr("transform", "translate(" + 60 + "," + margin.top + ")")
+      		.call(chart)
+      		.append("svg:text")
+      		.text(function(d,i){
+      			return keys[i];
+      		})
+      		.attr("dx", "-25px");
+	});
+
+     // Returns a function to compute the interquartile range.
+	function iqr(k) {
+ 		return function(d, i) {
+    		var q1 = d.quartiles[0],
+        		q3 = d.quartiles[2],
+        		iqr = (q3 - q1) * k,
+        		i = -1,
+        		j = d.length;
+    		while (d[++i] < q1 - iqr);
+   			while (d[--j] > q3 + iqr);
+    		return [i, j];
+  		};
+	}
+};
+clusters_box();
+</script>
+
+<div id="dropdown-1" class="dropdown dropdown-tip dropdown-relative">
+	<ul class="dropdown-menu" id="scatter_x1">{{scatter_fields}}</ul>
+</div>
+<div id="dropdown-2" class="dropdown dropdown-tip dropdown-relative">
+	<ul class="dropdown-menu" id="scatter_x2">{{scatter_fields}}</ul>
+</div>
+<script src="static/js/chart.scatter.crossfilter.js"></script>
+<script src="static/js/chart.matrix.js"></script>
+<script>
+scatter_x1_name='{{scatter_x}}'; 
+scatter_x2_name='{{scatter_y}}';
+file_provenance = "{{datfile_provenance}}";
+file_pca_matrix = "{{datfile_matrix}}";
+chart_matrix();
+chart_scatter_crossfilter(false);
+</script>
+
+
+
+{% endblock %}

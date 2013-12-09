@@ -21,11 +21,11 @@ jQuery.noConflict();
 	var uri = parseUri(document.location.search);
 	 
 	var query = uri.queryKey['query'];
-	 if(typeof query != 'undefined') 
-	 	query = decodeURIComponent(query).replace(/\+/g, ' ');
-	 else
+	if(typeof query != 'undefined') 
+		query = decodeURIComponent(query.replace(/\+/g, ' '));
+	else
 	 	query = '';
-	 
+	
 	 
 	$("#form_module_tables").submit(function() {
 		$('#query-input').val(window.visualSearch.searchBox.value());
@@ -98,10 +98,32 @@ jQuery.noConflict();
 						}
 
 					case 'field':
-						var table = 0;
-						sq.forEach(function (d) { if('table' in d) table = d['table'] });
+						var table = '';
+						sq.forEach(function (d) { 
+							if('table' in d) 
+								table = table + ',' + d['table'];
+						});
+						table = table.substring(1, table.length);
+						
 						var fields = [];
-						if  (table && table in data['tables']) fields = data['tables'][table]
+						if (table){
+							table = table.split(/\s*,\s*/);
+							
+							if (table.length > 1) {
+								for (i=0; i<table.length; i++){
+									if  (table[i] in data['tables']) {
+										var f = data['tables'][table[i]];
+										f.forEach(function(d, j){ 
+											fields.push('table_' + (i+1) + '.' + d);
+										});
+									}
+								}
+							}
+							else if (table.length > 0 && table[0] in data['tables']) 
+									fields = data['tables'][table[0]];
+						}
+						
+						
 						callback(fields);
 						break;
 		          }
@@ -111,7 +133,7 @@ jQuery.noConflict();
 				var module = 0; sq.forEach(function (d) { if('module' in d) module = d['module']; });
 				
 				var options = ['module', 'table', 'field', 'where', 'start', 'limit', 'reload', 'view']; 
-				var uniqueOptions = ['module', 'table', 'where', 'start', 'limit', 'reload', 'view'];
+				var uniqueOptions = ['module', 'where', 'start', 'limit', 'reload', 'view'];
 				
 				if (module) {
 					var moduleOptions = getKeys(data['modules'][module]);

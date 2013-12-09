@@ -15,7 +15,7 @@ def render(vis, request, info):
 		else:
 			sql = "SELECT table_name,column_name FROM information_schema.columns"
 
-	reload = int(request.args.get("reload", 0))
+	reload = 1#int(request.args.get("reload", 0))
 	(datfile, reload, result) = export_sql(sql, vis.config, reload, None, None)
 	
 	json_file = datfile.replace('csv', 'json')	

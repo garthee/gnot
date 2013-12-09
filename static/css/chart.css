@@ -1,0 +1,121 @@
+	
+	g {
+		overflow:hidden;
+	}
+	.scatter:after {
+		content: '↓';
+		margin-left: 6px;
+		color: #08C;
+	}
+	
+	.scatter {
+		color: #08C;
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 4px;
+	}
+	
+	.scatter:hover {
+		background: #F2F2F2;
+	}
+
+	g.cat.labels {
+		text-anchor: end;
+	}
+	
+	g.labels text:hover {
+		fill: red;
+		cursor: pointer;
+	}
+
+	.bar {
+		fill: steelblue;
+		fill-opacity: .9;
+	}
+	
+	#svg-box-features .x.axis path {
+		display: none;
+	}
+	
+	.axis text {
+		font: 12px;
+	}
+
+	.axis path,.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+	
+	#svg-box-scatter svg {
+		overflow: hidden;
+		height: 400px;
+		width:800px;
+	}
+	
+	
+	.chart {
+		display: inline-block;
+		height: 151px;
+		margin-bottom: 20px;
+		margin-right:10px;
+	}
+	
+	.chart div {
+		padding: 5px;
+	}
+
+	.reset {
+		padding-left: 1em;
+		font-size: smaller;
+		color: #ccc;
+	}
+	
+	.background.bar {
+		fill: #ccc;
+	}
+	
+	.foreground.bar {
+		fill: steelblue;
+	}
+	.foreground.bar.classid0 {
+		fill: #ff7f0e;
+	}
+	.axis path,.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+
+	.brush rect.extent {
+		fill: steelblue;
+		fill-opacity: .125;
+	}
+	
+	.brush .resize path {
+		fill: #eee;
+		stroke: #666;
+	}
+	
+	.nvd3 .nv-axis.nv-x path.domain {
+		stroke-opacity: 0.75;
+	}
+	
+	.line {
+  		fill: none;
+  		stroke: steelblue;
+  		stroke-width: 1.5px;
+	}
+	.separator {
+  		stroke: #aaa;
+	}
+	.area {
+    	fill: lightsteelblue;
+    	stroke-width: 0;
+	}
+	
+	.chart .title{
+		font-family: 'Josefin Sans', Helvetica, sans-serif;
+		font-size:14px;
+	}
+	

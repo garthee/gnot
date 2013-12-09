@@ -52,7 +52,6 @@ svg {
 </div>
 
 <script>
-
 	function isNumber(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
 	}	
@@ -80,26 +79,18 @@ nv.addGraph(function() {
   			fdata.push({key:names[i], values:[]});
   		}
 		// identify x axis
-		var parseX = str2int;
-		var XisInt = 1
+		var parseX = str2int, XisInt = 1
 		if (!isNumber(data[1][0])){
 			var lx = data[1][0].split(/[- :]/).length;
-			if (lx >= 6) {
+			if (lx >= 6)
 				parseX = time2int;
-				XisInt = 0;
-			}
-			else if (lx >= 3){
+			else if (lx >= 3)
 				parseX = date2int;
-				XisInt = 0;
-			}
-			else if (lx >= 2){
+			else if (lx >= 2)
 				parseX = month2int;
-				XisInt = 0;
-			}
-			
+			XisInt = 0;
 		} 	
 		
-
 		for (i=1; i < data.length; i++) {
 	        var row = data[i];
 			var d = parseX(row[0]);
@@ -108,7 +99,6 @@ nv.addGraph(function() {
 	            	fdata[j-1]["values"].push({ x: d, y: +row[j] });
 	        	}
 	       }
-	        
 	    }
 		
 		if (XisInt) {
@@ -116,11 +106,9 @@ nv.addGraph(function() {
 			chart.x2Axis.tickFormat(d3.format(',f'));
 			}
 			else {
-				
 				chart.xAxis.tickFormat(function(d) { 
 					return d3.time.format("%Y-%m-%d")(new Date(d)); 
 				});
-			 
 				chart.x2Axis.tickFormat(function(d) { 
 					return d3.time.format("%Y-%m-%d")(new Date(d)); 
 				});
@@ -131,17 +119,8 @@ nv.addGraph(function() {
       .transition().duration(500)
       .call(chart);
   });
- 
-
   nv.utils.windowResize(chart.update);
-
   return chart;
 });
-
-
-
-
-</script>
-
 </script>
 {% endblock %}

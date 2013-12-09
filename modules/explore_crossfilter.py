@@ -17,12 +17,10 @@ def render(vis, request, info):
 	pfield = request.args.get("pfield", [])
 	
 	groupBy =  request.args.get("groupBy", '')
-	if groupBy and len(groupBy) > 0:
-		groupBy = ' group by %s '%groupBy
+	if groupBy and len(groupBy) > 0: groupBy = ' group by %s '%groupBy
 
 	orderBy = request.args.get("orderBy", '')	
-	if orderBy and len(orderBy)>0:
-		orderBy = ' order by %s '%orderBy
+	if orderBy and len(orderBy)>0: orderBy = ' order by %s '%orderBy
 	
 	if len(table) == 0 or not field:
 		info["message"].append("table or field missing.")

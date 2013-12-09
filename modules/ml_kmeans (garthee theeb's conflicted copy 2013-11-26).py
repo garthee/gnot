@@ -4,7 +4,7 @@ from jinja2 import Markup
 import json
 
 from math import log, sqrt
-from sklearn import svm
+from sklearn import cluster
 from sklearn.decomposition import PCA
 from scipy import stats
 from sklearn import metrics
@@ -55,34 +55,28 @@ def fit_transform(pca, X):
 	return (U, V)
 
 
-def evaluate(predicted_matches, real_matches):
-	truePos = 0
-	falsePos = 0
-	falseNeg = 0
-	trueNeg = 0
+def evaluate(clust_dists, clustidx, X):
 	results = {}
-	for i in range(len(predicted_matches)):
-		#print predicted_matches[i], real_matches[i]
-		if predicted_matches[i] > 0:
-			if real_matches[i] > 0:
-				truePos += 1
-			else:
-				falsePos += 1
-		else:
-			if real_matches[i] < 0:
-				trueNeg += 1
-			else:
-				falseNeg += 1
-	
-	print truePos,falsePos,trueNeg,falseNeg
-	results['accuracy'] = float(truePos + trueNeg)/len(predicted_matches)
-	results['precision'] = float(truePos)/(truePos+falsePos) if truePos > 0 else 0
-	results['recall'] = float(truePos)/(truePos+falseNeg) if truePos > 0 else 0
-	if results['precision'] and results['recall']:
-		results['f1'] = 2*results['precision']*results['recall']/(results['precision'] + results['recall'])
-	else:
-		results['f1'] = 0
-	return results
+	sum = 0
+	count = 0
+	clustsum = [0 for i in xrange(len(clust_dists[0]))]
+	clustcount = [0 for i in xrange(len(clust_dists[0]))]
+	clustmean = [0 for i in xrange(len(clust_dists[0]))]
+	for i in xrange(len(clustidx)):
+		sum += clust_dists[i][clustidx[i]]
+		count += 1
+		
+		clustsum[clustidx[i]] += clust_dists[i][clustidx[i]]
+		clustcount[clustidx[i]] += 1 
+		
+	averagedist = float(sum)/count
+	print averagedist
+	results['meandist'] = averagedist
+
+	for i in xrange(len(clust_dists[0])):
+		clustmean[i] = float(clustsum[i])/clustcount[i]
+
+	return results,clustmean
 
 def render(vis, request, info):
 	info["message"] = []
@@ -98,14 +92,10 @@ def render(vis, request, info):
 	
 	#module dependent user inputs
 	field = request.args.get("field", '')
-	ratio = float(request.args.get("ratio", 0.9))
-	regularizer = float(request.args.get("regularizer", 1))
 	pre_process = request.args.get("pre_process", '')
 	pre_transform = request.args.get("pre_transform", '')
-	
-	orderBy = request.args.get("orderBy", '')
-	groupBy = request.args.get("groupBy", '')
-	if groupBy and len(groupBy)>0: groupBy = ' group by %s'%groupBy
+	orderBy = ''
+	k = int(request.args.get("k",2))
 	
 	pfield = request.args.get("pfield", [])
 	
@@ -122,7 +112,7 @@ def render(vis, request, info):
 			orderBy = ''
 			orderbyMessage = 'ordered randomly'
 		
-		sql = "select %s from %s where %s %s %s limit %s offset %s"%(field, table, where, groupBy, orderBy, limit, start)
+		sql = "select %s from %s where %s %s limit %s offset %s"%(field, table, where, orderBy, limit, start)
 
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
 		
@@ -131,23 +121,16 @@ def render(vis, request, info):
 			info["message_class"] = "failure"
 		else:
 			X = []
-			Y = []
 			with open(datfile, 'r') as f:
 				for r in f:		
 					row = r.rstrip().split(',')
-					Y.append(int(row[0]))
-					X.append([float(r) for r in row[1:]])
+					X.append([float(r) for r in row])
 			
-			if ratio == 1:
-				TrainingSize = 0
-			else:
-				TrainingSize = int(ratio*len(X))
-				
-			
-			xfield = pfield[1:]
+
+			xfield = pfield
 			# transform features
 			x2fs(X,xfield, pre_transform)
-			pfield = [pfield[0]] + xfield
+			pfield = xfield
 			
 			X = numpy.array(X)
 			
@@ -156,27 +139,21 @@ def render(vis, request, info):
 			elif pre_process == "PCA":
 				pca = PCA()
 				(X, V) = fit_transform(pca, X)
-				pfield = [pfield[0]] + ['PCA_%d'%(d+1) for d in range(len(pfield[1:]))]
+				pfield =  ['PCA_%d'%(d+1) for d in range(len(pfield))]
 			elif pre_process == "Whitened PCA":
 				pca = PCA(whiten=True)
 				(X, V) = fit_transform(pca, X)
-				pfield = [pfield[0]] + ['PCA_%d'%(d+1) for d in range(len(pfield[1:]))]
+				pfield = ['PCA_%d'%(d+1) for d in range(len(pfield))]
 				
+			clust = cluster.KMeans(n_clusters=k)
+			cidx = clust.fit_predict(X)
+			cdists = clust.transform(X)
 			
-			clf = svm.SVC(C=regularizer, kernel='linear', probability=True, random_state=0,verbose=False)
-			clf.fit(X[1:TrainingSize], Y[1:TrainingSize])
-			yhat = clf.decision_function(X[TrainingSize:])
-			yhat = [yhat[i][0] for i in range(len(yhat))]
 			
 			# summary results
-			results = evaluate(yhat, Y[TrainingSize:]) 
-			info["results"].append('Predicting %s using %2.2f %% of the data %s'%(pfield[0], ratio*100, orderbyMessage))
-			info["results"].append('Number of samples: %d'%len(X))
-			info["results"].append('Number of features: %d'%len(X[0]))
-			info["results"].append('Accuracy: %.4f'%results['accuracy'])
-			info["results"].append('Precision: %.4f'%results['precision'])
-			info["results"].append('Recall: %.4f'%results['recall'])
-			info["results"].append('F1: %.4f'%results['f1'])
+			results,clustmeans = evaluate(cdists, cidx, X) 
+			info["results"].append('Clustering the data using K-means with k=%d'%k)
+			info["results"].append('Average distance to centroid: %.4f'%results['meandist'])
 	
 			hashquery = datfile + hex(hash(request.args.get('query', datfile)) & 0xffffffff) 
 			
@@ -191,42 +168,41 @@ def render(vis, request, info):
 			else:
 				info["pca_matrix_divs"] = ''
 			
-			# preparing weights into a js array
+			# preparing within cluster distances into a js array
 			f = []
-			f.append('{feature:"intercept", weight:%.3f}'%clf.intercept_[0])
-			for i in range(len(clf.coef_[0])):
-				f.append('{feature:"%s", weight:%.3f}'%(pfield[i+1], clf.coef_[0][i]))
-			info["weights_data"] = Markup('weights_data=[' + ','.join(f) + '];') 
-				
+			for i in xrange(k):
+				f.append('{cluster:"%d", distance:%.3f}'%(i, clustmeans[i]))
+			info["clust_data"] = Markup('clust_data=[' + ','.join(f) + '];')
+							
 			# preparing popup window for scatter plot column selection
-			info["scatter_fields"]  = Markup(''.join(['<li><a>%s</a></li>'%pfield[i] for i in range(1,len(pfield))]))
-			info["scatter_x"] = Markup(pfield[1])
-			info["scatter_y"] = Markup(pfield[2])
+			info["scatter_fields"]  = Markup(''.join(['<li><a>%s</a></li>'%pfield[i] for i in xrange(len(pfield))]))
+			info["scatter_x"] = Markup(pfield[0])
+			info["scatter_y"] = Markup(pfield[1])
 			
+# 			#provenance
+# 			info["datfile_provenance"] = hashquery + '.provenance.csv'
+# 			with open(info["datfile_provenance"], 'w') as f:
+# 				f.write('Sample,Error,Cluster,%s\n'%(','.join(pfield)))
+# 				for i in xrange(len(cidx)):
+# 					f.write('%d,%.2f,%d,%s\n'%(i,cdists[i][cidx[i]],cidx[i],','.join([str(r) for r in X[i]])))
+# 			
 			#provenance
 			#0:id,1:prediction result (grouping),2:actual label(shape),3:error,4:y,or features
 			info["datfile_provenance"] = hashquery + '.provenance.csv'
-			RES = ['Correct', 'Mistake']
+			RES = ['Cluster %d'%(i+1) for i in range(k)]
 			with open(info["datfile_provenance"], 'w') as f:
-				f.write('Sample,Result,Label,Error,%s\n'%(','.join(pfield)))
-				for i in range(len(yhat)):
-					e = -yhat[i]*Y[i+TrainingSize]
-					f.write('%d,%s,%d,%.4f,%f,%s\n'%(i,RES[e>=0],Y[i+TrainingSize]+2,e,Y[i+TrainingSize],','.join([str(r) for r in X[i+TrainingSize]])))
+				f.write('Sample,Result,Label,Error,Y,%s\n'%(','.join(pfield)))
+				for i in xrange(len(cidx)):
+					e = cdists[i][cidx[i]]
+					f.write('%d,%s,%d,%.4f,%f,%s\n'%(i,RES[cidx[i]],0,e,cidx[i],','.join([str(r) for r in X[i]])))
+	
 			
+			pfield = ['cluster'] + pfield
 			divs = ['<div class="chart"><div class="title">%s<a href="javascript:reset(%d)" class="reset" style="display: none;">reset</a></div></div>'%(pfield[d], d+1) for d in range(len(pfield))]
 			divs = ''.join(divs)
-			divs  = '<div class="chart"><div class="title">Distance from hyperplane (<span id="active"></span> of <span id="total"></span> items selected.)<a href="javascript:reset(0)" class="reset" style="display: none;">reset</a></div></div>' + divs
+			divs  = '<div class="chart"><div class="title">Error (<span id="active"></span> of <span id="total"></span> items selected.)<a href="javascript:reset(0)" class="reset" style="display: none;">reset</a></div></div>' + divs
 			info['provenance_divs'] = Markup(divs)
 			
-			# auroc
-			fpr, tpr, thresholds = metrics.roc_curve(Y[TrainingSize:],yhat,pos_label=1)
-			info["datfile_auroc"] = hashquery +'.auroc.csv'
-			with open(info["datfile_auroc"],'w') as f:
-				f.write('fpr,tpr\n')
-				for i in xrange(len(fpr)):
-					f.write('%f,%f\n'%(fpr[i],tpr[i]))
-			auroc = metrics.auc(fpr,tpr)
-			info["auroc_score"] = '%.4f'%auroc
 			
 			info["message_class"] = "success"
 			if reload > 0:
@@ -234,10 +210,9 @@ def render(vis, request, info):
 			else:
 				info["message"].append("Loading from cache. Use reload=1 to reload.")
 
-			info["title"] = "FIELD_Y: <em>%s</em>, on <br />FIELD_X(predictors): <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[0], ','.join(xfield), table)
-			info["title"] = Markup(info["title"])		
-			
 	# prepare some messages
+	info["title"] = "FIELD_X: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(xfield), table)
+	info["title"] = Markup(info["title"])		
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
 	info["results"] = Markup('<ul>' + ''.join('<li>%s</li>'%m for m in info["results"] if len(m) > 0) + '</ul>')
 		

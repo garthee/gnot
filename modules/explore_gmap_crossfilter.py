@@ -18,15 +18,15 @@ def render(vis, request, info):
 	latitude = request.args.get("latitude", '')
 	longitude = request.args.get("longitude", '')
 	field = request.args.get("field", '')
+	mapField = request.args.get("mapField", " '1' ")
+	
 	pfield = request.args.get("pfield", [])
-
+	
 	groupBy =  request.args.get("groupBy", '')
-	if groupBy and len(groupBy) > 0:
-		groupBy = ' group by %s '%groupBy
+	if groupBy and len(groupBy) > 0: groupBy = ' group by %s '%groupBy
 
 	orderBy = request.args.get("orderBy", '')	
-	if orderBy and len(orderBy)>0:
-		orderBy = ' order by %s '%orderBy
+	if orderBy and len(orderBy)>0: orderBy = ' order by %s '%orderBy
 		
 	# verify essential parameter details - smell test
 	if len(table) == 0 or len(latitude) == 0 or len(longitude) == 0:
@@ -34,7 +34,7 @@ def render(vis, request, info):
 		info["message_class"] = "failure"
 	else:
 		# prepare sql query
-		sql = "select row_number() over (order by 1,2) as rnum, * from (select %s,%s,%s from %s where %s %s %s %s offset %s) as a"%(latitude,longitude,field, table, where, groupBy, orderBy, limit, start)
+		sql = "select row_number() over (order by 1,2) as rnum, * from (select %s,%s,%s,%s from %s where %s %s %s %s offset %s) as a"%(latitude,longitude,mapField,field, table, where, groupBy, orderBy, limit, start)
 
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)		
 		if len(result) > 0:

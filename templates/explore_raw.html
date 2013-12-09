@@ -63,16 +63,15 @@
 
 <script>
 	d3.csv("{{ datfile }}", function(error, data) {
-		  var header = d3.keys(data[0]);
-		  for (var i = 0; i<data.length; i++){
+		data.forEach(function(d,i) {
 		     var entry = '<div class="db-row">';
-		  	 for (var j = 0; j<header.length; j++) {
-		  	 	entry += '<span class="db-entry-key">' + header[j] + '</span>';
-		  	 	entry += '<span class="db-entry-value">' + data[i][header[j]] + '</span>';
+		  	 for (j in d) {
+		  	 	entry += '<span class="db-entry-key">' + j + '</span>';
+		  	 	entry += '<span class="db-entry-value">' + d[j] + '</span>';
 		  	 }
 		  	 entry += '</div>';
 		  	 $('#svg-box').append(entry);
-		  }
+		  });
 	});
 
 </script>

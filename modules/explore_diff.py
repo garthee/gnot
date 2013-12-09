@@ -12,18 +12,22 @@ def render(vis, request, info):
 	start = request.args.get("start", '0') # start at 0
 	limit = request.args.get("limit", '5000')#max 5000 data points
 	
+	groupBy =  request.args.get("groupBy", '')
+	if groupBy and len(groupBy) > 0: groupBy = ' group by %s '%groupBy
+
 	xField = request.args.get("xField", '')
-	
-	splitfield = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
+	pfield = request.args.get("pfield", [])
+	sfield = request.args.get("sfield", [])
 	
 	if len(table) == 0 or len(xField) == 0 or len(field) == 0:
 		info["message"].append("Table  or field missing.")
 		info["message_class"] = "failure"
-	elif  len(splitfield) < 2:
+	elif  len(sfield) < 2:
 		info["message"].append("Need at least two fields.")
 		info["message_class"] = "failure"
 	else:
-		sql = "select %s, %s from %s where %s group by 1 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)
+		
+		sql = "select %s, %s from %s where %s %s order by 1 limit %s offset %s"%(xField, ','.join(sfield[:2]), table, where, groupBy, limit, start)
 		
 		header =  "Date,A,B"
 		
@@ -39,10 +43,8 @@ def render(vis, request, info):
 				info["message"].append("Loading from cache. Use reload=1 to reload.")
 			
 			info["datfile"] = datfile
-	
-	
-	pfield = request.args.get("pfield", [])
-	info["title"] = "Diff of <br />FIELD: <em>%s</em> on <br />FIELD: <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[1], pfield[2], table)
+			
+	info["title"] = "Diff of <br />FIELD: <em>%s</em> on <br />FIELD: <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[1], pfield[0], table)
 	info["title"] = Markup(info["title"])		
 	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))

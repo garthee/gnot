@@ -152,11 +152,11 @@ d3.text("{{datfile}}", function(text) {
 		
 		if (type == 3) {
 			var group = row.group(function(d) { return groupint(d); });
-			 var bar = barChart()
+			var bar = barChart()
 		        .dimension(row)
 		        .group(group)
 		        .round(d3.time.day.round)
-		      	.x(d3.time.scale().domain([minX, maxX]).rangeRound([0, Math.min(group.size()*11,chart_width)]));
+		      	.x(d3.time.scale().domain([minX, maxX]).rangeRound([0, chart_width]));
 			 charts.push(bar);
 		}
 		else {
@@ -166,7 +166,7 @@ d3.text("{{datfile}}", function(text) {
         	.group(group)
         	.x(d3.scale.linear()
         			.domain([minX-0.1*Math.abs(minX), maxX+0.1*Math.abs(maxX)])
-        			.rangeRound([0, Math.min(group.size()*11,chart_width)]))
+        			.rangeRound([0, chart_width]))
 			charts.push(bar);
 			
 		}

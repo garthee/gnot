@@ -17,7 +17,7 @@ def render(vis, request, info):
 	#module dependent user inputs
 	latitude = request.args.get("latitude", '')
 	longitude = request.args.get("longitude", '')
-	field = request.args.get("field", 'count(*)')
+	field = request.args.get("field", ' count(*) ')
 	xField = request.args.get("xField", "'1'")
 
 	# verify essential parameter details - smell test
@@ -26,7 +26,7 @@ def render(vis, request, info):
 		info["message_class"] = "failure"
 	else:
 		# prepare sql query
-		sql = "select %s, %s, %s, %s from %s where %s group by 1,2,3 order by 1 %s offset %s"%(xField,latitude, longitude, field, table, where,limit, start)
+		sql = "select %s, trunc(%s::numeric,3), trunc(%s::numeric,3), %s from %s where %s group by 1,2,3 order by 1 %s offset %s"%(xField,latitude, longitude, field, table, where,limit, start)
 
 		header =  "t,latitude,longitude,count"
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
@@ -50,6 +50,10 @@ def render(vis, request, info):
 	
 	info["title"] = "FIELD: <em>%s</em> against <br />LATITUDE: <em>%s</em> and <br />LONGITUDE:<em>%s</em> along <br />xFIELD: <em>%s</em> from <br />TABLE: <em>%s</em>"%(field, latitude, longitude, xField, table)
 	info["title"] = Markup(info["title"])	
+	
+	if xField != "'1'":
+		info["div_slider_counter"] = Markup('<p>Slider is at <span id="slider-time"></span></p>')
+		info["div_slider"] = Markup('<div id="slider-container" style="padding: 10px;"> <input type="hidden" value="40" id="slider" /></div>')
 	
 	# format the message to encode HTML characters
 	info['query']= Markup(request.args.get('query', ''))

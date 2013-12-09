@@ -129,16 +129,13 @@ block body %}
 <div id="container" class="container">
 	<div id="main-container">
 		<div id="map"></div>
-		<div id="slider-container" style="padding: 10px;">
-			<input type="hidden" value="40" id="slider" />
-		</div>
-		
+		{{div_slider}}
 	</div>
 	<div id="side-container">
 		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
-			<p>Slider is at <span id="slider-time"></span></p>
+			{{div_slider_counter}}
 			<p><span><label><input type="checkbox" id="fullscreen">Full Screen</label></span></p>
 			
 		</div>
@@ -152,7 +149,7 @@ block body %}
 <script>
 
 	d3.select("#fullscreen").on("change", fullscreen);
-	var entries = {}, map=undefined, heatmap, dt, dx, keys;
+	var entries = {}, map=undefined, heatmap, dt = 0, dx, keys;
 	
 	function fullscreen(){
 		$('#container div').toggleClass('fullscreen');
@@ -357,6 +354,7 @@ block body %}
       	keys = d3.keys(entries);
       	dx = d3.scale.linear().domain([0, keys.length-1]).range([0, 100]);
       	$("#slider").PPSlider({width : 780});
+      	drawmap();
 	});  
 </script>
 

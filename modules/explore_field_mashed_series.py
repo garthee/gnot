@@ -40,20 +40,20 @@ def render(vis, request, info):
 	view = request.args.get("view", '')
 	start = request.args.get("start", '0') # start at 0	
 	limit = request.args.get("limit", '10000000')
-	xField = request.args.get("xField", '')
-	sub_field = request.args.get("sub_field", '')
 	
-	splitfield = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
-	if len(table) == 0 or len(xField) == 0:
+	xField = request.args.get("xField", '')
+	sfield = request.args.get("sfield", '')
+	pfield = request.args.get("pfield", [])
+	
+	if len(table) == 0 or not xField:
 		info["message"].append("Table or xfield missing.")
 		info["message_class"] = "failure"
-	elif len(splitfield) != 2:
+	elif len(sfield) != 2:
 		info["message"].append("Need two fields : a field to group by, and another aggregate field.")
 		info["message_class"] = "failure"
 	else:
 	
 		sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)
-		
 		
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
 		if len(result) > 0:
@@ -72,8 +72,6 @@ def render(vis, request, info):
 		
 		(startYear, endYear) = _array2mat(datfile, datfilen)
 		
-	
-	pfield = request.args.get("pfield", [])
 	info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(pfield), table)
 	info["title"] = Markup(info["title"])		
 	

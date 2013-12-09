@@ -39,8 +39,39 @@ def x2fs(X, fields, type = ''):
 	for j1 in range(l1):
 		for j2 in range(s2(j1), e2(j1, l2)):
 			fields.append(fields[j1]+'*'+fields[j2])
-					
-#
+
+def encodeCategories(X, fields, ids = ''):
+	dfields = fields[:]
+	del fields[:]
+	from sklearn.preprocessing import OneHotEncoder
+	if ids and len(ids)>0:
+		try:
+			categorical_features = [int(number) for number in ids.split(',')]
+			ids = categorical_features
+		except:
+			categorical_features = 'all'
+			ids = range(len(dfields))
+	else:
+		categorical_features = 'all'
+		ids = range(len(dfields))
+
+	enc = OneHotEncoder(n_values='auto', categorical_features=categorical_features)
+	enc.fit(X)
+	print enc.__dict__
+	for i in range(len(ids)):
+		flen = enc.n_values_[i]
+		for j in range(flen):
+			fields.append(dfields[ids[i]] + '_%02d'%(j+1))
+	for i in range(len(fields)):
+		if not i in enc.active_features_:
+			del fields[i]		
+	for i in range(len(dfields)):
+		if not i in ids:
+			fields.append(dfields[i])
+	
+	T =  enc.transform(X).toarray()
+	print T.shape
+	return T
 # fit_transform from sklearn doesn't return the loadings V. Here is a hacked version
 def fit_transform(pca, X):
 	U, S, V = pca._fit(X)
@@ -95,8 +126,10 @@ def render(vis, request, info):
 	regularizer = float(request.args.get("regularizer", 1))
 	pre_process = request.args.get("pre_process", '')
 	pre_transform = request.args.get("pre_transform", '')
-	orderBy = request.args.get("orderBy", '')
 	
+	orderBy = request.args.get("orderBy", '')
+	groupBy = request.args.get("groupBy", '')
+	if groupBy and len(groupBy)>0: groupBy = ' group by %s'%groupBy
 	pfield = request.args.get("pfield", [])
 	
 	# verify essential parameter details - smell test
@@ -113,7 +146,7 @@ def render(vis, request, info):
 			orderBy = ''
 			orderbyMessage = 'ordered randomly'
 		
-		sql = "select %s from %s where %s %s limit %s offset %s"%(field, table, where, orderBy, limit, start)
+		sql = "select %s from %s where %s %s %s limit %s offset %s"%(field, table, where, groupBy, orderBy, limit, start)
 
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
 		
@@ -126,7 +159,7 @@ def render(vis, request, info):
 			with open(datfile, 'r') as f:
 				for r in f:		
 					row = r.rstrip().split(',')
-					Y.append(int(row[0]))
+					Y.append(float(row[0]))
 					X.append([float(r) for r in row[1:]])
 			
 			if ratio == 1:
@@ -136,10 +169,14 @@ def render(vis, request, info):
 				
 			
 			xfield = pfield[1:]
-			
 			# transform features
-			x2fs(X,xfield, pre_transform)
+			if pre_transform == 'Encode_Categorical':
+				X = encodeCategories(X, xfield)
+			else:
+				x2fs(X, xfield, pre_transform)
 			pfield = [pfield[0]] + xfield
+			print len(pfield), pfield
+			print len(X[0]),len(X[1])
 			
 			X = numpy.array(X)
 			
@@ -174,7 +211,7 @@ def render(vis, request, info):
 			info["results"].append('Root Mean Squared: %.4f'%results['rms'])
 			info["results"].append('R^2: %.4f'%clf.score(X[TrainingSize:], Y[TrainingSize:]))
 	
-			hashquery = datfile# 'cache/%s'%hex(hash(request.args.get('query', datfile)) & 0xffffffff) 
+			hashquery = datfile + hex(hash(request.args.get('query', datfile)) & 0xffffffff) 
 			
 			if pre_process == "PCA" or pre_process == "Whitened PCA":
 				#write pca matrix file
@@ -189,7 +226,7 @@ def render(vis, request, info):
 			
 			# preparing weights into a js array
 			f = []
-			#f.append('{feature:"intercept", weight:%.3f}'%clf.intercept_[0])
+			f.append('{feature:"intercept", weight:%.3f}'%clf.intercept_)
 			for i in range(len(clf.coef_)):
 				f.append('{feature:"%s", weight:%.3f}'%(pfield[i+1], clf.coef_[i]))
 			info["weights_data"] = Markup('weights_data=[' + ','.join(f) + '];') 
@@ -200,15 +237,26 @@ def render(vis, request, info):
 			info["scatter_y"] = Markup(pfield[0])
 			
 			#provenance
+# 			info["datfile_provenance"] = hashquery + '.provenance.csv'
+# 			with open(info["datfile_provenance"], 'w') as f:
+# 				f.write('Sample,Error,%s\n'%(','.join(pfield)))
+# 				for i in range(len(yhat)):
+# 					f.write('%d,%.2f,%f,%s\n'%(i,float(Y[i+TrainingSize]-yhat[i]),Y[i+TrainingSize],','.join([str(r) for r in X[i+TrainingSize]])))
+# 			
+			#provenance
+			#0:id,1:prediction result (grouping),2:actual label(shape),3:error,4:y,or features
 			info["datfile_provenance"] = hashquery + '.provenance.csv'
+			RES = ['Squared Errors']
 			with open(info["datfile_provenance"], 'w') as f:
-				f.write('Sample,Error,%s\n'%(','.join(pfield)))
+				f.write('Sample,Result,Label,Error,%s\n'%(','.join(pfield)))
 				for i in range(len(yhat)):
-					f.write('%d,%.2f,%f,%s\n'%(i,float(Y[i+TrainingSize]-yhat[i]),Y[i+TrainingSize],','.join([str(r) for r in X[i+TrainingSize]])))
-			
+					e = float(Y[i+TrainingSize]-yhat[i])**2
+					f.write('%d,%s,%d,%.4f,%f,%s\n'%(i,RES[0],0,e,Y[i+TrainingSize],','.join([str(r) for r in X[i+TrainingSize]])))
+	
+	
 			divs = ['<div class="chart"><div class="title">%s<a href="javascript:reset(%d)" class="reset" style="display: none;">reset</a></div></div>'%(pfield[d], d+1) for d in range(len(pfield))]
 			divs = ''.join(divs)
-			divs  = '<div class="chart"><div class="title">Error (<span id="active"></span> of <span id="total"></span> items selected.)<a href="javascript:reset(0)" class="reset" style="display: none;">reset</a></div></div>' + divs
+			divs  = '<div class="chart"><div class="title">Squared Error (<span id="active"></span> of <span id="total"></span> items selected.)<a href="javascript:reset(0)" class="reset" style="display: none;">reset</a></div></div>' + divs
 			info['provenance_divs'] = Markup(divs)
 			
 			info["message_class"] = "success"
@@ -217,10 +265,10 @@ def render(vis, request, info):
 			else:
 				info["message"].append("Loading from cache. Use reload=1 to reload.")
 
-
+			info["title"] = "FIELD_Y: <em>%s</em>, on <br />FIELD_X(predictors): <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[0], ','.join(xfield), table)
+			info["title"] = Markup(info["title"])		
+			
 	# prepare some messages
-	info["title"] = "FIELD_Y: <em>%s</em>, on <br />FIELD_X(predictors): <em>%s</em> from <br />TABLE: <em>%s</em>"%(pfield[0], ','.join(xfield), table)
-	info["title"] = Markup(info["title"])		
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
 	info["results"] = Markup('<ul>' + ''.join('<li>%s</li>'%m for m in info["results"] if len(m) > 0) + '</ul>')
 			

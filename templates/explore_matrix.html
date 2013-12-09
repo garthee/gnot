@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% block title %}Graph{% endblock %} {%
+{% extends "layout.html" %} {% block title %}Matrix{% endblock %} {%
 block body %}
 
 <style>
@@ -10,7 +10,7 @@ line {
 }
 </style>
 
-<h1>Explore Graph</h1>
+<h1>Explore Matrix</h1>
 <div id="container">
 	<div id="main-container" style="width: 800px;">
 		<div id="svg-box"></div>
@@ -19,12 +19,12 @@ line {
 		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
-			<p>Each colored cell represents the co-occurrences; darker cells indicate items that co-occurred more frequently.</p>
+			<p>Each colored cell represents the value between entities.</p>
 			<p>Use the drop-down menu to reorder the matrix and explore the data.</p>
 			<p>Order: <select id="order">
   				<option value="name">by Name</option>
-  				<option value="count">by Frequency</option>
-  				<option value="group">by Cluster</option>
+  				<option value="count">by Value</option>
+  				<option value="group">by LinkGroup</option>
 				</select>
 			</p>
 		</div>
@@ -93,7 +93,7 @@ line {
   		};
 		
 		// The default sort order.
-		x.domain(orders.name);
+		x.domain(orders.count);
 	
 	  	svg.append("rect")
 	      .attr("class", "background")
@@ -115,10 +115,8 @@ line {
 	      .attr("y", x.rangeBand() / 2)
 	      .attr("dy", ".32em")
 	      .attr("text-anchor", "end")
-	      .text(function(d, i) { return nodes[i].name; })
-		  .on("click",function(d,i) { window.open('file?experiment={{experiment}}&file=' + nodes[i].name,'_blank');})
-		  .attr("class", "clickable");
-		 
+	      .text(function(d, i) { return nodes[i].name; });
+		  
 	  	var column = svg.selectAll(".column")
 	      .data(matrix)
 	    .enter().append("g")
@@ -139,12 +137,12 @@ line {
 	    	var cell = d3.select(this).selectAll(".cell")
 	        	.data(row.filter(function(d) { return d.z; }))
 	      	.enter().append("rect")
-		        .attr("class", function(d) {return nodes[d.x] == nodes[d.y] ? 'cell background' : 'cell'  })
+		        .attr("class", function(d) {return  'cell'  })
 		        .attr("x", function(d) { return x(d.x); })
 		        .attr("width", x.rangeBand())
 		        .attr("height", x.rangeBand())
-		        .style("fill-opacity", function(d) { return nodes[d.x] == nodes[d.y] ? null: z(4*d.z/max_link); })
-		        .style("fill", function(d) { return nodes[d.x] == nodes[d.y] ? null: c(nodes[d.x].group); })
+		        .style("fill-opacity", function(d) { return  z(4*d.z/max_link); })
+		        .style("fill", function(d) { return  c(nodes[d.x].group); })
 		        .on("mouseover", mouseover)
 		        .on("mouseout", mouseout)
 		        .append("title").text(function(d) { return d.z; });
@@ -183,8 +181,8 @@ line {
 	
 	  	var timeout = setTimeout(function() {
 		    order("group");
-		    d3.select("#order").property("selectedIndex", 2).node().focus();
-	  	}, 5000);
+		    d3.select("#order").property("selectedIndex", 1).node().focus();
+	  	}, 2000);
 
 		function nodeByName(name, group) {
 			var id = node_ids.indexOf(name);

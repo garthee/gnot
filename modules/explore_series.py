@@ -12,13 +12,14 @@ def render(vis, request, info):
 	start = request.args.get("start", '0') # start at 0	
 	limit = request.args.get("limit", '5000')
 	
+	pfield = request.args.get("pfield", [])
+	
 	xField = request.args.get("xField", '')
 	annotate = request.args.get("annotate", '')
-	groupby =  request.args.get("groupBy", '')
-	if groupby and len(groupby) > 0:
-		groupby = ' group by ' + groupby
-
 	
+	groupby =  request.args.get("groupBy", '')
+	if groupby and len(groupby) > 0: groupby = ' group by %s'%groupby
+
 	if len(table) == 0 or len(xField) == 0 or len(field) == 0:
 		info["message"].append("Table or field missing.")
 		info["message_class"] = "failure"
@@ -26,7 +27,7 @@ def render(vis, request, info):
 		annotate = ',%s'%annotate if len(annotate) > 0 else ''
 		sql = "select %s, %s %s from %s where %s %s order by 1 limit %s offset %s"%(xField, field, annotate, table, where, groupby, limit, start)
 		annotate = ',annotate' if len(annotate) > 0 else ''
-		header = "Date,%s%s"%(field, annotate)
+		header = "Date,%s%s"%(','.join(pfield), annotate)
 		
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
 		if len(result) > 0:
@@ -42,7 +43,6 @@ def render(vis, request, info):
 			info["datfile"] = datfile
 	
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
-
-	info["title"] = "%s from %s"%(field, table)
+	info["title"] = "%s from %s"%(','.join(pfield), table)
 
 	

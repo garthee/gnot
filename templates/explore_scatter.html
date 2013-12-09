@@ -9,26 +9,11 @@
 	#side-container {
 		width:100px;
 	}
-	#side-container-4{
-		background:#cbcbcb;
-	}
-	section{
-		border:0px;
-		padding:5px 0;
-	}
-	#legend{
-		background:inherit;
-		height:inherit;
-	}
-	#side_panel{
-		padding:0px;
-	}
 	svg {
   		overflow: hidden;
   		height:800px;
   		width:955px;
 	}
-	
 </style>
 
 <h1>Explore Scatter</h1>
@@ -44,7 +29,6 @@
 <div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
 </div>
 </div>
-
 
 <script>
  nv.addGraph(function() {
@@ -63,9 +47,6 @@
  
  	chart.xAxis.tickFormat(d3.format('f'))
  	chart.yAxis.tickFormat(d3.format('f'))
-   	chart.tooltipContent(function(key) {
-		return '<h2>' + key + '</h2>';
-  	});
   	
  	d3.csv("{{datfile}}", function(error, data) {
  		fd = {};
@@ -79,11 +60,8 @@
     		d.shape = shapes[0];
   			fd[d.c].values.push(d);
 	  	});
-	  	var fdvalues = Object.keys(fd).map(function(key){
-    		return fd[key];
-		});
 		d3.select('#svg-box svg')
-			.datum(fdvalues)
+			.datum(d3.values(fd))
 			.transition().duration(500)
 			.call(chart);
 		

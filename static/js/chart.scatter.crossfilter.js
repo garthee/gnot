@@ -1,204 +1,94 @@
-{% extends "layout.html" %}
-{% block title %}Google Map Crossfilter{% endblock %}
-{% block body %}
-
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.3.9/d3.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
-
-<style>
-.chart{
-	min-width:150px;
-  	display: inline-block;
-  	height: 151px;
-  	margin-bottom: 20px;
-  	margin-right:12px;
-}
-.chart div{
-	padding:5px;
-}
-.reset {
-  padding-left: 1em;
-  font-size: smaller;
-  color: #ccc;
-}
-
-.background.bar {
-  fill: #ccc;
-}
-
-.foreground.bar {
-  fill: steelblue;
-}
-
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.axis text {
-  font: 10px sans-serif;
-}
-
-.brush rect.extent {
-  fill: steelblue;
-  fill-opacity: .125;
-}
-
-.brush .resize path {
-  fill: #eee;
-  stroke: #666;
-}
-
-
-	#map.fullscreen{
-		width:100%;
-		height:100%;
-	}
-	#map{
-		width:800px;
-		height:800px;
-	}
-	#main-container{
-		width:800px;
-	}
+var chart_scatter_crossfilter = function (drawLine){
+	//scatter plot
+	var shapes = ['circle', 'square','diamond', 'cross', 'triangle-down', 'triangle-up'],
+	 		margin = {top: 40, right: 20, bottom: 50, left: 90},
+		    width = 800,
+		    height = 400,
+		    scatterchart;
 	
-	#main-container.fullscreen{
-		position: fixed;
-		left: 0px;
-		top: 0px;
-		margin-left: 0px;
-		width: 100%;
-		height: 100%;
-		z-index: -100;
-	}
-	#side-container.fullscreen{
-		position: fixed;
-		left: 10px;
-		display: block;
-		top:100px;
-	}
-	h1.fullscreen{
-		left: 10px;
-		position: fixed;
-	}
+	if (drawLine)
+		scatterchart = nv.models.scatterPlusLineChart();
+	else
+		scatterchart = nv.models.scatterChart();
 	
-</style>
-<script src="static/js/crossfilter.v1.min.js"></script>
-
-<h1>Explore Google Map Crossfilter</h1>
-
-<div id="container" class="container">
-<div id="main-container">
-	<div id="map"></div>
-	<div id="svg-box-provenance">{{divs}}</div>
-</div>
-<div  id="side-container">
-<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-<div class="side-container" id="side-container-0">{{title}}</div>
-<div class="side-container" id="side-container-1"  >
-<p id="totals"><span id="active"></span> of <span id="total"></span> items selected.</p>
-<p><span><label><input type="checkbox" id="fullscreen">Full Screen</label></span></p>
-</div>
-
-
-<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a></div>
-</div>
-</div>
-
-<script>
-
-var file_provenance = "{{datfile}}",
-	map=undefined, 
-	heatmap,
-	chart_width = 760,
-	num_bins = 70,
-	zoomLevel = 13;
+	scatterchart.showDistX(true)
+ 		.showDistY(true)
+		.width(width)
+		.height(height)
+		.margin(margin)
+		.color(d3.scale.category10().range());
+ 	
+ 	scatterchart.scatter.onlyCircles(false);
+   	scatterchart.tooltipContent(function(key, xVal, yVal, e, chart) {
+   		return '<h3>' + key + '</h3>';
+   	});
+	scatterchart.dispatch.on('stateChange', function(e) { ('New State:', JSON.stringify(e)); });
+	nv.utils.windowResize(scatterchart.update);
 
 	d3.text(file_provenance, function(text) {
 		var data = d3.csv.parseRows(text),
+			header = data[0],
 			charts = [];
+		data = data.slice(1,data.length);
 		
 		var flight = crossfilter(data),
 	  		all = flight.groupAll(),
-	  		flightId = flight.dimension(function(d){return +d[0]-1;}),
+	  		flightId = flight.dimension(function(d){return d[0];}),
   			flightIds = flightId.group();
 		
-		function fullscreen(){
-			$('#container div').toggleClass('fullscreen');
-			$('h1').toggleClass('fullscreen');
-			$('#search-box-top-container').toggle();
-			$('.chart').toggle();
-			map = undefined; //centering needs to be done again!
-			drawmap();
-		}
-		d3.select("#fullscreen").on("change", fullscreen);
-		
-		function drawmap(){  
-			var taxiData = new google.maps.MVCArray(),
-				idsarray = flightIds.all(),
-				entry,
-				points = {};
-		  	
-		  	var nfixed = Math.max(Math.min(4, Math.floor((zoomLevel-13)/2+3)),1);
-		  	
-			idsarray.forEach(function(dd,i){
-				if (dd.value > 0) {
-					var d = data[dd.key];
-					if (d === undefined)
-						var halthere = 1;
-					var	lat = (+d[1]).toFixed(nfixed),
-	    				lon = (+d[2]).toFixed(nfixed),
-	    				id = lat.toString() + '_' + lon.toString();
-	    		
-					if (!(id in points))
-						points[id] = {latitude:lat, longitude:lon, count:0};
-					
-					points[id].count += (+d[3]);
-				}
-			});
-		
-			if (map === undefined){
-			    var clat = d3.mean(d3.values(points), function(d){ return +d.latitude;});
-			    var clong = d3.mean(d3.values(points), function(d){ return +d.longitude;});
+		function scatter_plot() {
+			// 0:id,1:prediction result (grouping),2:actual label(shape),3:error,4:y,or features
+			
+			var	idsarray = flightIds.all(),
+				scatter_data = {};
 				
-		  		map = new google.maps.Map($('#map')[0], {
-		    		zoom: zoomLevel,
-		    		panControl: false,
-					overviewMapControl:true,
-					streetViewControl:false,
-		    		zoomControl: true,
-		    		zoomControlOptions: {
-		      			style: google.maps.ZoomControlStyle.SMALL,
-		      			position: google.maps.ControlPosition.RIGHT_TOP
-		    		},
-		    		center: new google.maps.LatLng(clat, clong),
-		    		styles: [{'stylers': [{'saturation': -90},{'lightness': -5}]}]
-				});
-				google.maps.event.addListener(map, 'zoom_changed', function() {
-  					var newZoomLevel = map.getZoom();
-  					if (Math.abs(newZoomLevel - zoomLevel) > 1) {
-  						zoomLevel = newZoomLevel;
-  						drawmap();
-  					}
-  				});
+			var x1 = 0, x2 = 0, intercept = 0, slope = 0;
+			if (drawLine){
+				weights_data.forEach(function (d) { if(d.feature == scatter_x2_name) x2 = d.weight;});
+				weights_data.forEach(function (d) { if(d.feature == scatter_x1_name) x1 = d.weight;});
+				weights_data.forEach(function (d) { if(d.feature == 'intercept') intercept = d.weight;});
 				
-		  		heatmap = new google.maps.visualization.HeatmapLayer({
-		    		radius: 15, opacity: 1, map: map
-		  		});
+				intercept = -1.0*intercept/x2;
+				slope = -1.0*x1/x2;
 			}
 			
-			heatmap.setData(taxiData);
-		    for (var i in points) {   	
-		   		entry  = points[i];
-		    	var latlong = new google.maps.LatLng(entry.latitude, entry.longitude);
-		    	taxiData.push({location: latlong, weight: entry.count });
-		    }	
+			var xi1  = header.indexOf(scatter_x1_name),
+				xi2  = header.indexOf(scatter_x2_name);
+			
+			idsarray.forEach(function(d,i){
+				if (d.value > 0) {
+					i = d.key;
+					if (!(data[i][1] in scatter_data)) {
+						scatter_data[data[i][1]] = {key:data[i][1], values:[], slope:slope, intercept:intercept};
+					}
+					scatter_data[data[i][1]].values.push({x:+data[i][xi1], y:+data[i][xi2], shape:shapes[+data[i][2]], size:(+data[i][3])});
+				}
+			});
+			
+			scatterchart.xAxis.tickFormat(d3.format('.2f')).axisLabel(scatter_x1_name);
+		 	scatterchart.yAxis.tickFormat(d3.format('.2f')).axisLabel(scatter_x2_name);
+
+		 	//scatter_data = ;//( getValues(scatter_data);
+			d3.select('#svg-box-scatter svg')
+					.datum(d3.keys(scatter_data).sort().map(function (d){return scatter_data[d];}))
+					.transition().duration(500)
+					.call(scatterchart);
 		}
 		
+		$( document ).ready(function() {
+		$("#scatter_x1 a").click(function(){
+			scatter_x1_name = $(this).text();
+			scatter_plot();
+		});
+		$("#scatter_x2 a").click(function(){			
+			scatter_x2_name = $(this).text();
+			scatter_plot();
+		});
+		});
+		
 		// crossfilter
-		var formatNumber = d3.format(",d"),
+		var num_bins = 70, chart_width = 760,
+			formatNumber = d3.format(",d"),
 	  		str2int = function(d){return +d;},
 	  		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
 	  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));};;
@@ -208,7 +98,7 @@ var file_provenance = "{{datfile}}",
 		}
 	
 		var sr = data[0];
-	  	for (j = 4; j < sr.length; j++){
+	  	for (j = 3; j < sr.length; j++){
 			var parseX = str2int, 
 				type = 1; 
 			if (!isNumber(sr[j])){
@@ -226,9 +116,11 @@ var file_provenance = "{{datfile}}",
 				minX  = Math.min(minX, parseX(data[i][j]));
 			}
 			var dxx = ((maxX-minX)/num_bins);
-			var groupint = function(d){return Math.floor(d / dxx) * dxx;}
+			var groupint = function(d){return Math.floor(d / dxx) * dxx;};
 			
-			var row = flight.dimension(function(d) { return parseX(d[j]); });
+			var row = flight.dimension(function(d) { 
+				return parseX(d[j]); }
+			);
 			if (type == 3) {
 				//var group = row.group(d3.time.day),
 				var group = row.group(function(d) { return groupint(d); }),
@@ -250,7 +142,7 @@ var file_provenance = "{{datfile}}",
 	        		.dimension(row)
 	        		.group(group)
 	      			.x(d3.scale.linear()
-	      				.domain([minX-dxx*2, maxX+dxx*2]) //10% buffer
+	      				.domain([minX-dxx*2, maxX+dxx*2])
 	      				.rangeRound([0, sw]));
 				charts.push(bar);
 			}
@@ -272,7 +164,7 @@ var file_provenance = "{{datfile}}",
 	
 	  // Whenever the brush moves, re-rendering everything.
 	function renderAll() {
-		drawmap();	
+	  	scatter_plot();	
 	    chart.each(render);
 	    d3.select("#active").text(formatNumber(all.value()));
 	}
@@ -437,7 +329,7 @@ var file_provenance = "{{datfile}}",
 	    chart.x = function(_) {
 	      if (!arguments.length) return x;
 	      x = _;
-	      axis.scale(x).ticks(Math.min(10, Math.floor(x.range()[1]/50)));
+	      axis.scale(x).ticks(Math.floor(x.range()[1]/40));
 	      brush.x(x);
 	      return chart;
 	    };
@@ -486,7 +378,4 @@ var file_provenance = "{{datfile}}",
 		for (i in x){ y.push(x[i]);}
 		return y;
 	}
-
-
-</script>
-{% endblock %}
+}
