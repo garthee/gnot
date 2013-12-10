@@ -17,10 +17,7 @@ jQuery.noConflict();
 	  return result;
 	}
 
-
-	var uri = parseUri(document.location.search);
-	 
-	var query = uri.queryKey['query'];
+	var query = parseUri(document.location.search).queryKey['query'];
 	if(typeof query != 'undefined') 
 		query = decodeURIComponent(query.replace(/\+/g, ' '));
 	else
@@ -28,6 +25,7 @@ jQuery.noConflict();
 	
 	 
 	$("#form_module_tables").submit(function() {
+		window.visualSearch.searchBox.disableFacets();
 		$('#query-input').val(window.visualSearch.searchBox.value());
 		return true;
 	});

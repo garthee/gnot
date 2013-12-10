@@ -34,6 +34,10 @@ class Visulizer(object):
 		cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0], "modules")))
 		if cmd_subfolder not in sys.path:
 			sys.path.insert(0, cmd_subfolder)
+	
+		cache_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0], "cache")))
+		if not os.path.exists(cache_subfolder):
+			os.makedirs(cache_subfolder)
 
 	def loadConfig(self):
 		config = json.loads(open(os.path.realpath(os.path.expanduser('~/.gnot_config')), 'r').read())
@@ -67,12 +71,10 @@ class Visulizer(object):
 		
 	def _parse_query(self, request):
 		query = request.args.get('query', '')
-		print query
+		
 		#matches = re.findall(r'([^:]+):\s(?=[^\s]+)', query)
 		reg = r'\s*([^:]+):\s+((?=\")\"[^\"]+\"|[^\s]+)'
 		matches = re.findall(reg, query)
-		
-		if not self.config["isProduction"] : print matches
 		
 		entries = defaultdict(list)
 		for (key, value) in matches:

@@ -3,7 +3,7 @@
 import os
 def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = False):
 		
-	hsql = hex(hash(sql) & 0xffffffff)	#32bit
+	hsql = hex(hash(sql + str(view)) & 0xffffffff)	#32bit
 	datfile = 'cache/%s_%s.csv'%(config.get("uid", ''), hsql)
 	
 	result = ''
@@ -47,6 +47,8 @@ def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = 
 		
 		sysout = os.popen(sql)
 		sysresult = sysout.read()
-		if sysout.close(): result += ' <p><strong>Error querying relation! </strong></p><p>' + sysresult + '</p>'
+		if sysout.close(): 
+			result += ' <p><strong>Error querying relation! </strong></p><p>' + sysresult + '</p>'
+			os.popen("rm %s"%(datfile)) # make sure we are not appending to an existing file
 		
 	return (datfile, reload, result)

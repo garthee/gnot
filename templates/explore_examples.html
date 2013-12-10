@@ -28,11 +28,19 @@
 		margin:50px;
 		padding-left:50px;
 		color : #666;
+		font-size:14px;
 	}
 	#main-container h2 {
 		font-size:20px;
 		padding:5px;
 	}
+	
+	#main-container p{
+	 	margin:5px;
+	 	padding:10px;
+	 	border-bottom:1px dashed #aaa;
+	}
+
 </style>
 
 <h1>Explore Examples</h1>
@@ -142,6 +150,76 @@ Example regression task on Wisconsin breast cancer dataset: ML_RIDGE_LINEAR modu
 <a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellshape%22+field%3A+%22cellsize%22+k%3A+%223%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+field%3A+%22thickness%22">
 Example clustering task on Wisconsin breast cancer dataset: ML_K-Means module 
 </a>
+
+<h2>Case study: Big Data Challenge by MIT Big Data Initiative at CSAIL</h2>
+<p>
+Let's start by exploring the dataset.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_raw+table%3A+public.d_pickup+field%3A+%22*%22+limit%3A+10">Explore_Raw</a>
+We see that there are 5 fields: trip_id, time, address, longitude, and latitude. 
+</p>
+
+<p>
+Next, we will use Explore_Calendar module to see the distribution of the data over the time span
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_calendar+table%3A+public.d_pickup+xField%3A+%22date%28time%29%22">Explore_Calendar</a>
+We can see that the data spans from May 1, 2012 to November 30, 2012, and that the data is missing for about two weeks during the latter part of August.
+</p>
+
+<p>
+We will use Explore_Diff module to compare the ridership in location to overall ridership across Boston.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_diff+table%3A+public.d_pickup+field%3A+%22count%28*%29+as+total_ridership%22+field%3A+%22sum%28%28%28latitude-42.354008%29%5E2%2B%28longitude-%28-71.062569%29%29%5E2%3C0.00224946357%5E2%29%3A%3Aint%29+as+ridership%22+xField%3A+%22date%28time%29%22+groupBy%3A+%221%22">Explore_Diff</a>
+We see that ratio fluctuates hugely, and use Explore_Series to get a more detailed view.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_series+table%3A+public.d_pickup+field%3A+%22count%28*%29+as+total_ridership%22+field%3A+%22sum%28%28%28latitude-42.354008%29%5E2%2B%28longitude-%28-71.062569%29%29%5E2%3C0.00224946357%5E2%29%3A%3Aint%29+as+ridership%22+xField%3A+%22date%28time%29%22+groupBy%3A+%221%22">Explore_Series</a>
+It is as easy as changing the module option in the query box. There we have many types of visualizations at our disposal.
+</p>
+
+<p>
+Explore_series and Explore_longseries modules support annotations. Can we use this feature to see the correlation between events and ridership?
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_series+table%3A+public.d_pickup+table%3A+public.d_events+xField%3A+%22date%28table_1.time%29%22+field%3A+%22count%28*%29%22+groupBy%3A+%221%22+annotate%3A+%22array_to_string%28+array_agg%28+distinct+table_2.name%29%2C+%27%3Cbr+%2F%3E%27%29%22+where%3A+%22%28table_1.latitude+-+42.366261%29%5E2+%2B+%28table_1.longitude+-+%28-71.062103+%29%29%5E2+%3C+0.00224946357%5E2+and+%28table_2.latitude+-+42.366261%29%5E2+%2B+%28table_2.longitude+-+%28-71.062103+%29%29%5E2+%3C+0.00224946357%5E2+and+date%28table_1.time%29+%3D+date%28table_2.e_date%29%22">Explore_Series</a>
+</p>
+
+<p>
+We will use Explore_Word module to see the popular words in the addresses. It shows the words sized according to the number of occurrences.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_word+table%3A+public.d_pickup+field%3A+%22address%22">Explore_Word</a>
+Of course, top word Boston is uninteresting given that this dataset is from Boston. Therefore, let's skip the first entry by starting at record 2, and we can see several zip codes popping up.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_word+table%3A+public.d_pickup+field%3A+%22address%22+start%3A+2">Explore_Word</a>
+</p>
+
+ <p>
+ We will use Explore_Multi-Field to understand which latitude, longitude, and specific address with high ridership.
+ <a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_multi-field+table%3A+public.d_pickup+field%3A+%22trunc%28latitude%3A%3Anumeric%2C2%29%2C+trunc%28longitude%3A%3Anumeric%2C2%29%2C+address%22">Explore_Multi-field</a>
+ Here, we truncated the coordinates to the second decimal point using SQL itself. We can see latitude: 42.34 has the highest with 34\% of the ridership, out of which longitude -71.08 takes the highest ridership at 14\%. Within this combination, ``unnamed road Boston'' (which is part of Boston Logan international airport) takes the highest fraction. Altogether, it takes 3\% of the total taxi ridership.
+ </p>
+ 
+ <p>
+However, making sense of the latitudes and longitudes is easier when they are plotted on a map. We will use Explore_Gmap to view them in Google maps.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_gmap+table%3A+public.d_pickup+field%3A+%22count%28*%29%22+latitude%3A+%22trunc%28latitude%3A%3Anumeric%2C3%29%22+longitude%3A+%22trunc%28longitude%3A%3Anumeric%2C3%29%22">Explore_Gmap</a>
+We can also visualize the changes in the ridership against time by making use of xField option.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_gmap+table%3A+public.d_pickup+field%3A+%22count%28*%29%22+latitude%3A+%22trunc%28latitude%3A%3Anumeric%2C3%29%22+longitude%3A+%22trunc%28longitude%3A%3Anumeric%2C3%29%22+xField%3A+%22date%28time%29%22">Explore_Gmap</a> 
+GNoT follows the SQL syntax, and offloads data filtering and formatting tasks to the RDBMS. Viewing changes by hour instead of by day is as easy as changing the xField from <em>date(time)</em> to <em>to_char(time, 'YYYYMMDDHH24')</em>.
+</p>
+
+<p>
+In order to gain a deeper insight into the ridership based on hour of the day, month of the year, and day of the week, we use Explore_Gmap_Crossfilter.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_gmap_crossfilter+table%3A+public.d_pickup+longitude%3A+%22longitude%22+latitude%3A+%22latitude%22+field%3A+%22extract%28month+from+time%29+as+Month%22+field%3A+%22extract%28dow+from+time%29+as+DayOfTheWeek%22+field%3A+%22extract%28hour+from+time%29+as+Hour%22+limit%3A+50000+orderBy%3A+%22random%28%29%22">Explore_Gmap Crossfilter</a>
+Using the brushing feature, we can learn that between 10 PM and 12 AM taxi rides peak around Boston University, Boylston Street / Prudential Tower, and Terminal E at Boston Logan international airport.
+</p>
+
+<p>
+While we can make such observations based on time and location, can we generate a hypothesis? We turn to a statistical method - k-means - to perform unsupervised clustering of the coordinates. Let's start by clustering the coordinates into 5 clusters.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.d_pickup+field%3A+%22latitude%22+field%3A+%22longitude%22+limit%3A+1000+k%3A+%225%22">Explore_K-means</a>
+What if we add the day of the week as the third dimension? Since, the range of the day of the week is not similar to the range of latitude and longitude (i.e., they have different units), and we apply Z-score normalization before applying K-means.
+It is as simple as picking Z-score from pre_process option in GNoT. Here, we see a totally different pattern emerging.
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.d_pickup+field%3A+%22latitude%22+field%3A+%22longitude%22+field%3A+%22extract%28dow+from+time%29%22+limit%3A+1000+k%3A+%225%22+pre_process%3A+%22Z-Score%22">Explore_K-means2</a>
+</p> 
+
+<p>
+Finally, let's look at the challenge problem itself: predicting the number of rides within 250 meters of a location (e.g.,  (-71.057114, 42.343365)) within a given time window. Before building a complex model, we can use GNoT to visually explore the data in order to test  the viability of the task and identify useful feature combination. For instance, we will use ML_Ridge_Linear module to explore the accuracy achievable in predicting the ridership in an hour with only three features: day of the week, hour of the day, and month.
+<a href="http://goo.gl/EKzMnz">Explore_Ridge_Linear2</a>
+Even with this basic model, we achieve a coefficient of determination (R<sup>2</sup> = 0.2224) when predicting 10% of the time windows by learning the model on the rest.  Using GNoT, we can also try different feature combinations, feature transformations such as applying interactions and quadratic transformations on the features, and pre-processing such as applying Z-score or PCA transformation.
+Using provenance, we can see the contributing factors for large squared errors (filter by squared errors): unsurprisingly month 8 stands out as data is corrupted in that month. Further, compared to the rest, peak hours and weekends stand out. This indicates the problem of capturing the tails of the distribution (filter by squared errors and ridership), i.e., not adequately modeling riderships with high amounts that fall at the tail of the distribution.
+
+</p>
+  
 
 
 </div>
