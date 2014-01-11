@@ -116,6 +116,7 @@ var chart_scatter_crossfilter = function (drawLine){
 				minX  = Math.min(minX, parseX(data[i][j]));
 			}
 			var dxx = ((maxX-minX)/num_bins);
+			if (dxx == 0) dxx = 1;
 			var groupint = function(d){return Math.floor(d / dxx) * dxx;};
 			
 			var row = flight.dimension(function(d) { 

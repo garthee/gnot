@@ -2,6 +2,7 @@
 "explore_calendar": {"xField":{"n":1, "values": "fields"}},
 "explore_gmap": {"latitude":{"n":1, "values": "fields"}, "longitude":{"n":1, "values": "fields"}, "xField":{"n":1, "values": "fields"}},
 "explore_gmap_crossfilter": {"latitude":{"n":1, "values": "fields"}, "longitude":{"n":1, "values": "fields"}, "mapField":{"n":1, "values": "fields"}, "groupBy":{"n":1, "values": "fields"}, "orderBy":{"n":1, "values":"fields"}},
+"explore_gmap_scatter_crossfilter": {"latitude":{"n":1, "values": "fields"}, "longitude":{"n":1, "values": "fields"}, "radius":{"n":1, "values": "fields"},  "label":{"n":1, "values": "fields"}, "groupBy":{"n":1, "values": "fields"}, "orderBy":{"n":1, "values":"fields"}},
 "explore_crossfilter": {"groupBy":{"n":1, "values": "fields"}, "orderBy":{"n":1, "values":"fields"}}, 
 "explore_corr":  {"groupBy":{"n":1, "values":"fields"}, "orderBy":{"n":1, "values":"fields"}},
 "explore_diff": {"xField":{"n":1, "values": "fields"}, "groupBy":{"n":1, "values": "fields"}},

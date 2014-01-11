@@ -208,7 +208,7 @@ def render(vis, request, info):
 				info["message"].append("Loading from cache. Use reload=1 to reload.")
 
 	# prepare some messages
-	info["title"] = "FIELD_X: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(xfield), table)
+	info["title"] = "FIELD_X: <em>%s</em> from <br />TABLE: <em>%s</em>"%(','.join(pfield), table)
 	info["title"] = Markup(info["title"])		
 	info["message"] = Markup(''.join('<p>%s</p>'%m for m in info["message"] if len(m) > 0))
 	info["results"] = Markup('<ul>' + ''.join('<li>%s</li>'%m for m in info["results"] if len(m) > 0) + '</ul>')

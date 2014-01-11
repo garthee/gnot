@@ -68,7 +68,6 @@ class Visulizer(object):
 		
 		self.config = config
 		
-		
 	def _parse_query(self, request):
 		query = request.args.get('query', '')
 		
@@ -94,6 +93,7 @@ class Visulizer(object):
 		tables = re.split(r',(?![^(]*\))', r.get('table', ''))
 		if len(tables) > 1:
 			tables = [tables[i] + ' as table_%d'%(i+1)  for i in range(len(tables))]
+		#delimiter = " %s "%(r.get('join', ','));
 		r['table'] = ','.join(tables)
 				
 		#split fields

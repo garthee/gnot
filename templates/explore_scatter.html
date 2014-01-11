@@ -43,10 +43,12 @@
 		.width(width)
 		.height(height)
 		.margin(margin)
+		.useVoronoi(false)
  		.color(d3.scale.category10().range());
  
- 	chart.xAxis.tickFormat(d3.format('f'))
- 	chart.yAxis.tickFormat(d3.format('f'))
+ 	chart.tooltipContent(function(key) {
+ 	      return '<h3>' + key + '</h3>';
+ 	  });
   	
  	d3.csv("{{datfile}}", function(error, data) {
  		fd = {};
@@ -60,12 +62,25 @@
     		d.shape = shapes[0];
   			fd[d.c].values.push(d);
 	  	});
+	  	var dx = -1*Math.log((d3.max(data, function(d){ return d.x;}) - d3.min(data, function(d){ return d.x;}))/10) / Math.LN10,
+	  		dy = -1*Math.log((d3.max(data, function(d){ return d.y;}) - d3.min(data, function(d){ return d.y;}))/10) / Math.LN10,
+	  		minz = d3.min(data, function(d){ return d.z;}),
+	  		maxz = d3.max(data, function(d){ return d.z;});
+	  	dx = Math.max(0, Math.round(dx)),
+	  	dy = Math.max(0, Math.round(dy));
+	  	
+	  	chart.xAxis.tickFormat(d3.format('.' + dx + 'f'));
+	 	chart.yAxis.tickFormat(d3.format('.' + dy +  'f'));
+	 	
+	 	
 		d3.select('#svg-box svg')
 			.datum(d3.values(fd))
 			.transition().duration(500)
 			.call(chart);
 		
+		
 	});
+ 	
 	chart.dispatch.on('stateChange', function(e) { ('New State:', JSON.stringify(e)); });
 	nv.utils.windowResize(chart.update);
 	return chart;

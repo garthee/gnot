@@ -44,7 +44,7 @@ def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = 
 							config.get("host", ''), config.get("user", ''), config.get("database", ''), sql, datfile)
 			
 		if not config.get("isProduction", '') : print sql
-		
+		print sql
 		sysout = os.popen(sql)
 		sysresult = sysout.read()
 		if sysout.close(): 

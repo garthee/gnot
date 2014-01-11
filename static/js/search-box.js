@@ -66,6 +66,9 @@ jQuery.noConflict();
 	        valueMatches : function(category, searchTerm, callback) {
 	        	  var sq = window.visualSearch.searchBox.app.searchQuery.facets();
 		          switch (category) {
+		          	case 'join':
+		          		callback([' left join ', ' right join ', ' full join ']);
+		          		break;
 					case 'module':
 						callback(getKeys(data['modules']));
 						break;
@@ -132,6 +135,21 @@ jQuery.noConflict();
 				
 				var options = ['module', 'table', 'field', 'where', 'start', 'limit', 'reload', 'view']; 
 				var uniqueOptions = ['module', 'where', 'start', 'limit', 'reload', 'view'];
+				
+				
+				var table = '';
+				sq.forEach(function (d) { 
+					if('table' in d) 
+						table = table + ',' + d['table'];
+				});
+				table = table.substring(1, table.length);
+				if (table){
+					table = table.split(/\s*,\s*/);
+					if (table.length > 1) {
+						options.push('join');
+						uniqueOptions.push('join');
+					}
+				}
 				
 				if (module) {
 					var moduleOptions = getKeys(data['modules'][module]);

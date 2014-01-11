@@ -101,11 +101,11 @@ var chart_width = 760;
 d3.text("{{datfile}}", function(text) {
 	var flights = d3.csv.parseRows(text);
 	  // Various formatters.
-  	var formatNumber = d3.format(",d");
-	var ident = function(d){return d;};
-	var str2int = function(d){return +d;};
-	var month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));};
-	var date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));};;
+  	var formatNumber = d3.format(",d"),
+		str2int = function(d){return +d;},
+		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
+		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
+		time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
 
 	function isNumber(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
@@ -128,17 +128,13 @@ d3.text("{{datfile}}", function(text) {
 		}
 		else {
 			var lx = sr[j].split(/[- :]/).length;
-			if (lx >= 3){
+			type = 3; // date
+			if (lx >=6)
+				parseX = time2int;
+			else if (lx >= 3)
 				parseX = date2int;
-				type = 3; // date
-			}
-			else if (lx >= 2){
+			else if (lx >= 2)
 				parseX = month2int;
-				type = 3; // date
-			}
-			else{
-				parseX = ident;
-			}
 		}
 		var row = flight.dimension(function(d) { return parseX(d[j]); });
 		

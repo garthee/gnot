@@ -201,7 +201,8 @@ var file_provenance = "{{datfile}}",
 		var formatNumber = d3.format(",d"),
 	  		str2int = function(d){return +d;},
 	  		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
-	  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));};;
+	  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
+	  		time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
 	
 		function isNumber(n) {
 			return !isNaN(parseFloat(n)) && isFinite(n);
@@ -213,7 +214,9 @@ var file_provenance = "{{datfile}}",
 				type = 1; 
 			if (!isNumber(sr[j])){
 				var lx = sr[j].split(/[- :]/).length;
-				if (lx >= 3)
+				if (lx >=6)
+					parseX = time2int;
+				else if (lx >= 3)
 					parseX = date2int;
 				else if (lx >= 2)
 					parseX = month2int;
