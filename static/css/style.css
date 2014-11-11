@@ -1,4 +1,5 @@
 #search-box-top-container {
+	text-align:left;
 	clear: both;
 	margin-top: 100px;
 	display: block;
@@ -31,9 +32,13 @@
 	margin-right: 4px;
 }
 
+.VS-interface.ui-autocomplete .ui-menu-item a{
+	text-align:left;
+}
+	
 #form-submit {
 	font-family: 'Josefin Sans', Helvetica, sans-serif;
-	background: #000;
+	background: #333;
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -59,9 +64,9 @@ body {
 	color: #333;
 	margin: 1em auto 4em auto;
 	position: relative;
-	width: 1080px;
 	font-family: "Roboto", Arial, sans-serif;
 	font-size: 12px;
+	text-align:center;
 }
 
 h1 {
@@ -82,6 +87,8 @@ h1,h2 {
 
 #container {
 	width: 1080px;
+	margin: 0 auto;
+	text-align:left;
 }
 
 #main-container {
@@ -90,13 +97,14 @@ h1,h2 {
 	margin: 0px;
 }
 
-#side-container {
+#side-container, .side-container {
 	font-family: 'Raleway', Helvetica, sans-serif;
 	float: left;
 	width: 220px;
 	margin: 0px;
 	word-wrap: break-word;
 }
+
 
 .side-container {
 	padding: 5px;
@@ -110,18 +118,18 @@ h1,h2 {
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-#side-container-0 {
+.side-container-0 {
 	color: #fff;
 	background: #5e5ca6;
 }
 
-#side-container-1 {
+.side-container-1 {
 	background: #a1c4fe;
 }
-#side-container-2 {
+.side-container-2 {
 	background: #a1c4fe;
 }
-#side-container-3 {
+.side-container-3 {
 }
 
 .success {
@@ -166,3 +174,45 @@ q:before {
 q:after {
 	content: "â€�";
 }
+
+.day {
+	fill: #fff;
+	stroke: #ccc;
+}
+.month {
+	fill: none;
+	stroke: #000;
+	stroke-width: 2px;
+}
+.reset {
+  padding-left: 1em;
+  /*font-size: smaller;*/
+  color: #ccc;
+}
+
+.background.bar {
+  fill: #ccc;
+}
+
+.foreground.bar {
+  fill: steelblue;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+}
+
+
+.brush rect.extent {
+  fill: steelblue;
+  fill-opacity: .125;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
+
+	

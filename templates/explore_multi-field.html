@@ -40,8 +40,9 @@ trail{
 }
 </style>
 
-<h1>Explore Multi-Field</h1>
+
 <div id="container">
+	<h1>Explore Multi-Field</h1>
 	<div id="main-container" style="width: 800px;">
 		<div id="sequence"></div>
       	<div id="chart">
@@ -53,7 +54,9 @@ trail{
 		</div>
 		
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
 			<p>Relative frequency of field values. Hover over an arc to see the representation.</p>
@@ -195,7 +198,7 @@ trail{
 			  // Add the svg area.
 			  var trail = d3.select("#sequence").append("svg:svg")
 			      .attr("width", width)
-			      .attr("height", 50)
+			      .attr("height", 30)
 			      .attr("id", "trail");
 			  // Add the label at the end, for the percentage.
 			  trail.append("svg:text")

@@ -44,9 +44,6 @@ def render(vis, request, info):
 	if len(table) == 0 or len(xField) == 0:
 		info["message"].append("Table or xfield missing.")
 		info["message_class"] = "failure"
-	elif len(splitfield) != 2:
-		info["message"].append("Need two fields : a field to group by, and another aggregate field.")
-		info["message_class"] = "failure"
 	else:
 	
 		#sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)

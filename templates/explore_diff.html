@@ -20,21 +20,21 @@
 }
 </style>
 
-<h1>Explore Diff</h1>
-
 <div id="container" class="container">
+	<h1>Explore Diff</h1>
 	<div id="main-container">
 		<div id="svg-box"></div>
 	</div>
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>
 		</div>
 	</div>
 </div>
-
 
 <script>
 	function isNumber(n) { return !isNaN(parseFloat(n)) && isFinite(n);}

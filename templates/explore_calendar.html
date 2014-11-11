@@ -1,42 +1,20 @@
 {% extends "layout.html" %} {% block title %}Calendar{% endblock %} {%
 block body %}
 <style>
-.day {
-	fill: #fff;
-	stroke: #ccc;
-}
 
-#side-container {
-	width: 110px;
-}
-
-#main-container {
-	width: 960px;
-}
-
-.month {
-	fill: none;
-	stroke: #000;
-	stroke-width: 2px;
-}
 </style>
 
-<h1>Explore Date</h1>
-
-<div id="container" class="container">
-	<div id="main-container">
+<div id="container" style="width:1200px;">
+	<h1>Explore Date</h1>
+	<div id="main-container" style="width: 960px;">
 		<div id="svg-box"></div>
 	</div>
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div class="side-container" id="side-container-1">
-			<p>
-				Calendar week starts on Sunday and ends on Saturday. Values range
-				from <span class="limit-values" id="val_min"></span> to <span class="limit-values" id="val_max"></span>.
-			</p>
-			<p>Hover over a cell to see it's value.</p>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
 		</div>
+		<div class="side-container" id="side-container-0">{{title}}</div>
+		<div class="side-container" id="side-container-m"></div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>
 		</div>
@@ -55,8 +33,12 @@ block body %}
 		format = d3.time.format("%Y-%m-%d");
 
 	d3.csv("{{datfile}}", function(error, csv) {
+		drawCalendar(csv);
+	});
+	
+	function drawCalendar(dall) {
 		var data = d3.nest().key(function(d) { return d.Date;})
-			.rollup(function(d) {return +d[0].Field;}).map(csv);
+			.rollup(function(d) {return +d[0].Field;}).map(dall);
 
 		var miny = year(format.parse(d3.min(d3.keys(data)))),
 			maxy = +year(format.parse(d3.max(d3.keys(data)))),
@@ -99,11 +81,12 @@ block body %}
 			.attr("class", "month")
 			.attr("d", monthPath);
 
-		var theDiv = document.getElementById("val_max");
-		theDiv.innerHTML += maxd;
-		var theDiv = document.getElementById("val_min");
-		theDiv.innerHTML += mind;
-
+		var theDiv = document.getElementById("side-container-m");
+		theDiv.innerHTML = '<p>Calendar week starts on Sunday and ends on Saturday. Values range ' 
+						  +'from <span class="limit-values" id="val_min">' + mind 
+						  + '</span> to <span class="limit-values" id="val_max">' + maxd 
+						  + '</span>.</p><p>Hover over a cell to see it\'s value.</p>' 
+		
 		//var quantize = d3.scale.quantile().domain([mind, maxd]).range(d3.range(9));
 		var names = d3.scale.quantize()
 			.domain([ mind, maxd ])
@@ -113,7 +96,7 @@ block body %}
 			.attr("class", function(d) {return "day q" + names(data[d]) + "-9";})
 			.select("title").text(function(d) {return d + ": " + data[d];});
 
-	});
+	}
 
 	function monthPath(t0) {
 		var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0), d0 = +day(t0), w0 = +week(t0), d1 = +day(t1), w1 = +week(t1);
@@ -123,8 +106,8 @@ block body %}
 				+ "H" + (w0 + 1) * cellSize + "Z";
 	}
 
-	d3.select(self.frameElement).style("height", "2910px");
-	d3.selectAll("svg").attr("class", "Blues");
+	//d3.select(self.frameElement).style("height", "2910px");
+	//d3.selectAll("svg").attr("class", "Blues");
 </script>
 
 {% endblock %}

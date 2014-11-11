@@ -38,7 +38,7 @@ def render(vis, request, info):
 		
 		# if z,c are not provided
 		sfield.extend(['1']*(4-len(sfield)))
-		pfield.extend(['1']*(4-len(sfield)))
+		pfield.extend(['1']*(4-len(pfield)))
 		info["field3"] = pfield[3-1]
 		info["field4"] = pfield[4-1]
 	

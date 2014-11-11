@@ -8,7 +8,7 @@ def render(vis, request, info):
 	# module independent user inputs
 	table = request.args.get("table", '')
 	where = request.args.get("where", '1=1')
-	limit = request.args.get("limit", '') # 10 years max
+	limit = request.args.get("limit", '1000') # 10 years max
 	if limit:limit = ' limit %s'%limit 
 	start = request.args.get("start", '0') # start at 0
 	reload = int(request.args.get("reload", 0))

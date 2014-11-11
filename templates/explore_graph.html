@@ -12,13 +12,16 @@ line {
 }
 </style>
 
-<h1>Explore Graph</h1>
+
 <div id="container">
+	<h1>Explore Graph</h1>
 	<div id="main-container" style="width: 800px;">
 		<div id="svg-box"></div>
 	</div>
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
 			<p>Use the pointer to select a node.</p>

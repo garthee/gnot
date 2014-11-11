@@ -7,9 +7,10 @@ from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.wsgi import SharedDataMiddleware
 from jinja2 import Environment, FileSystemLoader, Markup
 
-import json, urlparse
+import json
 import sys, os, inspect, re
 from collections import defaultdict
+from urllib.parse import urlparse
 
 isProduction = False
 
@@ -20,7 +21,7 @@ class Visulizer(object):
 
 		template_path = os.path.join(os.path.dirname(__file__), 'templates')
 		self.jinja_env = Environment(loader=FileSystemLoader(template_path),  autoescape=True)
-		self.jinja_env.filters['hostname'] = lambda x: urlparse.urlparse(x).netloc
+		self.jinja_env.filters['hostname'] = lambda x: urlparse(x).netloc
 
 		self.url_map = Map([
 			Rule('/', endpoint='home'),
@@ -78,7 +79,7 @@ class Visulizer(object):
 		entries = defaultdict(list)
 		for (key, value) in matches:
 			if value or len(value) > 0:
-				entries[key].append(value.encode('ascii', 'ignore').strip('"'))
+				entries[key].append(value.encode('ascii', 'ignore').decode('ascii').strip('"'))
 				
 		if type(entries['view'] == 'str') and len(entries['view']) > 0:
 			schema = self.config.get('db_schema', '')
@@ -86,7 +87,7 @@ class Visulizer(object):
 			entries['table'] = [schema+'custom_view']
 			
 		r = {}
-		for (key, value) in entries.iteritems():
+		for (key, value) in entries.items():
 			r[key] = ','.join(value)
 
 
@@ -122,8 +123,8 @@ class Visulizer(object):
 			else:
 				return self.render_template('%s.html'%(module_name), **info)
 			
-		except ImportError, e:
-			print "module not found %s"%e
+		except ImportError as strerror:
+			print("module not found %s"%strerror)
 			raise NotFound()
 
 	# home window
@@ -147,7 +148,7 @@ class Visulizer(object):
 			return getattr(self, 'on_' + endpoint)(request, **values)
 		except NotFound as e:
 			return self.error_404(e)
-		except HTTPException, e:
+		except HTTPException as e:
 			return e
 
 	def wsgi_app(self, environ, start_response):

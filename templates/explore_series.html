@@ -12,6 +12,11 @@
 <script src="static/js/extensions.js"></script>
 
 <style>
+	.rickshaw_graph .x_tick .title {
+		opacity:1;
+		margin-left: 3px;
+		bottom: -10px;
+	}
     .ui-slider .ui-slider-handle {
 		width: 12px; border-radius: 2px; 
 		border: 1px solid #adadad; height: 16px; 
@@ -43,9 +48,9 @@
 	}
 </style>
 
-<h1>Explore Time Series</h1>
+
 <div id="container">
-	
+<h1>Explore Time Series</h1>	
 <div id="main-container" style="width:840px;">
 	
 <div id="svg-box"></div>
@@ -130,7 +135,7 @@
 	var date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2])).getTime() / 1000;};
 	var time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]).getTime() / 1000;};
 
-	var palette = new Rickshaw.Color.Palette( { scheme: 'spectrum2000' } );
+	var palette = new Rickshaw.Color.Palette( { scheme: 'munin' } );
 
 	
 	d3.text('{{datfile}}', 'text/csv', function(text) {

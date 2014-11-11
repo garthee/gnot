@@ -45,9 +45,8 @@
 	}
 	
 </style>
-
-<h1>ML K-Means</h1>
 <div id="container">
+	<h1>ML K-Means</h1>
 	<div id="main-container" style="width: 800px;">
 		{{pca_matrix_divs}}
 		
@@ -64,12 +63,14 @@
 				data-vertical-offset="0">Y-axis</span> here.
 		</div>
 
-		<h2>Provenance</h2>
+		<h2>Contributing Factors</h2>
 		<div id="svg-box-provenance">{{provenance_divs}}</div>
 
 	</div>
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">{{results}}</div>
 		<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>

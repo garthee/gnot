@@ -40,7 +40,6 @@ block body %}
 	}
 	
 	.pp-slider {
-		width: 150px;
 		float: left;
 		-webkit-user-select: none;
 		-khtml-user-select: none;
@@ -87,19 +86,25 @@ block body %}
 	}
 	
 	.pp-slider .pp-slider-scale .pp-slider-tooltip {
-		width: 24px;
+		width: auto;
+		white-space: nowrap;
+		background: #fff;
+		padding: 2px;
+		display: inline;
 		height: 20px;
 		position: relative;
-		top: -5px;
+		top: -2px;
 		left: 0px;
 		text-align: center;
-		font-size: 12px;
+		font-size: 13px;
 		color: #000;
+		border: 2px solid rgba(50,50,50,.4);
+		border-radius: 5px;
 	}
 	
 	.pp-slider .pp-slider-min {
 		float: left;
-		width: 40px;
+		width: 80px;
 		color: #000;
 		font-size: 20px;
 	}
@@ -123,16 +128,26 @@ block body %}
 	.clickable{
 		cursor: pointer;
 	}
+	.pp-slider-min .clickable{
+		margin: 2px;
+		background: rgba(255,255,255,.8);
+		width: 20px;
+		display: inline-block;
+		text-align: center;
+	}
 </style>
-<h1>Explore Google Map</h1>
+
 
 <div id="container" class="container">
+	<h1>Explore Google Map</h1>
 	<div id="main-container">
 		<div id="map"></div>
 		{{div_slider}}
 	</div>
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
 			{{div_slider_counter}}
@@ -165,11 +180,11 @@ block body %}
 		$('#slider-time').html(t);
 		
 		if (map === undefined){
-		    var clat = d3.mean(entries[t], function(d){ return +d.latitude;});
-		    var clong = d3.mean(entries[t], function(d){ return +d.longitude;});
+		    var clat = d3.median(entries[t], function(d){ return +d.latitude;});
+		    var clong = d3.median(entries[t], function(d){ return +d.longitude;});
 			
 	  		map = new google.maps.Map($('#map')[0], {
-	    		zoom: 13,
+	    		zoom: 7,
 	    		panControl: false,
 				overviewMapControl:true,
 				streetViewControl:false,
@@ -179,7 +194,7 @@ block body %}
 	      			position: google.maps.ControlPosition.RIGHT_TOP
 	    		},
 	    		center: new google.maps.LatLng(clat, clong),
-	    		styles: [{'stylers': [{'saturation': -90},{'lightness': -5}]}]
+	    		styles: [{'stylers': [{'saturation': -100},{'lightness': -30}]}]
 			});
 	  		heatmap = new google.maps.visualization.HeatmapLayer({
 	    		radius: 15,
@@ -226,7 +241,7 @@ block body %}
 			if (typeof (options.width) != 'undefined') {
 				container.css('width', (options.width + 'px'));
 			}
-			container.find('.pp-slider-scale').css('width',(container.width() - 50) + 'px');
+			container.find('.pp-slider-scale').css('width',(container.width() - 90) + 'px');
 
 			var startSlide = function(e) {
 				isMouseDown = true;
@@ -286,7 +301,8 @@ block body %}
 				var upperBound = (container.find('.pp-slider-scale').width() - container.find('.pp-slider-button').width());
 				var newPos = currentVal * upperBound / 100;
 				container.find('.pp-slider-button').css("left", newPos);
-				container.find('.pp-slider-tooltip').html(currentVal + '%');
+				//container.find('.pp-slider-tooltip').html(currentVal + '%');
+				container.find('.pp-slider-tooltip').html(keys[Math.round(dx.invert(currentVal))]);
 				container.find('.pp-slider-tooltip').css('left', newPos - 6);
 				dt = v;
 				drawmap();
@@ -303,7 +319,7 @@ block body %}
 			var play = function(e) {
 				if (pause){
 					pause = false;
-					$('#slider-play').html('<span style="font-size:85%;letter-spacing:.02px;">||</span>');
+					$('#slider-play').html('&#9642;');
 					intervalId = setInterval(function() {
 						if (dx(1+dt) < 100)
 							initPosition(1+dt);
@@ -317,7 +333,7 @@ block body %}
 					stop(e);
 			}
 			var stop = function(e) {
-				$('#slider-play').html('&rsaquo;');
+				$('#slider-play').html('&#8250;');
 				pause = true;
 				clearInterval(intervalId);
 			}
@@ -353,7 +369,7 @@ block body %}
 	    });
       	keys = d3.keys(entries);
       	dx = d3.scale.linear().domain([0, keys.length-1]).range([0, 100]);
-      	$("#slider").PPSlider({width : 780});
+      	$("#slider").PPSlider({width : 760});
       	drawmap();
 	});  
 </script>

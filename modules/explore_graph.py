@@ -6,7 +6,7 @@ import re
 def render(vis, request, info):
 	info["message"] = []
 	
-	reload = request.args.get("reload", 0)
+	reload = int(request.args.get("reload", 0))
 	table = request.args.get("table", '')
 	where = request.args.get("where", '1=1')
 	field = request.args.get("field", ' count(*) ')

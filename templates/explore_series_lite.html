@@ -5,10 +5,6 @@
 <script src="static/js/nv.d3.min.js"></script>
 
 <style>
-#side-container {
-	width: 100px;
-}
-
 #side-container-4 {
 	background: #cbcbcb;
 }
@@ -34,16 +30,18 @@ svg {
 }
 </style>
 
-<h1>Explore Series Lite</h1>
-<div id="container">
 
+<div id="container" style="width:1280px;">
+	<h1>Explore Series Lite</h1>
 	<div id="main-container" style="width: 960px;">
 		<div id="svg-box">
 			<svg></svg>
 		</div>
 	</div>
 	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+		<div class="side-container {{message_class}}" id="side-container-3">
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>.

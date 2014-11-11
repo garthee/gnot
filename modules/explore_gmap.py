@@ -8,7 +8,7 @@ def render(vis, request, info):
 	# module independent user inputs
 	table = request.args.get("table", '')
 	where = request.args.get("where", '1=1')
-	limit = request.args.get("limit", '') # 10 years max
+	limit = request.args.get("limit", '5000') # 10 years max
 	if limit:limit = ' limit %s'%limit 
 	start = request.args.get("start", '0') # start at 0
 	reload = int(request.args.get("reload", 0))
@@ -26,7 +26,7 @@ def render(vis, request, info):
 		info["message_class"] = "failure"
 	else:
 		# prepare sql query
-		sql = "select %s, trunc(%s::numeric,3), trunc(%s::numeric,3), %s from %s where %s group by 1,2,3 order by 1 %s offset %s"%(xField,latitude, longitude, field, table, where,limit, start)
+		sql = "select %s, %s, %s, %s from %s where %s group by 1,2,3 order by 1 %s offset %s"%(xField,latitude, longitude, field, table, where,limit, start)
 
 		header =  "t,latitude,longitude,count"
 		(datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)

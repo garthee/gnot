@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+{% block title %}Scatter Plot{% endblock %}
+{% block body %}
+
+
+<style>
+    .ui-slider .ui-slider-handle {
+		width: 12px; border-radius: 2px; 
+		border: 1px solid #adadad; height: 16px; 
+		background-color: #efefef; cursor: pointer; 
+	}
+	.ui-slider-horizontal {
+		 background-color: #aaa; height: 1px; border-bottom: 1px solid #efefef;
+	}
+
+
+	#side-container {
+		width:100px;
+	}
+	#side-container-4{
+		background:#cbcbcb;
+	}
+	section{
+		border:0px;
+		padding:5px 0;
+	}
+	#legend{
+		background:inherit;
+		height:inherit;
+	}
+	#side_panel{
+		padding:0px;
+	}
+</style>
+
+
+<div id="container">
+<h1>Explore Scatter</h1>	
+<div id="main-container" style="width:960px;"><div id="svg-box"></div></div>
+<div  id="side-container">
+<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+<div class="side-container" id="side-container-0">{{title}}</div>
+<div class="side-container" id="side-container-1"  >
+	<p>Color corresponds to {{field4}}, and Size represents {{field3}}</p> 
+</div>
+<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+</div>
+</div>
+
+
+<script>
+
+
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+	    width = 955 - margin.left - margin.right,
+	    height = 500 - margin.top - margin.bottom;
+	
+	var x = d3.scale.linear()
+	    .range([0, width-50]);
+	
+	var y = d3.scale.linear()
+	    .range([height, 0]);
+	
+	var z = d3.scale.linear()
+		.range([3.5, 20.0]); // adjust the range of dot sizes
+    //	.range([3.5, 3.5]); // adjust the range of dot sizes
+	
+	var color = d3.scale.category10();
+	
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .orient("bottom")
+	    .tickFormat(d3.format('d'));
+	
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left")
+		.tickFormat(d3.format('d'));
+	
+	var svg = d3.select("#svg-box").append("svg")
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	d3.csv("{{datfile}}", function(error, data) {
+	  data.forEach(function(d) {
+	    d.y = +d.y;
+	    d.x = +d.x;
+	    d.z = +d.z;
+	  });
+	
+	  x.domain(d3.extent(data, function(d) { return d.x; })).nice();
+	  y.domain(d3.extent(data, function(d) { return d.y; })).nice();
+	  z.domain(d3.extent(data, function(d) { return d.z; })).nice();
+	
+
+	
+	  svg.selectAll(".dot")
+	      .data(data)
+	       .enter().append("circle")
+	      .attr("class", "dot")
+	      .attr("r", function(d) { return z(d.z); })
+	      .attr("cx", function(d) { return x(d.x); })
+	      .attr("cy", function(d) { return y(d.y); })
+	      .style("fill", function(d) { return color(d.c); })
+	  .append("svg:title")
+      	.text(function(d) { return d.c + ":" + d.z; });
+	
+	  var legend = svg.selectAll(".legend")
+	      .data(color.domain())
+	    .enter().append("g")
+	      .attr("class", "legend")
+	      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+	
+	  legend.append("rect")
+	      .attr("x", width + 14)
+	      .attr("width", 18)
+	      .attr("height", 18)
+	      .style("fill", color);
+	
+	  legend.append("text")
+	      .attr("x", width + 10)
+	      .attr("y", 9)
+	      .attr("dy", ".35em")
+	      .style("text-anchor", "end")
+	      .text(function(d) { return d; });
+	
+		  svg.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis)
+	    .append("text")
+	      .attr("class", "label")
+	      .attr("x", width)
+	      .attr("y", -6)
+	      .style("text-anchor", "end")
+	      .text("{{xlabel}}");
+	
+	  svg.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    .append("text")
+	      .attr("class", "label")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("{{ylabel}}")
+	      
+	});
+
+
+
+
+</script>
+{% endblock %}

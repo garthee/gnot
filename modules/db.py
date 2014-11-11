@@ -18,7 +18,7 @@ def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = 
 				view = 'psql %s %s %s -d %s -c "%s"'%(config.get("port", ''), 
 						config.get("host", ''), config.get("user", ''), config.get("database", ''), view)
 			
-			if not config.get("isProduction", '') : print view
+			if not config.get("isProduction", '') : print(view)
 			ret = os.popen(view).close()
 			if ret: result += ' Error creating view!'
 			
@@ -34,7 +34,11 @@ def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = 
 			elif config.get('db_system', '') == 'psql':
 				sql = 'psql %s %s %s -d %s -c "copy (%s) to stdout with CSV HEADER" 2>&1 1>> %s'%(config.get("port", ''), 
 							config.get("host", ''), config.get("user", ''), config.get("database", ''), sql, datfile)
-			
+				
+			elif config.get('db_system', '') == 'redshift':
+				sql = 'psql %s %s %s -d %s -c "%s" | sed "s/ //g" | sed "s/|/,/g" | sed -n -e "/\,/{p;}" | grep -v "NULL" 2>&1 1>> %s'%(config.get("port", ''),
+							config.get("host", ''), config.get("user", ''), config.get("database", ''), sql, datfile)
+
 		else:
 			if config.get('db_system', '') == 'mysql':
 				sql = 'mysql %s %s %s --database %s -e "%s" | sed "s/\\t/,/g" | grep -v "NULL" | tail -n +2 2>&1 1>> %s'%(config.get("user", ''), 
@@ -42,9 +46,12 @@ def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = 
 			elif config.get('db_system', '') == 'psql':
 				sql = 'psql %s %s %s -d %s -c "copy (%s) to stdout with CSV" 2>&1 1>> %s'%(config.get("port", ''),
 							config.get("host", ''), config.get("user", ''), config.get("database", ''), sql, datfile)
-			
-		if not config.get("isProduction", '') : print sql
-		print sql
+			elif config.get('db_system', '') == 'redshift':
+				sql = 'psql %s %s %s -d %s -c "%s" | sed "s/ //g" | sed "s/|/,/g" | sed -n -e "/\,/{p;}" | tail -n +2 | grep -v "NULL" 2>&1 1>> %s'%(config.get("port", ''),
+							config.get("host", ''), config.get("user", ''), config.get("database", ''), sql, datfile)
+
+		if not config.get("isProduction", '') : print(sql)
+		
 		sysout = os.popen(sql)
 		sysresult = sysout.read()
 		if sysout.close(): 
