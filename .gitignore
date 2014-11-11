@@ -3,3 +3,4 @@
 .project
 .dropbox
 cache/*.csv
+_support/*
