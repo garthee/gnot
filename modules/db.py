@@ -8,6 +8,7 @@ def export_sql(sql, config, reload = 0, header = None, view = None, addHeader = 
 	
 	result = ''
 	if reload > 0 or (not os.path.exists(os.path.realpath(datfile))):
+		reload = 1
 		if view and len(view) > 0: 
 			view_name = config.get("schema", '')+'custom_view'
 			view = "DROP VIEW IF EXISTS %s; CREATE VIEW %s as %s;"%(view_name,view_name,view)

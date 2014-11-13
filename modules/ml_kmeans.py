@@ -70,7 +70,7 @@ def evaluate(clust_dists, clustidx, X):
 		clustcount[clustidx[i]] += 1 
 		
 	averagedist = float(sum)/count
-	print averagedist
+	
 	results['meandist'] = averagedist
 
 	for i in xrange(len(clust_dists[0])):
@@ -175,14 +175,7 @@ def render(vis, request, info):
 			info["scatter_fields"]  = Markup(''.join(['<li><a>%s</a></li>'%pfield[i] for i in xrange(len(pfield))]))
 			info["scatter_x"] = Markup(pfield[0])
 			info["scatter_y"] = Markup(pfield[1])
-			
-# 			#provenance
-# 			info["datfile_provenance"] = hashquery + '.provenance.csv'
-# 			with open(info["datfile_provenance"], 'w') as f:
-# 				f.write('Sample,Error,Cluster,%s\n'%(','.join(pfield)))
-# 				for i in xrange(len(cidx)):
-# 					f.write('%d,%.2f,%d,%s\n'%(i,cdists[i][cidx[i]],cidx[i],','.join([str(r) for r in X[i]])))
-# 			
+	
 			#provenance
 			#0:id,1:prediction result (grouping),2:actual label(shape),3:error,4:y,or features
 			info["datfile_provenance"] = hashquery + '.provenance.csv'

@@ -40,36 +40,6 @@ def x2fs(X, fields, type = ''):
 		for j2 in range(s2(j1), e2(j1, l2)):
 			fields.append(fields[j1]+'*'+fields[j2])
 
-# def encodeCategories(X, fields, ids = ''):
-# 	dfields = fields[:]
-# 	del fields[:]
-# 	from sklearn.preprocessing import OneHotEncoder
-# 	if ids and len(ids)>0:
-# 		try:
-# 			categorical_features = [int(number) for number in ids.split(',')]
-# 			ids = categorical_features
-# 		except:
-# 			categorical_features = 'all'
-# 			ids = range(len(dfields))
-# 	else:
-# 		categorical_features = 'all'
-# 		ids = range(len(dfields))
-# 
-# 	enc = OneHotEncoder(n_values='auto', categorical_features=categorical_features)
-# 	enc.fit(X)
-# 	print enc.__dict__
-# 	for i in range(len(ids)):
-# 		flen = enc.n_values_[i]
-# 		for j in range(flen):
-# 			fields.append(dfields[ids[i]] + '_%02d'%(j+1))
-# 	for i in range(len(fields)):
-# 		if not i in enc.active_features_:
-# 			del fields[i]		
-# 	for i in range(len(dfields)):
-# 		if not i in ids:
-# 			fields.append(dfields[i])
-# 	
-# 	T =  enc.transform(X).toarray()
 # 	
 # fit_transform from sklearn doesn't return the loadings V. Here is a hacked version
 def fit_transform(pca, X):
@@ -101,7 +71,6 @@ def evaluate(predicted_matches, real_matches):
 	p_mean = p_mean/len(predicted_matches)
 	r_mean = r_mean/len(real_matches)
 	
-	print rms
 	results['rms'] = rms
 	results['p_mean'] = p_mean
 	results['r_mean'] = r_mean
