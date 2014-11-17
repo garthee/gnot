@@ -10,9 +10,9 @@ line {
 }
 </style>
 
-<div id="container">
+<div id="container" style="width:1180px;">
 	<h1>Explore Matrix</h1>
-	<div id="main-container" style="width: 800px;">
+	<div id="main-container" style="width:920px;">
 		<div id="svg-box"></div>
 	</div>
 	<div id="side-container">
@@ -43,14 +43,13 @@ line {
     	z = d3.scale.linear().domain([0, 4]).clamp(true),
     	c = d3.scale.category10().domain(d3.range(10));
     
-	
+	var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 
 	var force = d3.layout.force().charge(-25).linkDistance(100).size([ width, height ]);
 
 	var svg = d3.select("#svg-box").append("svg")
 	 	.attr("width", width + margin.left + margin.right)
     	.attr("height", height + margin.top + margin.bottom)
-    	.style("margin-left", -margin.left + "px")
   	.append("g")
     	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -197,6 +196,8 @@ line {
 				return id;
 			} 
 		}
+
+		spinner.stop();init_svg_conversion();
 
 	});
 </script>

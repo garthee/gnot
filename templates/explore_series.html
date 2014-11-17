@@ -27,7 +27,7 @@
 	}
 
 	.side-container {
-		width:220px;
+		width:240px;
 	}
 	#side-container-4{
 		background:#cbcbcb;
@@ -53,7 +53,7 @@
 <h1>Explore Time Series</h1>	
 <div id="main-container" style="width:840px;">
 	
-<div id="svg-box"></div>
+<div id="svg-box" style="width:840px;"></div>
 <div id="timeline" class="rickshaw_annotation_timeline"></div>
 <div id="slider" style="width: 800px;" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
 <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div>
@@ -137,7 +137,7 @@
 
 	var palette = new Rickshaw.Color.Palette( { scheme: 'munin' } );
 
-	
+	var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	d3.text('{{datfile}}', 'text/csv', function(text) {
 	    var data = d3.csv.parseRows(text);
 	    var names = data[0].slice(1, data[0].length);
@@ -280,6 +280,8 @@
 	    	}
 	    	graph.update();
 	    }
+
+	    spinner.stop();init_svg_conversion();
 	});  
 
 </script>

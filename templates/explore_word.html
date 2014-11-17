@@ -2,6 +2,7 @@
 endblock %} {% block body %}
 
 <script src="static/js/d3.layout.cloud.js"></script>
+<script src="static/js/spin.min.js"></script>
 
 <div id="container">
 	<h1>Explore Word</h1>
@@ -27,6 +28,7 @@ endblock %} {% block body %}
 
 
 <script>
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	d3.csv("{{datfile}}", function(error, data) {
 		//var fill = d3.scale.linear().domain([0,100]).range(["#bbe", "#223"]);
 		var fill = d3.scale.linear().domain([ 0, 100 ]).range(
@@ -68,7 +70,7 @@ endblock %} {% block body %}
 					.attr("transform",function(d) {return "translate(" + [ d.x, d.y ] + ")rotate(" + d.rotate + ")";})
 					.text(function(d) {return d.text;});
 		}
-
+        spinner.stop();init_svg_conversion();
 	});
 </script>
 {% endblock %}

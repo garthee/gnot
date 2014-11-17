@@ -1,8 +1,10 @@
-function calendar_draw() {	
+function calendar_draw() {
+    var	format = d3.time.format("%Y-%m-%d");
+
 	var date = modules['calendar']['variables']['date'],
 		format = d3.time.format("%Y-%m-%d"),
 		mdimension = flight.dimension(function(d){
-			return d[date]; 
+			return format(d[date]);
 		}),
 		mgroup = mdimension.group();
 	
@@ -27,7 +29,7 @@ function calendar_update() {
 	
 	var miny = d3.min(d3.keys(data), function(d){return format.parse(d);}).getFullYear(),
 		maxy = d3.max(d3.keys(data), function(d){return format.parse(d);}).getFullYear(),
-		mind = +d3.min(d3.values(data)),
+		mind = +d3.min(d3.values(data))-1,
 		maxd = +d3.max(d3.values(data));
 
 	var svg = d3.select("#svg-box-calendar")

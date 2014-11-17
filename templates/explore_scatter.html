@@ -9,14 +9,14 @@
 	svg {
   		overflow: hidden;
   		height:800px;
-  		width:960px;
+  		width:800px;
 	}
 </style>
 
 
-<div id="container" style="width:1180;">
+<div id="container">
 <h1>Explore Scatter</h1>	
-<div id="main-container" style="width:960px;"><div id="svg-box"><svg></svg></div></div>
+<div id="main-container" style="width:800px;"><div id="svg-box"><svg></svg></div></div>
 <div  id="side-container">
 <div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
 <div class="side-container" id="side-container-0">{{title}}</div>
@@ -31,7 +31,7 @@
  nv.addGraph(function() {
  	var shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
  		margin = {top: 20, right: 20, bottom: 40, left: 60},
-	    width = 955,
+	    width = 800,
 	    height = 800;
 	
  	var chart = nv.models.scatterChart()
@@ -46,7 +46,8 @@
  	chart.tooltipContent(function(key) {
  	      return '<h3>' + key + '</h3>';
  	  });
-  	
+
+  	var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
  	d3.csv("{{datfile}}", function(error, data) {
  		fd = {};
 	  	data.forEach(function(d) {
@@ -75,7 +76,7 @@
 			.transition().duration(500)
 			.call(chart);
 		
-		
+		spinner.stop();init_svg_conversion();
 	});
  	
 	chart.dispatch.on('stateChange', function(e) { ('New State:', JSON.stringify(e)); });

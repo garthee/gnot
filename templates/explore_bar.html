@@ -1,6 +1,9 @@
 {% extends "layout.html" %} {% block title %}Distribution{% endblock %}
 {% block body %}
 
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
 
 <style>
 .bar {
@@ -30,7 +33,8 @@
 	</div>
 	<div id="side-container">
 		<div class="side-container {{message_class}}" id="side-container-3">
-		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
+            <p>You may export as an image <a href="#" id="editor_save" title="Data file">here</a>.
 		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
@@ -41,6 +45,8 @@
 			Built with <a href="http://d3js.org/">d3.js</a>.
 		</div>
 	</div>
+
+    <canvas id="canvas" width="1000px" height="600px" style="visibility:hidden;"></canvas>
 </div>
 
 
@@ -63,6 +69,7 @@
 		.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	d3.csv("{{datfile}}", function(error, data) {
 		var l = data.length;
 		data.forEach(function(d) { d.frequency = +d.frequency; });
@@ -126,6 +133,39 @@
 				.selectAll("g")
 					.delay(delay);
 		}
+	    spinner.stop();init_svg_conversion();
 	});
+
+
+	/**
+     * Converts an SVG element to an IMG element with the same dimensions
+     * and same visual content. The IMG src will have a temporary blob URL.
+     * Works in Webkit and Firefox and IE10+.
+     */
+    $.fn.toImage = function() {
+        $(this).each(function() {
+            var svg$ = $(this);
+            var width = svg$.width();
+            var height = svg$.height();
+
+            // Create a blob from the SVG data
+            var svgData = new XMLSerializer().serializeToString(this);
+            var blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+
+            // Get the blob's URL
+            var blobUrl = (self.URL || self.webkitURL || self).createObjectURL(blob);
+
+            // Load the blob into an image
+            $('<img />')
+                .width(width)
+                .height(height)
+                .on('load', function() {
+                    // Overwrite the SVG tag with the img tag
+                    svg$.replaceWith(this);
+                })
+                .attr('src', blobUrl);
+        });
+    };
+
 </script>
 {% endblock %}

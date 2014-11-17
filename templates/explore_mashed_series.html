@@ -6,8 +6,6 @@
 <script src="static/js/jquery-ui.min.js"></script>
 
 <style>
-
-
 aside {
   font-size: small;
   position: absolute;
@@ -59,16 +57,14 @@ path {
 path.current, path.highlight.current {
     stroke: steelblue;
     stroke-width: 1.7;
+    z-index=1000;
 }
 
 line {
     stroke: black;
 }
-
-
 .axis {
     stroke-width: 0.8;
-    stroke: #000;
 }
 .xTicks, .yTicks {
     stroke-width: 0.6;
@@ -111,10 +107,11 @@ var temp = d3.select("svg").remove();
 var w = 800, h = 500, margin = 35, mleft = 100;
 
 var startEnd = {}, dataCodes = {}, formatX = Math.round;
-    
+
+var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 d3.text('{{datfile}}', 'text/csv', function(text) {
     var data = d3.csv.parseRows(text);
-    
+    var yformat = d3.format("e");
     var years = data[0].slice(1, data[0].length);
     
     
@@ -196,7 +193,10 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
 	var yAxis = d3.svg.axis()
     	.scale(y)
     	.orient('left')
+    	.ticks(5)
+    	.tickFormat(yformat)
     	.tickPadding(8);
+
 
 	var xAxis = d3.svg.axis()
     	.scale(x)
@@ -213,6 +213,8 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
 	vis.append('svg:g')
 	  	.attr('class', 'y axis')
 	  	.call(yAxis);
+
+	spinner.stop();init_svg_conversion();
 });  
     
 

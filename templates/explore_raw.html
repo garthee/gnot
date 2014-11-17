@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}Raw{% endblock %}
 {% block body %}
-<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 
 <script src="/static/js/jquery-1.10.2.min.js"></script>
 
@@ -62,7 +61,8 @@
 
 
 <script>
-	d3.csv("{{ datfile }}", function(error, data) {
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
+	d3.csv("{{datfile}}", function(error, data) {
 		data.forEach(function(d,i) {
 		     var entry = '<div class="db-row">';
 		  	 for (j in d) {
@@ -72,6 +72,7 @@
 		  	 entry += '</div>';
 		  	 $('#svg-box').append(entry);
 		  });
+		spinner.stop();init_svg_conversion();
 	});
 
 </script>

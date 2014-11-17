@@ -1,5 +1,3 @@
-import re
-
 from jinja2 import Markup
 
 from db import export_sql
@@ -13,7 +11,7 @@ def render(vis, request, info):
     reload = int(request.args.get("reload", 0))
     view = request.args.get("view", '')
     start = request.args.get("start", '0')  # start at 0
-    limit = request.args.get("limit", '100000')
+    limit = request.args.get("limit", '5000')
 
     xField = request.args.get("xField", '')
     groupby = request.args.get("groupBy", '')
@@ -21,14 +19,13 @@ def render(vis, request, info):
         groupby = ' group by ' + groupby
 
     if len(table) == 0 or len(xField) == 0 or len(field) == 0:
-        info["message"].append("Table  or field missing.")
+        info["message"].append("Table or field missing.")
         info["message_class"] = "failure"
     else:
+
         sql = "select %s, %s from %s where %s %s order by 1 limit %s offset %s" % (
         xField, field, table, where, groupby, limit, start)
-        field = ','.join([re.compile(r' as ').split(f)[-1].strip() for f in field.split(',')])
-        header = "Date,%s" % (field)
-
+        header = "Date,%s" % field
         (datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
         if len(result) > 0:
             info["message"].append(result)

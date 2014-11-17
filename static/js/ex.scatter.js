@@ -24,10 +24,21 @@ function scatter_draw() {
 
 	$("#svg-box-scatter").find("svg").remove();
 	d3.select("#svg-box-scatter").append("svg:svg").attr("height", height).attr("width", width);
-	
-	scatterchart.xAxis.tickFormat(d3.format('.2f')).axisLabel(Xaxis);
- 	scatterchart.yAxis.tickFormat(d3.format('.2f')).axisLabel(Yaxis);
- 	
+
+	if (types[Xaxis] == 3)
+        scatterchart.xAxis.tickFormat(function(d) { return d3.time.format('%d-%m-%y')(new Date(d))});
+	else
+        scatterchart.xAxis.tickFormat(d3.format('.2f')).axisLabel(Xaxis);
+
+	if (types[Yaxis] == 3)
+        scatterchart.yAxis.tickFormat(function(d) { return d3.time.format('%d-%m-%y')(new Date(d))});
+	else
+        scatterchart.yAxis.tickFormat(d3.format('.2f')).axisLabel(Yaxis);
+
+
+
+
+
 	modules['scatter']['crossfilter']={'dimension': mdimension, 'group': mgroup};
 	modules['scatter']['chart'] = scatterchart;
 	

@@ -98,6 +98,7 @@
 <script>
 var num_bins = 70;
 var chart_width = 760;
+var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 d3.text("{{datfile}}", function(text) {
 	var flights = d3.csv.parseRows(text);
 	  // Various formatters.

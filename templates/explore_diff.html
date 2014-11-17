@@ -1,5 +1,6 @@
 {% extends "layout.html" %} {% block title %}Diff series{% endblock %}
 {% block body %}
+
 <style>
 .x.axis path {
 	display: none;
@@ -53,6 +54,7 @@
 		.append("g")
 			.attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	d3.csv("{{datfile}}", function(error, data) {
 
 		// identify x axis
@@ -148,6 +150,7 @@
 				".35em").style("text-anchor", "end").text(function(d) {
 			return d;
 		});
+		    spinner.stop();init_svg_conversion();
 	});
 </script>
 {% endblock %}

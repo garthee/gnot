@@ -1,10 +1,5 @@
 {% extends "layout.html" %} {% block title %}Explore{% endblock %} {%
 block body %}
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
 <script src="static/js/nv.d3.min.js"></script>
 <link href="static/css/nv.d3.css" rel="stylesheet" type="text/css">
@@ -12,6 +7,7 @@ block body %}
 <script src="static/js/crossfilter.js"></script>
 <script src="static/js/dc.js"></script>
 <link href="static/css/dc.css" rel="stylesheet" type="text/css">
+<script src="static/js/d3.layout.cloud.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?sensor=false&sensor=false&libraries=visualization"></script>
 
@@ -23,24 +19,15 @@ block body %}
 <link type="text/css" rel="stylesheet" href="static/css/extensions.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
 <script src="static/js/rickshaw.min.js"></script>
-<script src="static/js/extensions.js"></script>	
+<script src="static/js/extensions.js"></script>
 
-<script src="static/js/ex.word.js"></script>	
-<script src="static/js/d3.layout.cloud.js"></script>
+<link rel=stylesheet href=/static/css/colorbrewer.css type=text/css>
 
 <style>
-
 #container {
 	margin:0 auto;
 	display:inline-block;
 	text-align:left;
-}
-
-#ex-sidebar{
-	width:100px;
-}
-#side-container {
-	width: 110px;
 }
 .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12{
 	padding:0px;
@@ -50,10 +37,12 @@ block body %}
 	float:left;
 }
 .side-container{
-	width:200px;
+	width:240px;
 	float:left;
 }
-
+#ex-sidebar{
+    width:100px;
+}
 .ex-nav .glyphicon {
 	margin-top: 5px;
 	margin-bottom: 10px;
@@ -88,7 +77,9 @@ block body %}
 }
 .title{
 	padding: 5px 5px 5px 0px;
-	background: #eee;
+	background: #fff;
+    font-family: 'Josefin Sans', Helvetica, sans-serif;
+    overflow:hidden;
 }
 .select-fields{
 	padding:5px;
@@ -111,6 +102,9 @@ a.g-collapse:hover, a.g-collapse.off{
 .dc-chart{
 	margin-left:2px;
 }
+.dc-chart g.row text {
+    fill: #000;
+}
 .chart div{
 	padding:5px;
 }
@@ -118,118 +112,127 @@ a.g-collapse:hover, a.g-collapse.off{
 	float: right;
 }
 
-	#svg-box-series.svg-box{
-		width:940px;
-	}
-	.rickshaw_graph .x_tick .title {
-		opacity:1;
-		margin-left: 3px;
-		bottom: -10px;
-	}
-    .ui-slider .ui-slider-handle {
-		width: 12px; border-radius: 2px; 
-		border: 1px solid #adadad; height: 16px; 
-		background-color: #efefef; cursor: pointer; 
-	}
-	.ui-slider-horizontal {
-		 background-color: #aaa; height: 1px; border-bottom: 1px solid #efefef;
-	}
-
-	#side-container-4{
-		background:#cbcbcb;
-		padding:0px;
-		font-size:10px;
-		width:240px;
-		font-size:10px;
-	}
-	#side_panel{
-		padding: 5px;
-	}
-	section{
-		border:0px;
-		padding:2px 0;
-	}
-	#series-legend{
-		background:inherit;
-		height:inherit;
-	}
-	#offset_form label, #interpolation_form  label{
-		margin-bottom: 1px;
-		font-weight: 100;
-	}
-	#offset_form label span, #interpolation_form label span{
-		padding-left: 42px;
-	}
-	.rickshaw_graph .detail .x_label{
-		background:#00b9e7;
-		opacity:0.5;
-	}
-
+section {
+    border: none;
+    padding: 5px 0;
+}
+.rickshaw_legend {
+    color: #333;
+    background:#fff;
+    padding:2px;
+    overflow:hidden;
+}
+.export_svg {
+    background: none;
+}
 </style>
 <a name="top" ></a>
 
 <div id="container" style="width:1300px; margin:0 auto;">
 <h1>Explore Dashboard</h1>
 <div class="col-md-1">
-  <ul class="nav ex-nav" id="ex-sidebar" data-spy="affix" data-offset-top="40" ></ul>
+  <ul class="nav ex-nav" id="ex-sidebar" data-spy="affix" data-offset-top="20" ></ul>
 </div>
-<div class="col-md-11" role="main">
+<div class="col-md-9" role="main">
 	<div id="ex-main-container">
 		<div id="svg-box">
-		<div id="svg-box-dashboard" class="svg-box"></div>
-		<div class="side-container {{message_class}}" id="side-container-3">
-		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
-		</div>
-		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div id="dashboard-side-container-m" class="side-container side-container-1"></div>
-		<div style="clear:both"></div>
+		    <div id="svg-box-dashboard" class="svg-box"></div>
 		</div>
 	</div>
+</div>
+<div class="col-md-2">
+    <div id="side-container" data-spy="affix" data-offset-top="20">
+        <div class="side-container {{message_class}}" id="side-container-3">
+        {{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
+        </div>
+        <div class="side-container" id="side-container-0">{{title}}</div>
+        <div id="dashboard-side-container-m" class="side-container side-container-1"></div>
+    </div>
 </div>
 </div>
 
 
 <script>
 	var bigdata,
-		keys = [],
+		keys = [], types = {},
 		modules = {'calendar':{'icon': 'calendar', 'fields':['date']},
 					'map_heatmap':{'icon': 'globe', 'fields':['latitude', 'longitude']},
 					'map_scatter':{'icon': 'flag', 'fields':['latitude', 'longitude', 'size', 'group', 'text-']},
 					'series':{'icon': 'flash', 'fields':['Xaxis', 'fields']},
 					'scatter':{'icon': 'th', 'fields':['Xaxis', 'Yaxis', 'Group']},
-					'word':{'icon': 'text-height', 'fields':['Text']},
-					'line':{'icon': 'flash', 'fields':['Xaxis', 'fields']}
+					'word':{'icon': 'text-height', 'fields':['Text']}
 					};
-	
+
+    //sidebar
+    for (m in modules){
+        $('#ex-sidebar').append('<li class=""><a title="'+ m +'" href="#ex-' + m + '" id="ex-' + m + '"><span class="glyphicon glyphicon-' + modules[m]['icon'] +  '"></span></a></li>');
+        modules[m]['count'] = 0;
+    }
+    $('#ex-sidebar li a').click(function (){
+        iid = $(this).attr('id');
+        iid = iid.split('-');
+        $('#svg-box-' + iid[1]).toggle();
+        $('#' + iid[1] + '-side-container-m').toggle();
+        $(this).toggleClass('sidebar-on');
+        $.getScript("static/js/ex." + iid[1] + ".js", function(){ init(iid[1]);}) //load sub module and init
+    });
+    $('#ex-sidebar').append('<li class=""><a href="javascript:window.scrollTo(0,0);" id="top" title="go to top"><span class="glyphicon glyphicon-home"></span></a></li>');
+
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
+
+    //data
 	d3.csv("{{datfile}}", function(error, data) {
-		
-		//sidebar
-		for (m in modules){
-			$('#ex-sidebar').append('<li class=""><a title="'+ m +'" href="#ex-' + m + '" id="ex-' + m + '"><span class="glyphicon glyphicon-' + modules[m]['icon'] +  '"></span></a></li>');
-			modules[m]['count'] = 0;
-		}
-		$('#ex-sidebar li a').click(function (){
-			iid = $(this).attr('id');
-			iid = iid.split('-');
-			$('#svg-box-' + iid[1]).toggle();
-			$('#' + iid[1] + '-side-container-m').toggle();
-			$(this).toggleClass('sidebar-on');
-			//init(iid[1]);
-			$.getScript("static/js/ex." + iid[1] + ".js", function(){ init(iid[1]);})
-		});
-		$('#ex-sidebar').append('<li class=""><a href="javascript:window.scrollTo(0,0);" id="top" title="go to top"><span class="glyphicon glyphicon-home"></span></a></li>');
-		
-		//data
 		data.forEach(function(d){ d.all = 1;})
 		for (var key in data[0]) {
 		    keys.push(key);
+		    types[key] = 1;
 		}
 		for (i = 0; i<data.length; i++){
 			data[i].cf_id = i;
 		}
+        var sr = data[0],
+	  		str2str = function(d){return d;},
+	  		str2int = function(d){return +d;},
+	  		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
+	  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
+	  		time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
+			isNumber = function (n) { return !isNaN(parseFloat(n)) && isFinite(n);};
+        for (j = 0; j < keys.length; j++){
+		    var k = keys[j], parseX = str2int, type = 1; // type1:int,type2:str,type3:date
+            if (!isNumber(sr[keys[j]])){
+                var lx = sr[keys[j]].split(/[- :]/).length;
+                if (lx >=6){
+                    parseX = time2int;
+                    type = 3;
+                }
+                else if (lx >= 3) {
+                    parseX = date2int;
+                    type = 3;
+                }
+                else if (lx >= 2) {
+                    parseX = month2int;
+                    type = 3;
+                }
+                else {
+                    parseX = str2str;
+                    type = 2;
+                }
+
+                if (type == 3){
+                    if (!(typeof parseX(sr[keys[j]]).getMonth === 'function') || parseX(sr[keys[j]]).toString() === "Invalid Date"){
+                        parseX = str2str;
+                        type = 2;
+                    }
+                }
+            }
+            types[keys[j]] = type;
+            for(di = 0; di < data.length; di++){
+                data[di][keys[j]] = parseX(data[di][keys[j]]);
+            }
+		}
+
 		flight = crossfilter(data);
   		all = flight.groupAll();
-		bigdata = data;
 
 		//dashboard	
 		modules['dashboard'] = {};
@@ -240,11 +243,14 @@ a.g-collapse:hover, a.g-collapse.off{
 		// title and chart types for each of the crossfilter charts
 		for (j=0; j<keys.length; j++){
 			if (keys[j] == 'all') continue;
+
+			// chart types
 			var strhtml = '<span class="select-charts">Pick a different <span class="dropdown">'
 				+ '<a id="dropdown-chart-' + j + '" role="button" data-toggle="dropdown" href="#"> chart <span class="caret"></span></a>'
 				+ '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-chart-' + j + '" id="ex-dashboard-chart-' + j + '"></ul>'
 				+ '</span></span>';
-		
+
+		    // title bar
 			$("#svg-box-dashboard")
 				.append($('<div id="'+keys[j]+'-dchart">')
 					.append($('<div class="title">')
@@ -253,11 +259,15 @@ a.g-collapse:hover, a.g-collapse.off{
 						.append(' | Current filter: <span class="filter"></span>'
 							+' | <a class="reset" href="javascript:reset(' + j + ');dc.redrawAll();" title="reset selections">reset</a>'
 							+ strhtml)));
+
+            // chart types
 			for (i = 0; i < chartNames.length; i++) {
 				$('#ex-dashboard-chart-' + j).append($('<li>').append($('<a href="#">').append(chartNames[i])));
 			}
 			config['DchartTypes'][j] = "barChart";
 		}
+
+		// change chart type
 		$(".select-charts .dropdown .dropdown-menu li a").click(function(){
 			iid = $(this).parent().parent().attr('id');
 			iid = iid.split('-'); iid = iid[3];
@@ -267,60 +277,36 @@ a.g-collapse:hover, a.g-collapse.off{
 				bar = draw_charts(chart, $(this).text(), oldbar.dimension(), oldbar.group(), oldbar.x(), oldbar.xUnits());
 			bar.render(); 
 		});
+
+		// totals place holder
 		$('#dashboard-side-container-m').html('<p id="totals"><span class="filter-count"></span> selected out of <span class="total-count"></span> records.</p>');
-	
-		// dc crossfilter charts	
-		dc.dataCount("#totals").dimension(flight).group(all);
+	    dc.dataCount("#totals").dimension(flight).group(all);
+
+		// construct cross filter charts
 	  	var num_bins = 100, 
 			charts = [],
-			sr = data[0],
-	  		str2str = function(d){return d;},
-	  		str2int = function(d){return +d;},
-	  		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
-	  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
-	  		time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
-			isNumber = function (n) { return !isNaN(parseFloat(n)) && isFinite(n);},
 			createChart = function(j, keys) {
 				var k = keys[j], parseX = str2int, type = 1; // type1:int,type2:str,type3:date
-				if (!isNumber(sr[keys[j]])){
-					var lx = sr[keys[j]].split(/[- :]/).length;
-					if (lx >=6){
-						parseX = time2int;
-						type = 3;
-					}
-					else if (lx >= 3) {
-						parseX = date2int;
-						type = 3;
-					}
-					else if (lx >= 2) {
-						parseX = month2int;
-						type = 3;
-					}
-					else {
-						parseX = str2str;
-						type = 2;
-						config['DchartTypes'][j] = 'pieChart';
-					}
-				}
-				
-				var maxX = d3.max(data, function(d){return parseX(d[k]);}),
-					minX = d3.min(data, function(d){return parseX(d[k]);}),
+
+				var maxX = d3.max(data, function(d){return d[k];}),
+					minX = d3.min(data, function(d){return d[k];}),
 					dxx = ((maxX-minX)/num_bins),
 					groupint = function(d){return Math.floor(d / dxx) * dxx;},
 					xunit = function(start,stop,step){return (stop-start)/dxx},
 				 	chartID = "#"+keys[j]+"-dchart",
-					row = flight.dimension(function(d) { return parseX(d[k]); });
+					row = flight.dimension(function(d) { return d[k]; });
 					
-				if (type == 1) {
+				if (types[k] == 1) {
 					group = row.group(function(d) { return groupint(d); });
 					x = d3.scale.linear().domain([minX, maxX]);
-				}else if (type == 3) {
+				}else if (types[k] == 3) {
 					group = row.group(function(d) { return groupint(d); });
 					x = d3.time.scale().domain([minX, maxX]); 
-				}else if (type == 2){
+				}else if (types[k] == 2){
 					group = row.group();
 					xunit = dc.units.ordinal;
 					x = d3.scale.ordinal();
+					config['DchartTypes'][j] = 'pieChart';
 				}
 				
 				if (group.size() < 5) {
@@ -332,10 +318,11 @@ a.g-collapse:hover, a.g-collapse.off{
 				var bar = dc[config['DchartTypes'][j]](chartID);
 			 	return draw_charts(bar, config['DchartTypes'][j], row, group, x, xunit); 
 			};
+
 	  	for (j = 0; j < keys.length; j++){
-	  		var cbar = createChart(j, keys);
-			charts.push(cbar);
+			charts.push(createChart(j, keys));
 	  	}
+	  	bigdata = data;
 	  	
 	  	charts[0].renderlet(function(chart){
 	  	    dc.events.trigger(function(){
@@ -361,10 +348,14 @@ a.g-collapse:hover, a.g-collapse.off{
 	  	});
 	  	
 		dc.renderAll();
+
 		window.reset = function(i) {
 		    charts[i].filter(null);
 		};
-		
+
+        spinner.stop();
+        //init_svg_conversion();
+
 		function draw_charts(chart, type, dimension, group, x, xunit) {
 			switch(type){
 				case 'rowChart':
@@ -391,7 +382,7 @@ a.g-collapse:hover, a.g-collapse.off{
 		}
 	});
 	
-	// load support views
+	// int sub modules
 	function init(m){
 		if (modules[m]['count'] == 0){
 
@@ -448,6 +439,7 @@ a.g-collapse:hover, a.g-collapse.off{
 								return;
 						}
 						window[iid[1] + "_draw"]();
+						//init_svg_conversion();
 					}
 		        }
 			});
@@ -458,6 +450,7 @@ a.g-collapse:hover, a.g-collapse.off{
 				}
 			}
 			window[m + "_draw"]();
+			//init_svg_conversion();
 		}
 		modules[m]['count']++;
 	}

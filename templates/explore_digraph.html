@@ -43,7 +43,7 @@ path.chord {
 
 <script>
 	var width = 800, height = 800,  outerRadius = Math.min(width, height) / 2 - 10, innerRadius = outerRadius - 24;
-
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	var formatPercent = d3.format(".1%");
 	var arc = d3.svg.arc()
     	.innerRadius(innerRadius)
@@ -54,14 +54,14 @@ path.chord {
     	.sortChords(d3.ascending);
 	var path = d3.svg.chord()
     	.radius(innerRadius);
-    
+
 	var svg = d3.select("#svg-box").append("svg")
 	 	.attr("width", width)
     	.attr("height", height)
-  	.append("g")
-    	.attr("id", "circle")
-    	.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-    
+        .append("g")
+            .attr("id", "circle")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
 	svg.append("circle")
     	.attr("r", outerRadius);
 
@@ -155,7 +155,7 @@ path.chord {
 				return id;
 			} 
 		}
-
+		spinner.stop();init_svg_conversion();
 	});
 </script>
 

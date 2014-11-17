@@ -27,7 +27,7 @@ function _get_series(Yaxis){
 	for (j=0; j < Yaxis.length; j++) {
 		for (i=0; i < data[j].length; i++) {
 	        if (data[j][i].value.avg > 0) {
-	        	currData[j].push({x: data[j][i].key, y: data[j][i].value.avg });
+	        	currData[j].push({x: (data[j][i].key).getTime()/1000, y: data[j][i].value.avg });
 	    	}
 	   }
 	}
@@ -46,36 +46,9 @@ function series_draw() {
 
 
 	var Xaxis = modules['series']['variables']['Xaxis'],
-		Yaxis = modules['series']['variables']['fields'],
-  		str2int = function(d){return +d;},
-  		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
-  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
-  		time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
-		isNumber = function (n) { return !isNaN(parseFloat(n)) && isFinite(n);},
-		sr = bigdata[0][Xaxis];
+		Yaxis = modules['series']['variables']['fields'];
 
-		var k = keys[j], parseX = str2int, type = 1; // type1:int,type2:str,type3:date
-		if (!isNumber(sr)){
-			var lx = sr.split(/[- :]/).length;
-			if (lx >=6){
-				parseX = time2int;
-				type = 3;
-			}
-			else if (lx >= 3) {
-				parseX = date2int;
-				type = 3;
-			}
-			else if (lx >= 2) {
-				parseX = month2int;
-				type = 3;
-			}
-			else {
-				parseX = str2str;
-				type = 2;
-			}
-		}
-		
-	var	mdimension = flight.dimension(function(d){ return parseX(d[Xaxis]);}),
+	var	mdimension = flight.dimension(function(d){ return d[Xaxis];}),
 		msgroup = [];
 	for (j=0; j< Yaxis.length; j++){
 		msgroup[j] = mdimension.group().reduce(
@@ -157,13 +130,13 @@ function series_draw() {
 	</div>';
 	
 	$("#side-container-4").remove();
-	$("#svg-box-series").after(sidePanelHtml);
+	$("#side-container").append(sidePanelHtml);
 	$("#svg-box-series-svg").remove();
 	$("#svg-box-series").append($('<div id="svg-box-series-svg">'));
 
 	var graph = new Rickshaw.Graph( {
 		element: document.getElementById("svg-box-series-svg"),
-		width: 940,
+		width: 960,
 		height: 500,
 		renderer: 'line',
 		stroke: true,
@@ -202,18 +175,7 @@ function series_draw() {
 	
 	var ticksTreatment = 'glow';
 		
-	if (type == 1) {
-		var xAxis = new Rickshaw.Graph.Axis.X( {
-			graph: graph,
-			ticksTreatment: ticksTreatment,
-			tickFormat: Rickshaw.Fixtures.Number.formatKMBT
-		});
-		var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-			graph: graph,
-			xFormatter: function(x) {return x;}
-		});
-	}
-	else {
+	if (types[Xaxis] == 3) {
 		var xAxis = new Rickshaw.Graph.Axis.Time( {
 			graph: graph,
 			ticksTreatment: ticksTreatment,
@@ -222,6 +184,17 @@ function series_draw() {
 		var hoverDetail = new Rickshaw.Graph.HoverDetail( {
 			graph: graph,
 			xFormatter: function(x) {return new Date(x * 1000).toString();}
+		});
+	}
+	else {
+        var xAxis = new Rickshaw.Graph.Axis.X( {
+			graph: graph,
+			ticksTreatment: ticksTreatment,
+			tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+		});
+		var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+			graph: graph,
+			xFormatter: function(x) {return x;}
 		});
 	}
 	xAxis.render();

@@ -1,6 +1,6 @@
 {% extends "layout.html" %} {% block title %}Google Map{% endblock %} {%
 block body %}
-  
+
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.3.9/d3.min.js"></script>
@@ -18,7 +18,7 @@ block body %}
 		width:800px;
 		height:800px;
 	}
-	
+
 	#main-container.fullscreen{
 		position: fixed;
 		left: 0px;
@@ -38,7 +38,7 @@ block body %}
 		left: 10px;
 		position: fixed;
 	}
-	
+
 	.pp-slider {
 		float: left;
 		-webkit-user-select: none;
@@ -48,7 +48,7 @@ block body %}
 		user-select: none;
 		height: 30px;
 	}
-	
+
 	.pp-slider .pp-slider-scale {
 		background-color: #000;
 		height: 1px;
@@ -57,7 +57,7 @@ block body %}
 		margin-top: 14px;
 		float: left;
 	}
-	
+
 	.pp-slider .pp-slider-scale .pp-slider-button {
 		width: 12px;
 		border-radius: 2px;
@@ -69,7 +69,7 @@ block body %}
 		background-color: #eee;
 		cursor: pointer;
 	}
-	
+
 	.pp-slider .pp-slider-scale .pp-slider-button .pp-slider-divies {
 		border-left: 1px solid #000;
 		border-right: 1px solid #000;
@@ -79,12 +79,12 @@ block body %}
 		width: 4px;
 		height: 10px;
 	}
-	
+
 	.pp-slider .pp-slider-scale .pp-slider-button:hover {
 		border-color: #000;
 		background-color: #a1c4fe;
 	}
-	
+
 	.pp-slider .pp-slider-scale .pp-slider-tooltip {
 		width: auto;
 		white-space: nowrap;
@@ -101,7 +101,7 @@ block body %}
 		border: 2px solid rgba(50,50,50,.4);
 		border-radius: 5px;
 	}
-	
+
 	.pp-slider .pp-slider-min {
 		float: left;
 		width: 80px;
@@ -111,7 +111,7 @@ block body %}
 	.pp-slider .pp-slider-min span{
 		padding:4px;
 	}
-	
+
 	#slider-container{
 		padding: 10px;
 		margin-top:-65px;
@@ -146,13 +146,13 @@ block body %}
 	</div>
 	<div id="side-container">
 		<div class="side-container {{message_class}}" id="side-container-3">
-		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
 		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-1">
 			{{div_slider_counter}}
 			<p><span><label><input type="checkbox" id="fullscreen">Full Screen</label></span></p>
-			
+
 		</div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>
@@ -165,7 +165,7 @@ block body %}
 
 	d3.select("#fullscreen").on("change", fullscreen);
 	var entries = {}, map=undefined, heatmap, dt = 0, dx, keys;
-	
+
 	function fullscreen(){
 		$('#container div').toggleClass('fullscreen');
 		$('h1').toggleClass('fullscreen');
@@ -174,17 +174,16 @@ block body %}
 		drawmap();
 	}
 
-	
-	function drawmap(){  
+
+	function drawmap(){
 		var t = keys[Math.floor(dt)];
 		$('#slider-time').html(t);
-		
+
 		if (map === undefined){
 		    var clat = d3.median(entries[t], function(d){ return +d.latitude;});
 		    var clong = d3.median(entries[t], function(d){ return +d.longitude;});
-			
+
 	  		map = new google.maps.Map($('#map')[0], {
-	    		zoom: 7,
 	    		panControl: false,
 				overviewMapControl:true,
 				streetViewControl:false,
@@ -193,7 +192,6 @@ block body %}
 	      			style: google.maps.ZoomControlStyle.SMALL,
 	      			position: google.maps.ControlPosition.RIGHT_TOP
 	    		},
-	    		center: new google.maps.LatLng(clat, clong),
 	    		styles: [{'stylers': [{'saturation': -100},{'lightness': -30}]}]
 			});
 	  		heatmap = new google.maps.visualization.HeatmapLayer({
@@ -201,19 +199,31 @@ block body %}
 	    		opacity: 1,
 	    		map: map
 	  		});
+
+	  		for (t in entries){
+                var markerBounds = new google.maps.LatLngBounds();
+                for (var i = 0; i < entries[t].length; i++) {
+                    entry = entries[t][i];
+                    var latlong = new google.maps.LatLng(entry.latitude, entry.longitude);
+                    markerBounds.extend(latlong);
+                }
+                map.fitBounds(markerBounds);
+    		}
+
 		}
-		
+
 		var taxiData = new google.maps.MVCArray();
       	heatmap.setData(taxiData);
-      	
+
 		if (t in entries){
 			var entry;
 	      	for (var i = 0; i < entries[t].length; i++) {
 	        	entry = entries[t][i];
 	        	var latlong = new google.maps.LatLng(entry.latitude, entry.longitude);
 	        	taxiData.push({location: latlong, weight: entry.count });
-	      	}	
+	      	}
 		}
+
 	}
     // wrapped - just in case it conflicts with other jquery methods.
 	(function($) {
@@ -234,7 +244,7 @@ block body %}
 
 			if (typeof (options) != 'undefined'
 					&& typeof (options.hideTooltip) != 'undefined'
-					&& options.hideTooltip == true) { 
+					&& options.hideTooltip == true) {
 				container.find('.pp-slider-tooltip').hide();
 			}
 
@@ -314,7 +324,7 @@ block body %}
 				dt = dx.invert(currentVal);
 				drawmap();
 			};
-			
+
 			var pause = true, intervalId;
 			var play = function(e) {
 				if (pause){
@@ -356,10 +366,10 @@ block body %}
 			});
 		}
 		$.fn.PPSlider.defaults = {width : 150};
-		
-		
+
+
 	})(jQuery);
-	
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('map'));
 	d3.csv("{{datfile}}", function (err, data) {
       	data.forEach(function (entry) {
         	entry.count = parseInt(entry.count, 10);
@@ -371,8 +381,8 @@ block body %}
       	dx = d3.scale.linear().domain([0, keys.length-1]).range([0, 100]);
       	$("#slider").PPSlider({width : 760});
       	drawmap();
-	});  
+      	spinner.stop();init_svg_conversion();
+	});
 </script>
 
 {% endblock %}
-

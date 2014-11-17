@@ -1,69 +1,21 @@
-{% extends "layout.html" %} {% block title %}Ridge Results{% endblock %}
-{% block body %}
-<link href="static/css/nv.d3.css" rel="stylesheet" type="text/css">
-<link type="text/css" rel="stylesheet" href="static/css/jquery.dropdown.css" />
 <link href="static/css/chart.css" rel="stylesheet" type="text/css">
 
-<script src="static/js/nv.d3.min.js"></script>
-<script src="static/js/crossfilter.v1.min.js"></script>
-<script src="static/js/fisheye.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-<script type="text/javascript" src="static/js/jquery.dropdown.js"></script>
+{{pca_matrix_divs}}
+<div id="svg-box-features"><span><label><input type="checkbox"> Sort values</label></span></div>
+<div class="side-container" id="side-container-r">{{results}}</div>
 
-<div id="container">
-	<h1>ML Ridge</h1>
-	<div id="main-container" style="width: 800px;">
-		{{pca_matrix_divs}}
-		
-		<h2>Feature Weights</h2>
-		<span><label><input type="checkbox"> Sort values</label></span>
-		<div id="svg-box-features"></div>
-		
-		
-		<h2>Spread Features</h2>
-		<div id="svg-box-scatter"><svg></svg></div>
-		<div>
-			Pick different fields for <span class="scatter"
-				data-dropdown="#dropdown-1" data-horizontal-offset="0"
-				data-vertical-offset="0">X-axis</span> or <span class="scatter"
-				data-dropdown="#dropdown-2" data-horizontal-offset="0"
-				data-vertical-offset="0">Y-axis</span> here.
-		</div>
-
-		<h2>Contributing Factors</h2>
-		<div id="svg-box-provenance">{{provenance_divs}}</div>
-
-	</div>
-	<div id="side-container">
-		<div class="side-container {{message_class}}" id="side-container-3">
-		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
-		</div>
-		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div class="side-container" id="side-container-1">{{results}}</div>
-		<div class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
-	</div>
-</div>
-
-
-<script src="static/js/chart.scatter.crossfilter.js"></script>
 <script src="static/js/chart.histogram.js"></script>
 <script src="static/js/chart.matrix.js"></script>
 <script>
-scatter_x1_name='{{scatter_x}}'; 
-scatter_x2_name='{{scatter_y}}';
-file_provenance = "{{datfile_provenance}}";
 file_pca_matrix = "{{datfile_matrix}}";
 {{weights_data}}
 chart_matrix();
 chart_histogram();
-chart_scatter_crossfilter(false);
+$('#svg-box').prepend($('#svg-box-features'));
+$('#svg-box').prepend($('#svg-pca_matrix'));
+
+$('h1').html('Explore Ridge Linear');
+$('#side-container').append($('#side-container-r'));
+
 </script>
 
-
-<div id="dropdown-1" class="dropdown dropdown-tip dropdown-relative">
-	<ul class="dropdown-menu" id="scatter_x1">{{scatter_fields}}</ul>
-</div>
-<div id="dropdown-2" class="dropdown dropdown-tip dropdown-relative">
-	<ul class="dropdown-menu" id="scatter_x2">{{scatter_fields}}</ul>
-</div>
-{% endblock %}

@@ -1,8 +1,7 @@
 {% extends "layout.html" %} {% block title %}Calendar{% endblock %} {%
 block body %}
-<style>
 
-</style>
+<link rel=stylesheet href=/static/css/colorbrewer.css type=text/css>
 
 <div id="container" style="width:1200px;">
 	<h1>Explore Date</h1>
@@ -11,10 +10,11 @@ block body %}
 	</div>
 	<div id="side-container">
 		<div class="side-container {{message_class}}" id="side-container-3">
-		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>. 
+		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
+
 		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div class="side-container" id="side-container-m"></div>
+		<div class="side-container" id="side-container-1"></div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>
 		</div>
@@ -32,8 +32,10 @@ block body %}
 		percent = d3.format(".1%"),
 		format = d3.time.format("%Y-%m-%d");
 
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	d3.csv("{{datfile}}", function(error, csv) {
 		drawCalendar(csv);
+		spinner.stop();init_svg_conversion();
 	});
 	
 	function drawCalendar(dall) {
@@ -81,7 +83,7 @@ block body %}
 			.attr("class", "month")
 			.attr("d", monthPath);
 
-		var theDiv = document.getElementById("side-container-m");
+		var theDiv = document.getElementById("side-container-1");
 		theDiv.innerHTML = '<p>Calendar week starts on Sunday and ends on Saturday. Values range ' 
 						  +'from <span class="limit-values" id="val_min">' + mind 
 						  + '</span> to <span class="limit-values" id="val_max">' + maxd 
@@ -108,6 +110,7 @@ block body %}
 
 	//d3.select(self.frameElement).style("height", "2910px");
 	//d3.selectAll("svg").attr("class", "Blues");
+
 </script>
 
 {% endblock %}

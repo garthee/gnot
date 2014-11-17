@@ -34,6 +34,7 @@ line {
 
 
 <script>
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	var width = 800, height = 800, r = 6;
 	var color = d3.scale.category20();
 
@@ -97,7 +98,7 @@ line {
 				group : group
 			});
 		}
-
+        spinner.stop();init_svg_conversion();
 	});
 </script>
 

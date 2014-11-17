@@ -75,6 +75,9 @@ trail{
 	var radius = Math.min(width, height) / 2;
 	var b = {w: 200, h: 30, s: 3, t: 10};
 
+
+    var spinner = new Spinner(spinner_opts).spin(document.getElementById('chart'));
+
 	// Total size of all segments; we set this later, after loading the data.
 	var totalSize = 0; 
 	var names = d3.set([]);
@@ -95,8 +98,8 @@ trail{
 	    .innerRadius(function(d) { return Math.sqrt(d.y); })
 	    .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
 
-		// Use d3.text and d3.csv.parseRows so that we do not need to have a header
-			// row, and can receive the csv as an array of arrays.
+    // Use d3.text and d3.csv.parseRows so that we do not need to have a header
+	// row, and can receive the csv as an array of arrays.
 	d3.text("{{datfile}}", function(text) {
 		var csv = d3.csv.parseRows(text);
 		csv = csv.slice(1, csv.length);
@@ -320,6 +323,7 @@ trail{
 			}
 			return root;
 		}
+		spinner.stop();init_svg_conversion();
 	});
 </script>
 {% endblock %}

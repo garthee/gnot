@@ -64,7 +64,7 @@ body {
 	color: #333;
 	margin: 1em auto 4em auto;
 	position: relative;
-	font-family: "Roboto", Arial, sans-serif;
+	font-family: "Roboto", Helvetica, sans-serif;
 	font-size: 12px;
 	text-align:center;
 }
@@ -123,13 +123,11 @@ h1,h2 {
 	background: #5e5ca6;
 }
 
-.side-container-1 {
-	background: #a1c4fe;
+#side-container-1, .side-container-1 {
+	background: #1aa1e1;
 }
-.side-container-2 {
+#side-container-2, .side-container-2 {
 	background: #a1c4fe;
-}
-.side-container-3 {
 }
 
 .success {
@@ -198,12 +196,6 @@ q:after {
   fill: steelblue;
 }
 
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-}
-
-
 .brush rect.extent {
   fill: steelblue;
   fill-opacity: .125;
@@ -213,6 +205,43 @@ q:after {
   fill: #eee;
   stroke: #666;
 }
+
+.export_svg{
+    position: absolute;
+    padding: 3px;
+    background: #a1c4fe;
+}
+.export_svg a {
+    color:#333;
+}
+.export_svg a:hover{
+    color:#fff;
+}
+
+.x.axis path {
+	display: none;
+}
+
+text {
+	font-size: 12px;
+	font-family: Helvetica, sans-serif;
+}
+
+.axis path,.axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+label{
+    max-width: 100%;
+    margin-bottom: 0px;
+    font-weight: 100;
+}
+label input, label input[type=radio], label input[type=checkbox]{
+    padding:0px;
+    margin:3px;
+}
+
 
 
 	

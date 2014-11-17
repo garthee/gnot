@@ -51,11 +51,11 @@
 What's in the data : Raw module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_calendar+table%3A+finance.twitter_feed2+xField%3A+%22date%28created_at%29%22+field%3A+%22count%28*%29%22+reload%3A+1"/ >
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_calendar+table%3A+finance.twitter_feed2+xField%3A+%22date%28created_at%29%22+field%3A+%22count%28*%29%22"/ >
 Counts : Calendar Module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field+table%3A+finance.twitter_feed2+field%3A+%22stock%22+limit%3A+100+reload%3A+1" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_field+table%3A+finance.twitter_feed2+field%3A+%22stock,count(*)+limit%3A+100+" />
 Distribution of stocks : Field Module
 </a>
 You can also check distribution of user_id, and source.
@@ -64,13 +64,10 @@ Distribution of stock,hour of the tweet, and day of the week of the tweet: Multi
 </a>
 
 <h2>Visualizing time series</h2>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns2+xField%3A+%22date%28to_date%28date%2C%27YYYYMMDD%27%29%29%22+reload%3A+1+field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+groupBy%3A+%221%22" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns2+xField%3A+%22date%28to_date%28date%2C%27YYYYMMDD%27%29%29%22++field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+groupBy%3A+%221%22" />
 AAPL returns compared to SP500 returns : Diff module
 </a>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_series_lite+table%3A+finance.interday_returns+xField%3A+%22to_date%28date%2C%27YYYYMMDD%27%29%22+reload%3A+1+field%3A+%22sprtrn+as+SP%2C+RET+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27%22" />
-Both AAPL returns SP500 returns over last 10 years: Series Lite module
-</a>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_long_series+table%3A+finance.interday_returns+xField%3A+%22to_date%28date%2C%27YYYYMMDD%27%29%22+reload%3A+1+field%3A+%22sprtrn+as+SP%2C+RET+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27%22" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_long_series+table%3A+finance.interday_returns+xField%3A+%22to_date%28date%2C%27YYYYMMDD%27%29%22++field%3A+%22sprtrn+as+SP%2C+RET+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27%22" />
 An optimized version with the support for annotation: Long series module
 </a>
 You can even annotate this plot using data from another table!
@@ -94,7 +91,7 @@ What people are tweeting about AAPL : Word module
 <a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_series+table%3A+finance.twitter_feed+xField%3A+%22to_char%28to_date%28date%2C+%27YYYYMMDD%27%29%2C+%27YYYY-MM%27%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+limit%3A+5" >
 How does it change over time : Word series module
 </a>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_mashed_series+table%3A+finance.twitter_feed+xField%3A+%22extract%28month+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+reload%3A+1" >
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_word_mashed_series+table%3A+finance.twitter_feed+xField%3A+%22extract%28month+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%22+field%3A+%22text%22+where%3A+%22stock%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+" >
 If you would like to get a high level picture : Word Mashed series module
 </a>
 
@@ -105,26 +102,26 @@ Visualizing Geo-location information : Google Map module
 
 
 <h2>Modelling inter-connections</h2>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_graph+table%3A+finance.twitter_feed+source%3A+%22author_id%22+target%3A+%22stock%22+limit%3A+1000+field%3A+%22count%28*%29+as+n%22+reload%3A+1+orderBy%3A+%22n+desc%22" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_graph+table%3A+finance.twitter_feed+source%3A+%22author_id%22+target%3A+%22stock%22+limit%3A+1000+field%3A+%22count%28*%29+as+n%22++orderBy%3A+%22n+desc%22" />
 Who is covering what stock : Graph module
 </a>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_matrix+table%3A+finance.sample_cov_2006+source%3A+%22s1%22+target%3A+%22s2%22+field%3A+%22max%28cv%29%22+reload%3A+1+limit%3A+10000+linkGroup%3A+%22substring%28s1%2C0%2C3%29%22" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_matrix+table%3A+finance.sample_cov_2006+source%3A+%22s1%22+target%3A+%22s2%22+field%3A+%22max%28cv%29%22++limit%3A+10000+linkGroup%3A+%22substring%28s1%2C0%2C3%29%22" />
 Covariance of some stock returns on year 2006 : Matrix module
 </a>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_digraph+table%3A+finance.sample_cov_2006+source%3A+%22s1%22+target%3A+%22s2%22+field%3A+%22max%28cv%29%22+reload%3A+1+limit%3A+10000" />
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_digraph+table%3A+finance.sample_cov_2006+source%3A+%22s1%22+target%3A+%22s2%22+field%3A+%22max%28cv%29%22++limit%3A+10000" />
 Covariance of some stock returns on year 2006 : Digraph module
 </a>
 
 <h2>Statistical analysis</h2>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore+table%3A+finance.twitter_feed2+xField%3A+%22stock%22+field%3A+%22date%28created_at%29+as+date%2Ccount%28*%29+as+count%2C+avg%28char_length%28text%29%29+as+lengths%22+groupBy%3A+%22stock%2Cdate%28created_at%29%22+field%3A+%22avg%28retweet_count%29%22">
-Dashboard on few twitter related features
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore+table%3A+public.jeopardy+field%3A+%22date%28air_date_d%29%22+field%3A+%22extract%28year+from+air_date_d%29%22+field%3A+%22value_n%22+field%3A+%22round%22+field%3A+%22to_char%28air_date_d%2C+%27DY%27%29%22+field%3A+%22category%22+field%3A+%22question%22+field%3A+%22answer%22+limit%3A+2000+orderBy%3A+%22random%28%29%22#">
+Dashboard on Jeopardy! data.
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_scatter+field%3A+%22extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29+as+year%22+field%3A+%22avg%28openprc%29%22+field%3A+%22sum%28vol%29%22+field%3A+%22ticker%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+group+by+1%2C4%22+reload%3A+1">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_scatter+field%3A+%22extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29+as+year%22+field%3A+%22avg%28openprc%29%22+field%3A+%22sum%28vol%29%22+field%3A+%22ticker%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+group+by+1%2C4%22+">
 Scatter plot module
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_corr+field%3A+%22ticker%2Cret%22+field%3A+%22openprc%22+field%3A+%22vol%22+field%3A+%22numtrd%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2011+and+random%28%29+%3C+0.1%22+limit%3A+100+reload%3A+1">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=table%3A+finance.interday_returns+module%3A+explore_corr+field%3A+%22ticker%2Cret%22+field%3A+%22openprc%22+field%3A+%22vol%22+field%3A+%22numtrd%22+where%3A+%22ticker+in+%28%27AAPL%27%2C%27MSFT%27%2C%27GE%27%2C%27IBM%27%2C%27C%27%29+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2011+and+random%28%29+%3C+0.1%22+limit%3A+100+">
 Visual Classification : Corr Module
 </a>
 
@@ -134,11 +131,11 @@ Histogram : average tweet length for few stocks
 
 
 <h2>Machine learning tasks</h2>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_svm_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22class-3%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22cellsize%22+field%3A+%22normal_nucleoli%22+ratio%3A+%220.8%22+pre_process%3A+%22Z-Score%22+regularizer%3A+%2210%22+reload%3A+1#">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_svm_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22class-3%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22cellsize%22+field%3A+%22normal_nucleoli%22+ratio%3A+%220.8%22+pre_process%3A+%22Z-Score%22+regularizer%3A+%2210%22+#">
 Example binary classification task on Wisconsin breast cancer dataset (easy task): ML_SVM module 
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_ridge_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellsize%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22adhesion%22+field%3A+%22bare_nuclei%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+regularizer%3A+%22.5%22+pre_process%3A+%22Z-Score%22+reload%3A+1+orderBy%3A+%22random%28%29%22">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_ridge_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellsize%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22adhesion%22+field%3A+%22bare_nuclei%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+regularizer%3A+%22.5%22+pre_process%3A+%22Z-Score%22++orderBy%3A+%22random%28%29%22">
 Example regression task on Wisconsin breast cancer dataset: ML_RIDGE_LINEAR module 
 </a>
 <a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellshape%22+field%3A+%22cellsize%22+k%3A+%223%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+field%3A+%22thickness%22">
