@@ -1,11 +1,10 @@
 GNoT
 ====
-
 Rapid DB Visualization by Garthee
 
 Required
 ===
-1. Python (preferably 2.7)
+1. Python (2.7+, 3.x supported)
 2. werkzeug and jinja2 (available in PIP)
 3. ML SVM module also requires sklearn (available in PIP). Sklearn requires numpy and scipy.
 
