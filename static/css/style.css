@@ -152,7 +152,8 @@ a:active {
 }
 
 svg {
-	background-color: rgba(245, 245, 245, 0.952941);
+	/*background-color: rgba(245, 245, 245, 0.952941);*/
+	background-color: rgba(255, 255, 255, 1);
 }
 
 #annottation div {
@@ -209,13 +210,14 @@ q:after {
 .export_svg{
     position: absolute;
     padding: 3px;
-    background: #a1c4fe;
+    /*background: #a1c4fe;*/
+    background:#fff;
 }
 .export_svg a {
     color:#333;
 }
 .export_svg a:hover{
-    color:#fff;
+    color:#a1c4fe;
 }
 
 .x.axis path {

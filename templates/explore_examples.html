@@ -67,6 +67,10 @@ Distribution of stock,hour of the tweet, and day of the week of the tweet: Multi
 <a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns2+xField%3A+%22date%28to_date%28date%2C%27YYYYMMDD%27%29%29%22++field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+groupBy%3A+%221%22" />
 AAPL returns compared to SP500 returns : Diff module
 </a>
+<a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_series+table%3A+finance.interday_returns+xField%3A+%22to_date%28date%2C%27YYYYMMDD%27%29%22+field%3A+%22sprtrn+as+SP%2C+RET+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27%22" />
+Visualizing time series: Series module
+</a>
+
 <a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_long_series+table%3A+finance.interday_returns+xField%3A+%22to_date%28date%2C%27YYYYMMDD%27%29%22++field%3A+%22sprtrn+as+SP%2C+RET+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27%22" />
 An optimized version with the support for annotation: Long series module
 </a>

@@ -14,7 +14,7 @@ block body %}
 
 		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div class="side-container" id="side-container-1"></div>
+		<div class="side-container" id="side-container-m"></div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>
 		</div>
@@ -36,6 +36,8 @@ block body %}
 	d3.csv("{{datfile}}", function(error, csv) {
 		drawCalendar(csv);
 		spinner.stop();init_svg_conversion();
+		init_svg_conversion();
+
 	});
 	
 	function drawCalendar(dall) {
@@ -83,7 +85,7 @@ block body %}
 			.attr("class", "month")
 			.attr("d", monthPath);
 
-		var theDiv = document.getElementById("side-container-1");
+		var theDiv = document.getElementById("side-container-m");
 		theDiv.innerHTML = '<p>Calendar week starts on Sunday and ends on Saturday. Values range ' 
 						  +'from <span class="limit-values" id="val_min">' + mind 
 						  + '</span> to <span class="limit-values" id="val_max">' + maxd 
