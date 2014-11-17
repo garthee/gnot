@@ -10,7 +10,10 @@ from jinja2 import Environment, FileSystemLoader, Markup
 import json
 import sys, os, inspect, re
 from collections import defaultdict
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except:
+    from urlparse import urlparse
 
 isProduction = False
 
