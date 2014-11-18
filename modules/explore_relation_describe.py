@@ -10,7 +10,6 @@ from db import export_sql
 
 def nest_array(nlist, keys):
     k = keys.pop()
-    print(k)
     jout = {}
     for row in nlist:
         rk = row[k]
