@@ -1,11 +1,11 @@
 {
-"db_pass":"",
-"db_user":"db_user",
+"db_host":"db_url",
 "db_port":"5432",
-"db_schema":"",
+"db_user":"db_user",
+"db_pass":"",
 "db_system":"psql",
-"db_host":"db_url", 
 "db_database":"db",
+"db_scope":" table_shema='public' ",
  "web_host":"host_url", 
  "web_port": 5000
 }
