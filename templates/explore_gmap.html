@@ -87,7 +87,7 @@
 		width: auto;
 		white-space: nowrap;
 		background: #fff;
-		padding: 2px;
+		padding: 5px;
 		display: inline;
 		height: 20px;
 		position: relative;
@@ -96,13 +96,13 @@
 		text-align: center;
 		font-size: 13px;
 		color: #000;
-		border: 2px solid rgba(50,50,50,.4);
+		border: 1px solid rgba(100,100,100,.4);
 		border-radius: 5px;
 	}
 
 	.pp-slider .pp-slider-min {
 		float: left;
-		width: 80px;
+		width: 70px;
 		color: #000;
 		font-size: 20px;
 	}
@@ -128,8 +128,7 @@
 	}
 	.pp-slider-min .clickable{
 		margin: 2px;
-		background: rgba(255,255,255,.8);
-		width: 20px;
+		width: 25px;
 		display: inline-block;
 		text-align: center;
 	}
@@ -152,9 +151,6 @@
 			<p><span><label><input type="checkbox" id="fullscreen">Full Screen</label></span></p>
 
 		</div>
-		<div class="side-container" id="side-container-2">
-			Built with <a href="http://d3js.org/">d3.js</a>
-		</div>
 	</div>
 </div>
 
@@ -174,13 +170,7 @@
 
 
 	function drawmap(){
-		var t = keys[Math.floor(dt)];
-		$('#slider-time').html(t);
-
 		if (map === undefined){
-		    var clat = d3.median(entries[t], function(d){ return +d.latitude;});
-		    var clong = d3.median(entries[t], function(d){ return +d.longitude;});
-
 	  		map = new google.maps.Map($('#map')[0], {
 	    		panControl: false,
 				overviewMapControl:true,
@@ -198,21 +188,22 @@
 	    		map: map
 	  		});
 
+            var markerBounds = new google.maps.LatLngBounds();
 	  		for (t in entries){
-                var markerBounds = new google.maps.LatLngBounds();
                 for (var i = 0; i < entries[t].length; i++) {
                     entry = entries[t][i];
                     var latlong = new google.maps.LatLng(entry.latitude, entry.longitude);
                     markerBounds.extend(latlong);
                 }
-                map.fitBounds(markerBounds);
     		}
-
+		    map.fitBounds(markerBounds);
 		}
+		
+		var t = keys[Math.floor(dt)];
+		$('#slider-time').html(t);
 
 		var taxiData = new google.maps.MVCArray();
       	heatmap.setData(taxiData);
-
 		if (t in entries){
 			var entry;
 	      	for (var i = 0; i < entries[t].length; i++) {
@@ -238,7 +229,14 @@
 			container.addClass('pp-slider');
 			container.addClass('clearfix');
 
-			container.append('<div class="pp-slider-min"><span id="slider-rewind" class="clickable">&laquo;</span><span id="slider-play" class="clickable">&rsaquo;</span></div><div class="pp-slider-scale"><div class="pp-slider-button"><div class="pp-slider-divies"></div></div><div class="pp-slider-tooltip"></div></div>');
+			container.append('<div class="pp-slider-min">'
+                                +'<span id="slider-rewind" class="clickable glyphicon glyphicon-repeat" title="rewind"></span>'
+                                +'<span id="slider-play" title="play/stop" class="clickable glyphicon glyphicon-play-circle"></span>'
+			                +'</div>'
+			                +'<div class="pp-slider-scale">'
+			                    +'<div class="pp-slider-button"><div class="pp-slider-divies"></div></div>'
+			                    +'<div class="pp-slider-tooltip"></div>'
+			                +'</div>');
 
 			if (typeof (options) != 'undefined'
 					&& typeof (options.hideTooltip) != 'undefined'
@@ -293,7 +291,7 @@
 				currentVal = currentVal.toFixed(2);
 
 				container.find('.pp-slider-button').css("left", newPos);
-				container.find('.pp-slider-tooltip').html(currentVal + '%');
+				container.find('.pp-slider-tooltip').html(keys[Math.round(dx.invert(currentVal))]);
 				container.find('.pp-slider-tooltip').css('left', newPos - 6);
 			};
 
@@ -327,7 +325,7 @@
 			var play = function(e) {
 				if (pause){
 					pause = false;
-					$('#slider-play').html('&#9642;');
+					$('#slider-play').toggleClass('glyphicon-remove-circle');
 					intervalId = setInterval(function() {
 						if (dx(1+dt) < 100)
 							initPosition(1+dt);
@@ -341,7 +339,7 @@
 					stop(e);
 			}
 			var stop = function(e) {
-				$('#slider-play').html('&#8250;');
+				$('#slider-play').toggleClass('glyphicon-remove-circle');
 				pause = true;
 				clearInterval(intervalId);
 			}
@@ -367,6 +365,7 @@
 
 
 	})(jQuery);
+	
     var spinner = new Spinner(spinner_opts).spin(document.getElementById('map'));
 	d3.csv("{{datfile}}", function (err, data) {
       	data.forEach(function (entry) {
@@ -379,7 +378,9 @@
       	dx = d3.scale.linear().domain([0, keys.length-1]).range([0, 100]);
       	$("#slider").PPSlider({width : 760});
       	drawmap();
-      	spinner.stop();init_svg_conversion();
+      	
+      	spinner.stop();
+      	init_svg_conversion();
 	});
 </script>
 

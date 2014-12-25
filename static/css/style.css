@@ -101,6 +101,11 @@ h1,h2 {
 	margin: 0px;
 }
 
+#side-container {
+    width:220px;
+    float:left;
+    margin-left:5px;
+}
 .side-container {
 	font-family: 'Raleway', Helvetica, sans-serif;
 	float: left;
