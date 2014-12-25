@@ -1,5 +1,6 @@
-{% extends "layout.html" %} {% block title %}Explore{% endblock %} {%
-block body %}
+{% extends "layout.html" %} 
+{% block title %}Explore{% endblock %}
+{% block body %}
 
 <script src="static/js/nv.d3.min.js"></script>
 <link href="static/css/nv.d3.css" rel="stylesheet" type="text/css">
@@ -125,29 +126,29 @@ section {
     background: none;
 }
 </style>
-<a name="top" ></a>
 
+<a name="top" ></a>
 <div id="container" style="width:1300px; margin:0 auto;">
-<h1>Explore Dashboard</h1>
-<div class="col-md-1">
-  <ul class="nav ex-nav" id="ex-sidebar" data-spy="affix" data-offset-top="20" ></ul>
-</div>
-<div class="col-md-9" role="main">
-	<div id="ex-main-container">
-		<div id="svg-box">
-		    <div id="svg-box-dashboard" class="svg-box"></div>
-		</div>
-	</div>
-</div>
-<div class="col-md-2">
-    <div id="side-container" data-spy="affix" data-offset-top="20">
-        <div class="side-container {{message_class}}" id="side-container-3">
-        {{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
-        </div>
-        <div class="side-container" id="side-container-0">{{title}}</div>
-        <div id="dashboard-side-container-m" class="side-container side-container-1"></div>
+    <h1>Explore Dashboard</h1>
+    <div class="col-md-1">
+      <ul class="nav ex-nav" id="ex-sidebar" data-spy="affix" data-offset-top="20" ></ul>
     </div>
-</div>
+    <div class="col-md-9" role="main">
+    	<div id="ex-main-container">
+    		<div id="svg-box">
+    		    <div id="svg-box-dashboard" class="svg-box"></div>
+    		</div>
+    	</div>
+    </div>
+    <div class="col-md-2">
+        <div id="side-container" data-spy="affix" data-offset-top="20">
+            <div class="side-container {{message_class}}" id="side-container-3">
+            {{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
+            </div>
+            <div class="side-container" id="side-container-0">{{title}}</div>
+            <div id="dashboard-side-container-m" class="side-container side-container-1"></div>
+        </div>
+    </div>
 </div>
 
 
@@ -186,17 +187,17 @@ section {
 		    keys.push(key);
 		    types[key] = 1;
 		}
-		for (i = 0; i<data.length; i++){
+		for (var i = 0; i < data.length; i++){
 			data[i].cf_id = i;
 		}
         var sr = data[0],
-	  		str2str = function(d){return d;},
-	  		str2int = function(d){return +d;},
-	  		month2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
-	  		date2int = function(d){ d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
-	  		time2int = function(d){ d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
+	  		str2str = function (d) {return d;},
+	  		str2int = function (d) {return +d;},
+	  		month2int = function (d) { d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, 0));},
+	  		date2int = function (d) { d = d.split(/[- :]/); return (new Date(d[0], d[1]-1, d[2]));},
+	  		time2int = function (d) { d = d.split(/[- :]/);  return new Date(d[0], d[1]-1, d[2], d[3], d[4], d[5]);};
 			isNumber = function (n) { return !isNaN(parseFloat(n)) && isFinite(n);};
-        for (j = 0; j < keys.length; j++){
+        for (var j = 0; j < keys.length; j++){
 		    var k = keys[j], parseX = str2int, type = 1; // type1:int,type2:str,type3:date
             if (!isNumber(sr[keys[j]])){
                 var lx = sr[keys[j]].split(/[- :]/).length;
@@ -225,7 +226,7 @@ section {
                 }
             }
             types[keys[j]] = type;
-            for(di = 0; di < data.length; di++){
+            for(var di = 0; di < data.length; di++){
                 data[di][keys[j]] = parseX(data[di][keys[j]]);
             }
 		}
@@ -240,8 +241,9 @@ section {
 		config['DchartTypes'] = [];
 		
 		// title and chart types for each of the crossfilter charts
-		for (j=0; j<keys.length; j++){
-			if (keys[j] == 'all') continue;
+		for (var j=0; j < keys.length; j++){
+			if (keys[j] == 'all')
+			    continue;
 
 			// chart types
 			var strhtml = '<span class="select-charts">Pick a different <span class="dropdown">'
@@ -260,7 +262,7 @@ section {
 							+ strhtml)));
 
             // chart types
-			for (i = 0; i < chartNames.length; i++) {
+			for (var i = 0; i < chartNames.length; i++) {
 				$('#ex-dashboard-chart-' + j).append($('<li>').append($('<a href="#">').append(chartNames[i])));
 			}
 			config['DchartTypes'][j] = "barChart";
@@ -269,7 +271,7 @@ section {
 		// change chart type
 		$(".select-charts .dropdown .dropdown-menu li a").click(function(){
 			iid = $(this).parent().parent().attr('id');
-			iid = iid.split('-'); iid = iid[3];
+			iid = iid.split('-')[3];
 			config['DchartTypes'][iid] = $(this).text();
 			var oldbar = charts[iid],
 				chart = dc[$(this).text()]("#"+keys[iid]+"-dchart"),
@@ -290,9 +292,9 @@ section {
 				var maxX = d3.max(data, function(d){return d[k];}),
 					minX = d3.min(data, function(d){return d[k];}),
 					dxx = ((maxX-minX)/num_bins),
-					groupint = function(d){return Math.floor(d / dxx) * dxx;},
-					xunit = function(start,stop,step){return (stop-start)/dxx},
-				 	chartID = "#"+keys[j]+"-dchart",
+					groupint = function (d) {return Math.floor(d / dxx) * dxx;},
+					xunit = function (start, stop, step) {return (stop-start)/dxx},
+				 	chartID = "#" + keys[j] + "-dchart",
 					row = flight.dimension(function(d) { return d[k]; });
 					
 				if (types[k] == 1) {
@@ -318,7 +320,7 @@ section {
 			 	return draw_charts(bar, config['DchartTypes'][j], row, group, x, xunit); 
 			};
 
-	  	for (j = 0; j < keys.length; j++){
+	  	for (var j = 0; j < keys.length; j++){
 			charts.push(createChart(j, keys));
 	  	}
 	  	bigdata = data;
@@ -381,7 +383,7 @@ section {
 		}
 	});
 	
-	// int sub modules
+	// init sub modules
 	function init(m){
 		if (modules[m]['count'] == 0){
 
@@ -423,6 +425,7 @@ section {
 				}
 				
 			}
+			
 			// setup multiselect - if needed
 			$('.multiselect-' + m).multiselect({
 				numberDisplayed: 4,
@@ -453,11 +456,6 @@ section {
 		}
 		modules[m]['count']++;
 	}
-
-	
-	
-	
-	
 </script>
 
 {% endblock %}
