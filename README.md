@@ -24,4 +24,4 @@ Module Development
 
 Acknowledgement
 ====
-GNoT builds on (and thus heavily benefits from) JS visualization libraries such as D3, NVD3, Crossfilter, DC, Rickshaw, etc.
+GNoT builds on (and thus heavily benefits from) JS visualization libraries such as D3, NVD3, Crossfilter, DC, Rickshaw, VisualSearch, etc.
