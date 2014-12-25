@@ -181,14 +181,11 @@ q:after {
 }
 .reset {
   padding-left: 1em;
-  /*font-size: smaller;*/
   color: #ccc;
 }
-
 .background.bar {
   fill: #ccc;
 }
-
 .foreground.bar {
   fill: steelblue;
 }
@@ -206,7 +203,6 @@ q:after {
 .export_svg{
     position: absolute;
     padding: 3px;
-    /*background: #a1c4fe;*/
     background:#fff;
 }
 .export_svg a {
