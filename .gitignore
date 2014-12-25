@@ -2,6 +2,8 @@
 .pydevproject
 .project
 .dropbox
+cache/*.json
+cache/*.csv
 cache/*
 __pycache__/*
 _support/*
