@@ -19,12 +19,8 @@
 	#main-container a:hover{
 		text-decoration:underline;
 	}
-	#main-container a:visited{
-	 color:#aaa;
-	}
 	
 	#main-container{
-	    font-family: 'Josefin Sans', Helvetica, sans-serif;
 		margin:50px;
 		padding-left:50px;
 		color : #666;
@@ -213,11 +209,8 @@ Finally, let's look at the challenge problem itself: predicting the number of ri
 <a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_ridge_linear+table%3A+public.d_pickup3+field%3A+%22sum%28%28%28latitude-42.354008%29%5E2%2B%28longitude-%28-71.062569%29%29%5E2%3C0.00224946357%5E2%29%3A%3Aint%29+as+ridership%22+field%3A+%22min%28extract%28dow+from+time%29%29+as+dayOfWeek%22+field%3A+%22min%28extract%28hour+from+time%29%29+as+hour%22+field%3A+%22min%28extract%28month+from+time%29%29+as+month%22+field%3A+%22to_char%28time%2C+%27YYYYMMDDHH24%27%29+as+t%22+groupBy%3A+%225%22+limit%3A+6000">Explore_Ridge_Linear2</a>
 Even with this basic model, we achieve a coefficient of determination (R<sup>2</sup> = 0.2224) when predicting 10% of the time windows by learning the model on the rest.  Using GNoT, we can also try different feature combinations, feature transformations such as applying interactions and quadratic transformations on the features, and pre-processing such as applying Z-score or PCA transformation.
 Using provenance, we can see the contributing factors for large squared errors (filter by squared errors): unsurprisingly month 8 stands out as data is corrupted in that month. Further, compared to the rest, peak hours and weekends stand out. This indicates the problem of capturing the tails of the distribution (filter by squared errors and ridership), i.e., not adequately modeling riderships with high amounts that fall at the tail of the distribution.
-
 </p>
   
-
-
 </div>
 </div>
 

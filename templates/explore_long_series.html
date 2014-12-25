@@ -2,31 +2,61 @@
 {% block title %}Time Series{% endblock %}
 {% block body %}
 
-<script type="text/javascript" src="static/js/dygraph-combined.js"></script
-
+<script type="text/javascript" src="static/js/dygraph-combined.js"></script>
+<style>
+    #annottate_box_container{
+        float:left;
+        width:70%;
+        margin:10px;
+    }
+    #form-annottate-submit{
+        float:left;
+        width:10%;
+        font-family: 'Josefin Sans', Helvetica, sans-serif;
+    	color: #333;
+        background-color: #ddd;
+        border-color: #ccc;
+    	border-radius: 5px;
+    	-moz-border-radius: 5px;
+    	-webkit-border-radius: 5px;
+    	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    	-ms-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    	border: 0px;
+    	font-size: 15px;
+    	padding: 2px;
+    	margin: 10px auto;
+    	display: block;
+    }
+</style>
 <div id="container">
-<h1>Explore Time Series</h1>
-
-<script src="/static/js/dependencies.js"></script>
+    <h1>Explore Time Series</h1>
+    
+    <script src="/static/js/dependencies.js"></script>
 	<script src="/static/js/visualsearch.js"></script>
-<div id="annottation">
-	<form id="form_annottate" name="module_tables" action="" method="get" target="_selfs">
-    <div id="annottate_box_container"></div>
-    <input id="form-annottate-submit" class="submit-button" type="submit" value="submit" name="submit" tabindex="12">
-    <div id="annottate_query">&nbsp;</div>
-	</form>
-</div>
 
-<div id="main-container"><div id="svg-box"></div></div>
+    <div id="annottation">
+    	<form id="form_annottate" name="module_tables" action="" method="get" target="_selfs">
+        <div id="annottate_box_container"></div>
+        <input id="form-annottate-submit" class="submit-button" type="submit" value="ANNOTATE" name="submit" tabindex="12">
+        <div id="annottate_query">&nbsp;</div>
+    	</form>
+    </div>
 
-<div  id="side-container">
-<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-<div class="side-container" id="side-container-0">{{title}}</div>
-<div class="side-container" id="side-container-1"  >
-	<p>Time series with zoom-in feature. Use the controls zoom and pan. Hover over to see the point value.</p> 
-</div>
-<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
-</div>
+    <div id="main-container"><div id="svg-box" style="width:960px;"></div></div>
+
+    <div  id="side-container">
+        <div  class="side-container {{message_class}}" id="side-container-3">
+            {{message}}
+            <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
+        </div>
+        <div class="side-container" id="side-container-0">{{title}}</div>
+        <div class="side-container" id="side-container-1"  >
+        	<p>Time series with zoom-in feature. Use the controls zoom and pan. Hover over to see the point value.</p> 
+        </div>
+        <div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+    </div>
 </div>
 
 	
@@ -87,7 +117,7 @@
 	         'start',
 	        'limit'
 	      ],
-		  placeholder : "Make your choices ... ",
+		  placeholder : "Annotation choices ... ",
 	      callbacks  : {
 	        search : function(query, searchCollection) {
 	        },

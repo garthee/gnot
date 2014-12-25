@@ -38,16 +38,17 @@
 	
 #form-submit {
 	font-family: 'Josefin Sans', Helvetica, sans-serif;
-	background: #333;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	-moz-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-	-ms-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	color: #333;
+    background-color: #ddd;
+    border-color: #ccc;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	-ms-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 	border: 0px;
-	color: #fff !important;
 	padding: 5px; font-size : 20px;
 	margin: 10px auto;
 	width: 200px;
@@ -124,7 +125,7 @@ h1,h2 {
 }
 
 #side-container-1, .side-container-1 {
-	background: #1aa1e1;
+	background: #33bbf6;
 }
 #side-container-2, .side-container-2 {
 	background: #a1c4fe;
@@ -140,11 +141,14 @@ h1,h2 {
 
 
 a {
-	color: steelblue;
+	color: #039be6;
 }
 
 a:active {
-	color: yellow;
+	color: #ffdb4f;
+}
+a:visited{
+    color:rgba(161,136,189,1)
 }
 
 svg {

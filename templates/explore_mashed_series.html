@@ -108,7 +108,6 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
     var yformat = d3.format("e");
     var years = data[0].slice(1, data[0].length);
     
-    
  	// identify x axis
     function isNumber(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
@@ -141,7 +140,6 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
 	else				
 		var x = d3.time.scale().domain([startYear, endYear]).range([0, w-margin-mleft]);
 	var y = d3.scale.linear().domain([endAge, startAge]).range([0 + margin, h - margin]);
-	
 	
 	var vis = d3.select("#svg-box")
 	    .append("svg:svg")
