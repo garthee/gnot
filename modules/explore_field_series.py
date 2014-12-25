@@ -1,8 +1,5 @@
 from collections import defaultdict
-import re
-
 from jinja2 import Markup
-
 from db import export_sql
 
 
@@ -43,23 +40,23 @@ def render(vis, request, info):
     limit = request.args.get("limit", '1000')
     start = request.args.get("start", '0')  # start at 0
     xField = request.args.get("xField", '')
-    splitfield = re.findall(r'[^,]*\([^\)]*\)[^,]*|[^,]+', field)
-
+        
+    sfield = request.args.get("sfield", [])
+    pfield = request.args.get("pfield", [])
+    
     if len(table) == 0 or len(xField) == 0:
         info["message"].append("Table or xfield missing.")
         info["message_class"] = "failure"
     else:
 
-        # sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s"%(xField, field, table, where, limit, start)
-
-        field = [re.compile(r' as ').split(f)[0].strip() for f in field.split(',')]
+        #sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s"\
+        #    %(xField, field, table, where, limit, start)
 
         sql = "select t, %s, n from ( \
-		select *,row_number() over (partition by 1,2 order by 3 desc) as rank from  \
-			(select %s as t, %s, %s as n from %s where %s group by 1,2) \
-		as a) \
-		as a where rank >= %s and rank <=%s + %s" % (
-        field[0], xField, field[0], field[1], table, where, start, start, limit)
+    		select *,row_number() over (partition by 1,2 order by 3 desc) as rank from  \
+    			(select %s as t, %s, %s as n from %s where %s group by 1,2) \
+    		as a) as a where rank >= %s and rank <=%s + %s" \
+    		% (sfield[0], xField, sfield[0], sfield[1], table, where, start, start, limit)
 
         (datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
         if len(result) > 0:
@@ -78,9 +75,9 @@ def render(vis, request, info):
         (startYear, endYear) = _array2mat(datfile, datfilen)
 
     pfield = request.args.get("pfield", [])
-    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>" % (','.join(pfield), table)
+    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"\
+        % (','.join(pfield), table)
     info["title"] = Markup(info["title"])
-
     info["message"] = Markup(''.join('<p>%s</p>' % m for m in info["message"] if len(m) > 0))
 
     return vis.render_template('explore_series.html', **info)

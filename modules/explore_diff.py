@@ -1,8 +1,5 @@
 import os
-import re
-
 from jinja2 import Markup
-
 from db import export_sql
 
 
@@ -31,8 +28,8 @@ def render(vis, request, info):
         info["message_class"] = "failure"
     else:
 
-        sql = "select %s, %s from %s where %s %s order by 1 limit %s offset %s" % (
-        xField, ','.join(sfield[:2]), table, where, groupBy, limit, start)
+        sql = "select %s, %s from %s where %s %s order by 1 limit %s offset %s" \
+            % (xField, ','.join(sfield[:2]), table, where, groupBy, limit, start)
 
         header = "Date,A,B"
 
@@ -49,9 +46,8 @@ def render(vis, request, info):
 
             info["datfile"] = datfile
 
-    info["title"] = "Diff of <br />FIELD: <em>%s</em> on <br />FIELD: <em>%s</em> from <br />TABLE: <em>%s</em>" % (
-    pfield[1], pfield[0], table)
+    info["title"] = "Diff of <br />FIELD: <em>%s</em> on <br />FIELD: <em>%s</em> from <br />TABLE: <em>%s</em>" \
+                % (pfield[1], pfield[0], table)
     info["title"] = Markup(info["title"])
-
     info["message"] = Markup(''.join('<p>%s</p>' % m for m in info["message"] if len(m) > 0))
 

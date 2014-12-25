@@ -6,6 +6,7 @@
 "db_system":"psql",
 "db_database":"db",
 "db_scope":" table_schema='public' ",
+"db_schema":"public",
  "web_host":"host_url", 
  "web_port": 5000
 }

@@ -1,8 +1,9 @@
-{% extends "layout.html" %} {% block title %}Relations{% endblock %} {%block body %}
+{% extends "layout.html" %}
+{% block title %}Relations{% endblock %} 
+{%block body %}
 
 <link href="static/css/nv.d3.css" rel="stylesheet" type="text/css">
 <script src="static/js/nv.d3.js"></script>
-
 
 <div id="container">
 	<h1>Explore Relation Describe</h1>
@@ -13,14 +14,6 @@
 		<div class="side-container {{message_class}}" id="side-container-3">
 			{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
-		<div class="side-container" id="side-container-1">
-			<p>Relative frequency of field values .</p>
-
-			<form>
-			  <label><input type="radio" class="db-map" name="mode" value="size"> Size</label>
-			  <label><input type="radio" class="db-map" name="mode" value="count" checked> Count</label>
-			</form>
-		</div>
 		<div class="side-container" id="side-container-2">
 			Built with <a href="http://d3js.org/">d3.js</a>.
 		</div>
@@ -33,7 +26,7 @@ nv.addGraph(function() {
     var chart = nv.models.indentedTree()
         .tableClass('table table-striped') //for bootstrap styling
         .columns([
-          {
+        {
             key: 'key',
             label: 'Name',
             showCount: true,
@@ -43,14 +36,12 @@ nv.addGraph(function() {
             click: function(d) {
                if (d.url) window.location.href = d.url;
             }
-          },
-          {
+        },{
             key: 'data_type',
             label: 'Type',
             width: '20%',
             type: 'text'
-          }
-        ]);
+        }]);
     d3.json("{{datfile}}", function(error, data) {
         d3.select('#svg-box').datum(data).call(chart);
     });

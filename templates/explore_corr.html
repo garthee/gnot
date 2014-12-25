@@ -1,11 +1,8 @@
-{% extends "layout.html" %} {% block title %}Correlations{% endblock %}
+{% extends "layout.html" %}
+{% block title %}Correlations{% endblock %}
 {% block body %}
 
 <style type="text/css">
-    .axis {
-        shape-rendering: crispEdges;
-    }
-
     .axis line {
         stroke: #ddd;
         stroke-width: .5px;
@@ -49,11 +46,11 @@
 <div id="container">
     <h1>Explore Correlations</h1>
 
-    <div id="main-container" style="width: 800px;">
+    <div id="main-container" style="width:800px;">
         <div id="svg-box"></div>
     </div>
     <div id="side-container">
-        <div class="side-container {{message_class}}" id="side-container-3">
+        <div class="side-container {{message_class}}">
             {{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
         </div>
         <div class="side-container" id="side-container-0">{{title}}</div>
@@ -217,7 +214,10 @@
         for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
         return c;
       }
-      spinner.stop();init_svg_conversion();
+      
+      
+      spinner.stop();
+      init_svg_conversion();
     });
 
 </script>

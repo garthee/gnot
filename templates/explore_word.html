@@ -2,11 +2,10 @@
 endblock %} {% block body %}
 
 <script src="static/js/d3.layout.cloud.js"></script>
-<script src="static/js/spin.min.js"></script>
 
 <div id="container">
 	<h1>Explore Word</h1>
-	<div id="main-container" style="width: 800px;">
+	<div id="main-container">
 		<div id="svg-box"></div>
 		<div style="padding: 10px;">
 			<input type="hidden" value="40" id="slider1" />
@@ -30,9 +29,8 @@ endblock %} {% block body %}
 <script>
     var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
 	d3.csv("{{datfile}}", function(error, data) {
-		//var fill = d3.scale.linear().domain([0,100]).range(["#bbe", "#223"]);
-		var fill = d3.scale.linear().domain([ 0, 100 ]).range(
-				[ "#000", "#bbb" ]);
+		var fill = d3.scale.linear().domain([ 0, 100 ])
+		        .range([ "#000", "#bbb" ]);
 
 		var min_size = d3.min(data, function(d) {return +d.size;});
 		var range_size = d3.max(data, function(d) {return +d.size;}) - min_size;
@@ -44,7 +42,7 @@ endblock %} {% block body %}
 		data.forEach(function(d) {d['size'] = change_size(+d['size'])});
 
 		d3.layout.cloud()
-			.size([ 800, 500 ])
+			.size([960, 500 ])
 			.words(data)
 			.padding(5)
 			.rotate(function() {return ~~(Math.random() * 2) * 90;})
@@ -56,10 +54,10 @@ endblock %} {% block body %}
 		function draw(words) {
 			d3.select("#svg-box")
 				.append("svg")
-					.attr("width", 800)
+					.attr("width", 960)
 					.attr("height", 500)
 				.append("g")
-					.attr("transform","translate(400,250)")
+					.attr("transform","translate(480,250)")
 				.selectAll("text")
 					.data(words)
 					.enter()
@@ -70,7 +68,8 @@ endblock %} {% block body %}
 					.attr("transform",function(d) {return "translate(" + [ d.x, d.y ] + ")rotate(" + d.rotate + ")";})
 					.text(function(d) {return d.text;});
 		}
-        spinner.stop();init_svg_conversion();
+        spinner.stop();
+        init_svg_conversion();
 	});
 </script>
 {% endblock %}

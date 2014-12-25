@@ -1,12 +1,10 @@
 from jinja2 import Markup
-
 from db import export_sql
-
 
 def render(vis, request, info):
     info["message"] = []
 
-    reload = request.args.get("reload", 0)
+    reload = int(request.args.get("reload", '0'))
     table = request.args.get("table", '')
     where = request.args.get("where", '1=1')
     field = request.args.get("field", '')
@@ -21,8 +19,8 @@ def render(vis, request, info):
         info["message"].append("table or field missing.")
         info["message_class"] = "failure"
     else:
-        sql = "select %s, count(*) as n from %s where %s group by %s order by n desc limit %s offset %s" % (
-        field, table, where, groupby, limit, start)
+        sql = "select %s, count(*) as n from %s where %s group by %s order by n desc limit %s offset %s"\
+            % (field, table, where, groupby, limit, start)
 
         (datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
         if len(result) > 0:
@@ -37,8 +35,8 @@ def render(vis, request, info):
 
             info["datfile"] = datfile
 
-    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>" % (', '.join(pfield[:2]), table)
+    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>" \
+        % (', '.join(pfield[:2]), table)
     info["title"] = Markup(info["title"])
-
     info["message"] = Markup(''.join('<p>%s</p>' % m for m in info["message"] if len(m) > 0))
 	

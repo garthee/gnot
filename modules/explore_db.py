@@ -1,10 +1,8 @@
-import json
-import csv
-import os
+import json, csv, os
+
 from collections import defaultdict
 from werkzeug.wrappers import Response
 from db import export_sql
-
 
 def render(vis, request, info):
     dbscope = vis.config.get('db_scope', '')
@@ -16,7 +14,9 @@ def render(vis, request, info):
     else:
         sql = "SELECT table_schema || '.' || table_name,column_name FROM information_schema.columns " + dbscope
 
+    #load always
     reload = 1  # int(request.args.get("reload", 0))
+    
     (datfile, reload, result) = export_sql(sql, vis.config, reload, None, None)
 
     table_list = defaultdict(list)

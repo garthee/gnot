@@ -1,4 +1,6 @@
-{% extends "layout.html" %} {% block title %}Fields{% endblock %} {%block body %}
+{% extends "layout.html" %} 
+{% block title %}Fields{% endblock %}
+{%block body %}
 
 
 <div id="container">
@@ -66,7 +68,8 @@
             return d.className;
         });
 
-        spinner.stop();init_svg_conversion();
+        spinner.stop();
+        init_svg_conversion();
     });
 
     // Returns a flattened hierarchy containing all leaf nodes under the root.

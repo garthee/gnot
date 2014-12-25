@@ -1,17 +1,24 @@
-{% extends "layout.html" %} {% block title %}Calendar{% endblock %} {%
-block body %}
+{% extends "layout.html" %} 
+{% block title %}Calendar{% endblock %}
+{% block body %}
 
 <link rel=stylesheet href=/static/css/colorbrewer.css type=text/css>
+<style>
+    .limit-values {
+        font-weight: bold;
+        color: #756bb1;
+    }
+</style>
 
-<div id="container" style="width:1200px;">
+<div id="container">
 	<h1>Explore Date</h1>
-	<div id="main-container" style="width: 960px;">
+	<div id="main-container">
 		<div id="svg-box"></div>
 	</div>
 	<div id="side-container">
 		<div class="side-container {{message_class}}" id="side-container-3">
-		{{message}} <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
-
+		    {{message}} 
+		    <p>You may download the data file <a href="{{datfile}}" title="Data file">here</a>.
 		</div>
 		<div class="side-container" id="side-container-0">{{title}}</div>
 		<div class="side-container" id="side-container-m"></div>
@@ -32,13 +39,16 @@ block body %}
 		percent = d3.format(".1%"),
 		format = d3.time.format("%Y-%m-%d");
 
-    var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
-	d3.csv("{{datfile}}", function(error, csv) {
-		drawCalendar(csv);
-		spinner.stop();init_svg_conversion();
-		init_svg_conversion();
-
-	});
+    var datfile = "{{datfile}}";
+    if (datfile.length > 0){
+        var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
+    	d3.csv(datfile, function(error, csv) {
+    		drawCalendar(csv);
+    		spinner.stop();
+    		init_svg_conversion();
+    
+    	});
+    }
 	
 	function drawCalendar(dall) {
 		var data = d3.nest().key(function(d) { return d.Date;})
@@ -109,9 +119,6 @@ block body %}
 				+ (d1 + 1) * cellSize + "H" + (w1 + 1) * cellSize + "V" + 0
 				+ "H" + (w0 + 1) * cellSize + "Z";
 	}
-
-	//d3.select(self.frameElement).style("height", "2910px");
-	//d3.selectAll("svg").attr("class", "Blues");
 
 </script>
 

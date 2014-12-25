@@ -1,7 +1,4 @@
-import re
-
 from jinja2 import Markup
-
 from db import export_sql
 
 
@@ -35,11 +32,11 @@ def render(vis, request, info):
             pfield = pfield[:5]
 
         info["fieldValue"] = pfield[0]
-        info["title"] = "FIELD_1: <em>%s</em> against <br />OTHER FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>" % (
-        pfield[0], ', '.join(pfield[1:]), table)
+        info["title"] = "FIELD_1: <em>%s</em> against <br />OTHER FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"\
+            % (pfield[0], ', '.join(pfield[1:]), table)
 
-        sql = "select %s from %s where %s %s %s limit %s offset %s" % (
-        ','.join(sfield), table, where, groupBy, orderBy, limit, start)
+        sql = "select %s from %s where %s %s %s limit %s offset %s" \
+            % (','.join(sfield), table, where, groupBy, orderBy, limit, start)
 
         header = "labels,%s" % (','.join(pfield[1:]))
 

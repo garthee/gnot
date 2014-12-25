@@ -1,9 +1,5 @@
-import re
-
 from jinja2 import Markup
-
 from db import export_sql
-
 
 def render(vis, request, info):
     info["message"] = []
@@ -46,10 +42,9 @@ def render(vis, request, info):
         info["field3"] = pfield[3 - 1]
         info["field4"] = pfield[4 - 1]
 
-        sql = "select %s from %s where %s %s %s limit %s offset %s" % (
-        ','.join(sfield), table, where, groupby, orderBy, limit, start)
+        sql = "select %s from %s where %s %s %s limit %s offset %s" \
+            % (','.join(sfield), table, where, groupby, orderBy, limit, start)
         header = "x,y,z,c"
-
         (datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
         if len(result) > 0:
             info["message"].append(result)
@@ -64,11 +59,9 @@ def render(vis, request, info):
             info["datfile"] = datfile
 
     pfield = request.args.get("pfield", [])
-    info[
-        "title"] = "FIELD_X: <em>%s</em>, <br />FIELD_Y: <em>%s</em>, <br />FIELD_Z(size): <em>%s</em>, <br />FIELD_C(color): <em>%s</em> from <br />TABLE: <em>%s</em>" % (
-    pfield[0], pfield[1], pfield[2], pfield[3], table)
+    info["title"] = "FIELD_X: <em>%s</em>, <br />FIELD_Y: <em>%s</em>, <br />FIELD_Z(size): <em>%s</em>, <br />FIELD_C(color): <em>%s</em> from <br />TABLE: <em>%s</em>" \
+            % (pfield[0], pfield[1], pfield[2], pfield[3], table)
     info["title"] = Markup(info["title"])
-
     info["message"] = Markup(''.join(['<p>%s</p>' % m for m in info["message"] if len(m) > 0]))
 
 

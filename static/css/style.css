@@ -56,7 +56,7 @@
 }
 
 html {
-	min-width: 1080px;
+	min-width: 1200px;
 }
 
 body {
@@ -64,9 +64,13 @@ body {
 	color: #333;
 	margin: 1em auto 4em auto;
 	position: relative;
-	font-family: "Roboto", Helvetica, sans-serif;
+	font-family: 'Josefin Sans', Helvetica, sans-serif;
 	font-size: 12px;
 	text-align:center;
+}
+
+p{
+    margin: 0;
 }
 
 h1 {
@@ -81,32 +85,28 @@ h2 {
 }
 
 h1,h2 {
-	font-family: 'Josefin Sans', Helvetica, sans-serif;
 	text-rendering: optimizeLegibility;
 }
 
 #container {
-	width: 1080px;
+	width: 1200px;
 	margin: 0 auto;
 	text-align:left;
 }
 
 #main-container {
 	float: left;
-	width: 800px;
+	width: 960px;
 	margin: 0px;
 }
 
-#side-container, .side-container {
+.side-container {
 	font-family: 'Raleway', Helvetica, sans-serif;
 	float: left;
 	width: 220px;
 	margin: 0px;
 	word-wrap: break-word;
-}
 
-
-.side-container {
 	padding: 5px;
 	margin-bottom: 5px;
 	-moz-border-radius: 2px;
@@ -138,17 +138,13 @@ h1,h2 {
 	background: #ce5043;
 }
 
+
 a {
 	color: steelblue;
 }
 
 a:active {
 	color: yellow;
-}
-
-.limit-values {
-	font-weight: bold;
-	color: #756bb1;
 }
 
 svg {
@@ -220,15 +216,15 @@ q:after {
     color:#a1c4fe;
 }
 
-.x.axis path {
-	display: none;
-}
-
 text {
 	font-size: 12px;
 	font-family: Helvetica, sans-serif;
 }
 
+.bar {
+	fill: steelblue;
+	fill-opacity: .9;
+}
 .axis path,.axis line {
 	fill: none;
 	stroke: #000;

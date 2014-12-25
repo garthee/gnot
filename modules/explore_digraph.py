@@ -1,11 +1,6 @@
-#!/usr/bin/python
-
 import re
-
 from jinja2 import Markup
-
 from db import export_sql
-
 
 def render(vis, request, info):
     info["message"] = []
@@ -36,9 +31,9 @@ def render(vis, request, info):
         else:
             sfield = sfield[0]
 
-        sql = "select %s, %s, %s from (select * from %s where %s)" % (source, target, sfield, table, where,) + \
-              " as a where %s is not null and %s is not null group by 1,2  %s limit %s offset %s" % (
-              source, target, orderBy, limit, start)
+        sql = "select %s, %s, %s from (select * from %s where %s)" % (source, target, sfield, table, where,)  \
+            + " as a where %s is not null and %s is not null group by 1,2  %s limit %s offset %s" \
+                % (source, target, orderBy, limit, start)
 
         header = "source,target,value"
         (datfile, reload, result) = export_sql(sql, vis.config, reload, header, view)
@@ -55,8 +50,7 @@ def render(vis, request, info):
             info["datfile"] = datfile
 
     pfield = request.args.get("pfield", [])
-    info[
-        "title"] = "SOURCE: <em>%s</em>, <br />TARGET: <em>%s</em>, on <br />LINK: <em>%s</em> from <br />TABLE: <em>%s</em>" % (
-    source, target, pfield[0], table)
+    info["title"] = "SOURCE: <em>%s</em>, <br />TARGET: <em>%s</em>, on <br />LINK: <em>%s</em> from <br />TABLE: <em>%s</em>" \
+            % (source, target, pfield[0], table)
     info["title"] = Markup(info["title"])
     info["message"] = Markup(''.join('<p>%s</p>' % m for m in info["message"] if len(m) > 0))

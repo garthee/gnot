@@ -1,10 +1,6 @@
 from collections import defaultdict
-import re
-
 from jinja2 import Markup
-
 from db import export_sql
-
 
 def _array2mat(fl, flo):
     f = open(fl, 'r')
@@ -12,7 +8,6 @@ def _array2mat(fl, flo):
     words = set()
     for r in f:
         (year, word, item) = r.rstrip().split(',')
-
         table[num_if_is_number(year)][word] = item
         words.add(word)
 
@@ -43,9 +38,9 @@ def render(vis, request, info):
     reload = int(request.args.get("reload", 0))
     view = request.args.get("view", '')
     start = request.args.get("start", '0')  # start at 0
-    limit = request.args.get("limit", '10000000')
-
+    limit = request.args.get("limit", '1000')
     xField = request.args.get("xField", '')
+    
     sfield = request.args.get("sfield", '')
     pfield = request.args.get("pfield", [])
 
@@ -56,9 +51,15 @@ def render(vis, request, info):
         info["message"].append("Need two fields : a field to group by, and another aggregate field.")
         info["message_class"] = "failure"
     else:
+        sql = "select t, %s, n from ( \
+    		select *,row_number() over (partition by 1,2 order by 3 desc) as rank from  \
+    			(select %s as t, %s, %s as n from %s where %s group by 1,2) \
+    		as a) as a where rank >= %s and rank <=%s + %s" \
+    		% (sfield[0], xField, sfield[0], sfield[1], table, where, start, start, limit)
 
-        sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s" % (
-        xField, field, table, where, limit, start)
+
+        # sql = "select %s, %s from %s where %s group by 1,2 order by 1 limit %s offset %s"\
+        #     % (xField, field, table, where, limit, start)
 
         (datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
         if len(result) > 0:
@@ -76,9 +77,9 @@ def render(vis, request, info):
 
         (startYear, endYear) = _array2mat(datfile, datfilen)
 
-    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>" % (','.join(pfield), table)
+    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"\
+        % (','.join(pfield), table)
     info["title"] = Markup(info["title"])
-
     info["message"] = Markup(''.join('<p>%s</p>' % m for m in info["message"] if len(m) > 0))
 
     return vis.render_template('explore_mashed_series.html', **info)

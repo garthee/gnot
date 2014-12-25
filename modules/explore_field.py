@@ -27,7 +27,8 @@ def render(vis, request, info):
         info["message"].append("table or field missing.")
         info["message_class"] = "failure"
     else:
-        sql = "select %s as n from %s where %s group by 1 order by n desc limit %s offset %s" % (field, table, where, limit, start)
+        sql = "select %s as n from %s where %s group by 1 order by n desc limit %s offset %s"\
+            % (field, table, where, limit, start)
 
         (datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
         if len(result) > 0:
@@ -56,7 +57,7 @@ def render(vis, request, info):
 
         info["datfile"] = json_file
 
-    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>" % (', '.join(pfield[:2]), table)
+    info["title"] = "FIELDS: <em>%s</em> from <br />TABLE: <em>%s</em>"\
+        % (', '.join(pfield[:2]), table)
     info["title"] = Markup(info["title"])
-
     info["message"] = Markup(''.join('<p>%s</p>' % m for m in info["message"] if len(m) > 0))

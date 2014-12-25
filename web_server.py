@@ -7,15 +7,17 @@ from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.wsgi import SharedDataMiddleware
 from jinja2 import Environment, FileSystemLoader, Markup
 
-import json
-import sys, os, inspect, re
+import json, sys, os, inspect, re, subprocess
 from collections import defaultdict
+
+# python3
 try:
     from urllib.parse import urlparse
 except:
     from urlparse import urlparse
 
 isProduction = False
+
 
 # our webserver implementation
 class Visulizer(object):
@@ -64,10 +66,9 @@ class Visulizer(object):
 
         config["database"] = config.get("db_database", '')
 
-        import subprocess
-        p = subprocess.Popen(['/bin/ps', '-o', 'comm,pid,user'],stdout=subprocess.PIPE)
-        config["uid"] = hex(hash(p.stdout.read()) & 0xffffffff) #32 bit
-
+        p = subprocess.check_output(['/bin/ps', '-o', 'comm,pid,user'])
+        config["uid"] = hex(hash(p) & 0xffffffff) #32 bit
+        
         config["isProduction"] = isProduction
 
         self.config = config
@@ -96,6 +97,7 @@ class Visulizer(object):
         tables = re.split(r',(?![^(]*\))', r.get('table', ''))
         if len(tables) > 1:
             tables = [tables[i] + ' as table_%d'%(i+1)  for i in range(len(tables))]
+            
         #delimiter = " %s "%(r.get('join', ','));
         r['table'] = ','.join(tables)
 

@@ -1,14 +1,15 @@
-{% extends "layout.html" %} {% block title %}Graph{% endblock %} {%
-block body %}
+{% extends "layout.html" %} 
+{% block title %}Graph{% endblock %}
+{% block body %}
 
 <style>
 line {
-	stroke: #000;
+    stroke: #000;
 }
 
 .node {
-  stroke: #fff;
-  stroke-width: 1.5px;
+    stroke: #fff;
+    stroke-width: 1.5px;
 }
 </style>
 
@@ -98,7 +99,9 @@ line {
 				group : group
 			});
 		}
-        spinner.stop();init_svg_conversion();
+        
+        spinner.stop();
+        init_svg_conversion();
 	});
 </script>
 

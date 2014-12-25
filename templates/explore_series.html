@@ -6,7 +6,6 @@
 <link type="text/css" rel="stylesheet" href="static/css/rickshaw.min.css">
 <link type="text/css" rel="stylesheet" href="static/css/extensions.css">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
 <script src="static/js/rickshaw.min.js"></script>
 <script src="static/js/extensions.js"></script>
@@ -23,7 +22,7 @@
 		background-color: #efefef; cursor: pointer; 
 	}
 	.ui-slider-horizontal {
-		 background-color: #aaa; height: 1px; border-bottom: 1px solid #efefef;
+        background-color: #aaa; height: 1px; border-bottom: 1px solid #efefef;
 	}
 
 	.side-container {
@@ -51,15 +50,14 @@
 
 <div id="container">
 <h1>Explore Time Series</h1>	
-<div id="main-container" style="width:840px;">
-	
-<div id="svg-box" style="width:840px;"></div>
-<div id="timeline" class="rickshaw_annotation_timeline"></div>
-<div id="slider" style="width: 800px;" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
-<div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div>
-<a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a>
-<a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a>
-</div>
+    <div id="main-container">
+    <div id="svg-box"></div>
+    <div id="timeline" class="rickshaw_annotation_timeline"></div>
+    <div id="slider" style="width: 800px;" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+        <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div>
+        <a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a>
+        <a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a>
+    </div>
 </div>
 <div  id="side-container">
 <div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
@@ -188,7 +186,7 @@
 	    
 	    var graph = new Rickshaw.Graph( {
 			element: document.getElementById("svg-box"),
-			width: 840,
+			width: 960,
 			height: 500,
 			renderer: 'line',
 			stroke: true,
@@ -281,7 +279,8 @@
 	    	graph.update();
 	    }
 
-	    spinner.stop();init_svg_conversion();
+	    spinner.stop();
+	    init_svg_conversion();
 	});  
 
 </script>

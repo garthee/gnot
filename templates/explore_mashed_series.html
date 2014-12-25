@@ -70,42 +70,36 @@ line {
     stroke-width: 0.6;
     stroke: #000;
 }
-
-
 </style>
 
-
 <div id="container">
-<h1>Explore Mashed Series</h1>	
-<div id="main-container" style="width:800px;">
-	<aside id="blurb" class="float">
-	<div >
-        <div id="blurb-content">
-        	<h2>Field</h2><p>Trend over time.</p>
-        </div>
+    <h1>Explore Mashed Series</h1>	
+    <div id="main-container">
+    	<aside id="blurb" class="float">
+        	<div >
+                <div id="blurb-content">
+                	<h2>Field</h2><p>Trend over time.</p>
+                </div>
+            </div>
+        </aside>
+    <div id="svg-box"></div>
     </div>
-</aside>
-<div id="svg-box"></div>
-</div>
-<div  id="side-container">
-<div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
-<div class="side-container" id="side-container-0">{{title}}</div>
-<div class="side-container" id="side-container-1"  >
-	<p>Plots multi-dimensional series as string of lines.
-</div>
-<div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
-</div>
+    <div  id="side-container">
+        <div  class="side-container {{message_class}}" id="side-container-3">{{message}}</div>
+        <div class="side-container" id="side-container-0">{{title}}</div>
+        <div class="side-container" id="side-container-1"  >
+        	<p>Plots multi-dimensional series as string of lines.
+        </div>
+        <div  class="side-container" id="side-container-2">Built with <a href="http://d3js.org/">d3.js</a>.</div>
+    </div>
 </div>
 
 
 <script>
 
-limit = typeof limit !== 'undefined' ? limit : 100;
+var limit = typeof limit !== 'undefined' ? limit : 100;
 var temp = d3.select("svg").remove();
-
- 
-var w = 800, h = 500, margin = 35, mleft = 100;
-
+var w = 960, h = 500, margin = 35, mleft = 100;
 var startEnd = {}, dataCodes = {}, formatX = Math.round;
 
 var spinner = new Spinner(spinner_opts).spin(document.getElementById('svg-box'));
@@ -214,7 +208,8 @@ d3.text('{{datfile}}', 'text/csv', function(text) {
 	  	.attr('class', 'y axis')
 	  	.call(yAxis);
 
-	spinner.stop();init_svg_conversion();
+	spinner.stop();
+	init_svg_conversion();
 });  
     
 

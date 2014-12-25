@@ -1,37 +1,33 @@
-{% extends "layout.html" %} {% block title %}Relations{% endblock %} {%block body %}
+{% extends "layout.html" %} 
+{% block title %}Relations{% endblock %} 
+{%block body %}
 
 <style>
-
-.node {
-  cursor: pointer;
-}
-
-.node:hover {
-  stroke: #000;
-  stroke-width: 1.5px;
-}
-
-.node--leaf {
-  fill: white;
-}
-
-.label {
-  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-anchor: middle;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
-}
-
-.label,
-.node--root,
-.node--leaf {
-  pointer-events: none;
-}
-
+    .node {
+        cursor: pointer;
+    }
+    .node:hover {
+        stroke: #000;
+        stroke-width: 1.5px;
+    }
+    .node--leaf {
+        fill: white;
+    }
+    .label {
+        font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+        text-anchor: middle;
+        text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+    }
+    .label,
+    .node--root,
+    .node--leaf {
+        pointer-events: none;
+    }
 </style>
 
 <div id="container">
 	<h1>Explore Relation</h1>
-	<div id="main-container" style="width: 800px;">
+	<div id="main-container">
 		<div id="svg-box"></div>
 	</div>
 	<div id="side-container">
@@ -56,7 +52,7 @@
 <script>
 
 var margin = 20,
-    diameter = 800;
+    diameter = 960;
 
 var color = d3.scale.linear()
     .domain([-1, 5])

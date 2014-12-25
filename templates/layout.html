@@ -1,82 +1,81 @@
 <!doctype html>
 <head>
-<title>{% block title %}{% endblock %} GNoT Visualization</title>
-
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="/static/js/spin.min.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-
-<link href='http://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-<link rel=stylesheet href=/static/css/style.css type=text/css>
-
-<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
+    <title> GNoT | {% block title %}{% endblock %} </title>
+    
+    <!--load from cdns-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    
+    <script type="text/javascript" src="/static/js/spin.min.js"></script>
+    <link rel=stylesheet href=/static/css/style.css type=text/css>
+    
+    <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
 </head>
+
 <body>
 {% block body %}{% endblock %}
 
- <div id="search-box-top-container">
- 	<form id="form_module_tables" name="module_tables" action="render" method="get" target="_self">
-    <div id="search_box_container"></div>
-    <input id="form-submit" class="submit-button" type="submit" value="submit" name="submit" tabindex="12">
-    <div id="search_query">&nbsp;</div>
-	<input id="query-input" type="hidden" name="query" value="">
-	</form>
-</div>
+    <!-- visual search -->
+    <div id="search-box-top-container">
+     	<form id="form_module_tables" name="module_tables" action="render" method="get" target="_self">
+        <div id="search_box_container"></div>
+        <input id="form-submit" class="submit-button" type="submit" value="SUBMIT" name="submit" tabindex="12">
+        <div id="search_query">&nbsp;</div>
+    	<input id="query-input" type="hidden" name="query" value="">
+    	</form>
+    </div>
 
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
-<script>
-	function init_svg_conversion(){
-	    $('.export_svg').remove();
-	    $('svg').before('<div class="export_svg"><a href="#" class="editor_save" title="Export this as an image"><span class="glyphicon glyphicon-save" aria-hidden="true"></span></a></div>');
-        $(".editor_save").click(function() {
+    <script src="/static/js/dependencies.js"></script>
+    <script src="/static/js/visualsearch.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore.js"></script>
 
-            // embedd css styles
-            (function ($) {
-                var sheets = document.styleSheets;
-                for (var isheet in sheets) {
-                    var rules = sheets[isheet].rules || sheets[isheet].cssRules;
-                    if (!rules) continue;
-                    for (var idx = 0, len = rules.length; idx < len; idx++) {
-                        if (!rules[idx].selectorText || rules[idx].selectorText.indexOf('::') > -1)  continue;
-                        $(rules[idx].selectorText).each(function (i, elem) {
-                            elem.style.cssText += rules[idx].style.cssText;
-                        });
+    <!--[if (!IE)|(gte IE 8)]><!-->
+      <link href="static/css/visualsearch-datauri.css" media="screen" rel="stylesheet" type="text/css" />
+    <!--<![endif]-->
+    <!--[if lte IE 7]><!-->
+      <link href="static/css/visualsearch.css" media="screen" rel="stylesheet" type="text/css" />
+    <!--<![endif]-->
+    <script src="/static/js/parseuri.js" type="text/javascript"></script>
+    <script type="text/javascript" src="static/js/search-box.js"></script>
+    
+    
+    <!-- export svg -->
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
+    <script>
+    	function init_svg_conversion(){
+    	    $('.export_svg').remove();
+    	    $('svg').before('<div class="export_svg"><a href="#" class="editor_save" title="Export this as an image"><span class="glyphicon glyphicon-save" aria-hidden="true"></span></a></div>');
+            $(".editor_save").click(function() {
+    
+                // embedd css styles
+                (function ($) {
+                    var sheets = document.styleSheets;
+                    for (var isheet in sheets) {
+                        var rules = sheets[isheet].rules || sheets[isheet].cssRules;
+                        if (!rules) continue;
+                        for (var idx = 0, len = rules.length; idx < len; idx++) {
+                            if (!rules[idx].selectorText || rules[idx].selectorText.indexOf('::') > -1)  continue;
+                            $(rules[idx].selectorText).each(function (i, elem) {
+                                elem.style.cssText += rules[idx].style.cssText;
+                            });
+                        }
                     }
-                }
-            })(jQuery);
+                })(jQuery);
+    
+                var canvas  = document.createElement('canvas');
+                var svgString = new XMLSerializer().serializeToString($(this).parent().next()[0]);
+                canvg(canvas, svgString,  { ignoreMouse: true, ignoreAnimation: true });
+                window.location = canvas.toDataURL("image/png");
+            });
+    	}
+    </script>
 
-            var canvas  = document.createElement('canvas');
-            var svgString = new XMLSerializer().serializeToString($(this).parent().next()[0]);
-            canvg(canvas, svgString,  { ignoreMouse: true, ignoreAnimation: true });
-            window.location = canvas.toDataURL("image/png");
-
-            //var DOMURL = self.URL || self.webkitURL || self;
-            //var img = new Image();
-            //var svg = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
-            //window.location = DOMURL.createObjectURL(svg);
-        });
-	}
-</script>
-
-
-<script src="/static/js/dependencies.js"></script>
-<script src="/static/js/visualsearch.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore.js"></script>
-
-<!--[if (!IE)|(gte IE 8)]><!-->
-  <link href="static/css/visualsearch-datauri.css" media="screen" rel="stylesheet" type="text/css" />
-<!--<![endif]-->
-<!--[if lte IE 7]><!-->
-  <link href="static/css/visualsearch.css" media="screen" rel="stylesheet" type="text/css" />
-<!--<![endif]-->
-<script src="/static/js/parseuri.js" type="text/javascript"></script>
-<script type="text/javascript" src="static/js/search-box.js"></script>
 </body>

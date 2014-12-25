@@ -1,7 +1,5 @@
-
 from jinja2 import Markup
 from db import export_sql
-
 
 def render(vis, request, info):
     info["message"] = []
