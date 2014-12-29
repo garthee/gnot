@@ -3,10 +3,10 @@ function scatter_draw() {
 	var Xaxis = modules['scatter']['variables']['Xaxis'],
 		Yaxis = modules['scatter']['variables']['Yaxis'],
 		Group = modules['scatter']['variables']['Group'],
-		Size = modules['map_scatter']['variables']['Size'],
-		Shape = modules['map_scatter']['variables']['Shape'],
+		Size = modules['scatter']['variables']['Size'],
+		Shape = modules['scatter']['variables']['Shape'],
 		mdimension = flight.dimension(function(d){ return [+d[Xaxis], +d[Yaxis], d[Group], d[Shape]];}),
-		mgroup = mdimension.group(),
+		mgroup = (Size == 'none') ?  mdimension.group() : mdimension.group().reduceSum(function(d) { return   +d[Size]; });
 		
 		margin = {top: 40, right: 20, bottom: 50, left: 90},
 		width = 960,
@@ -39,7 +39,7 @@ function scatter_draw() {
 
 
 
-
+    scatterchart.scatter.onlyCircles(false);
 
 	modules['scatter']['crossfilter']={'dimension': mdimension, 'group': mgroup};
 	modules['scatter']['chart'] = scatterchart;
@@ -61,7 +61,7 @@ function scatter_update() {
 			if (!(d.key[2] in scatter_data)) {
 				scatter_data[d.key[2]] = {key:d.key[2], values:[]};
 			}
-			scatter_data[d.key[2]].values.push({x:d.key[0], y:d.key[1], size:d.value, shape:shapes(d.key[2])});
+			scatter_data[d.key[2]].values.push({x:d.key[0], y:d.key[1], size:d.value, shape:shapes(d.key[3])});
 		}
 	});
 	
