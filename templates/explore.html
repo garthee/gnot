@@ -51,15 +51,27 @@
 }
 .ex-nav li {
 	float: right;
-	font-size: 10px;
 	line-height: 1.4;
 	text-align: center;
-	background-color: #f9f9f9;
-	border: 1px solid #fff;
-	color:#000;
 }
 .ex-nav li a{
-	color:#000;
+	color:#666;
+	background-color: #f9f9f9;
+	border: 1px solid #eee;
+	width:60px;
+	height:60px;
+	border-radius:30px;
+	margin-bottom:10px;
+}
+.ex-nav li a:hover{
+    color:#000;
+    background:#fff;
+    border-color:#000;
+}
+.ex-nav li a.sidebar-on{
+	color:#fff;
+	background:#00b9e7;
+	border-color:#fff;
 }
 #top{
 	background:none;
@@ -69,10 +81,7 @@
 	font-size: 12px;
 }
 
-.ex-nav li a.sidebar-on{
-	color:#fff;
-	background:#00b9e7;
-}
+
 .svg-box{
 	margin-bottom: 10px;
 }
@@ -164,17 +173,28 @@ section {
 					};
 
     //sidebar
-    for (m in modules){
-        $('#ex-sidebar').append('<li class=""><a title="'+ m +'" href="#ex-' + m + '" id="ex-' + m + '"><span class="glyphicon glyphicon-' + modules[m]['icon'] +  '"></span></a></li>');
-        modules[m]['count'] = 0;
+    for (var m in modules){
+        $('#ex-sidebar').append('<li class=""><a title="'+ m +'" id="ex-' + m + '"><span class="glyphicon glyphicon-' + modules[m]['icon'] +  '"></span></a></li>');
+        
+		// initialize options
+		modules[m]['count'] = 0;
+		modules[m]['variables'] = {};
+		modules[m]['visible'] = false;
+		
+		for (var i; i < modules[m]['fields'].length; i++){
+		    var c = modules[m]['fields'][i];
+			modules[m]['variables'][c] = undefined;
+		}
     }
+    
     $('#ex-sidebar li a').click(function (){
-        iid = $(this).attr('id');
-        iid = iid.split('-');
-        $('#svg-box-' + iid[1]).toggle();
-        $('#' + iid[1] + '-side-container-m').toggle();
+        var m = $(this).attr('id').split('-')[1]; 
+        modules[m]['visible'] = !modules[m]['visible']; 
+        $('#svg-box-' + m).toggle();
+        $('#' + m + '-side-container-m').toggle();
         $(this).toggleClass('sidebar-on');
-        $.getScript("static/js/ex." + iid[1] + ".js", function(){ init(iid[1]);}) //load sub module and init
+        $.getScript("static/js/ex." + m + ".js", function(){ init(m);}) //load sub module and init
+        update_url();
     });
     $('#ex-sidebar').append('<li class=""><a href="javascript:window.scrollTo(0,0);" id="top" title="go to top"><span class="glyphicon glyphicon-home"></span></a></li>');
 
@@ -353,6 +373,15 @@ section {
 		window.reset = function(i) {
 		    charts[i].filter(null);
 		};
+		
+		
+		// load modules based on URL
+        var mquery = parseUri(document.location.search).queryKey['modules'];
+    	mquery = JSON.parse(decodeURI(mquery));
+        for (m in mquery){
+            modules[m]['variables'] = mquery[m];
+            $('#ex-' + m).click();
+        }
 
         spinner.stop();
         //init_svg_conversion();
@@ -398,13 +427,10 @@ section {
 				if (c.slice(-1) == '-')
 					c = c.slice(0,-1);
 				var multiple = (c == 'fields') ? 'multiple="multiple"' : '';
-				strhtml +=  c + ' <select class="multiselect multiselect-' + m + '" id="ex-' + m + '-' + c + '" ' + multiple + '></select> ';
+				strhtml +=  c + ' <select size="2" class="multiselect multiselect-' + m + '" id="ex-' + m + '-' + c + '" ' + multiple + '></select> ';
 			}
 			strhtml += '</div>';
 			$("#svg-box-" + m).prepend(strhtml);
-			
-			// initialize options
-			modules[m]['variables'] = {};
 			
 			for (i = 0; i < fields.length; i++) {
 				c = fields[i];
@@ -414,16 +440,29 @@ section {
 					$('#ex-' + m + '-' + c).append($('<option value="none">').append("none"));
 				}
 			
-				modules[m]['variables'][c] = '';
-				for (k = 0; k < keys.length; k++) {
-					var selected = '';
-					if (c == keys[k]){
-						selected = 'selected';
-						modules[m]['variables'][c] = c;
-					}
-					$('#ex-' + m + '-' + c).append($('<option value="'+keys[k]+'" '+ selected +'>').append(keys[k]));
-				}
-				
+			    if (typeof modules[m]['variables'][c] === "string"){
+			        for (k = 0; k < keys.length; k++) {
+			            var selected = (modules[m]['variables'][c] == keys[k]) ? ' selected ' : '';
+					    $('#ex-' + m + '-' + c).append($('<option value="'+keys[k]+'" '+ selected +'>').append(keys[k]));
+			        }
+			    }
+			    else if (typeof modules[m]['variables'][c] === "object"){
+			        for (k = 0; k < keys.length; k++) {
+			            var selected = (modules[m]['variables'][c].indexOf(keys[k]) >= 0) ? ' selected ' : '';
+					    $('#ex-' + m + '-' + c).append($('<option value="'+keys[k]+'" '+ selected +'>').append(keys[k]));
+			        }
+			    }
+			    else{
+			        for (k = 0; k < keys.length; k++) {
+			            var selected = '';
+			            modules[m]['variables'][c] = '';
+			            if (c == keys[k]){
+    						selected = 'selected';
+    						modules[m]['variables'][c] = c;
+    					}
+					    $('#ex-' + m + '-' + c).append($('<option value="'+keys[k]+'" '+ selected +'>').append(keys[k]));
+			        }
+			    }
 			}
 			
 			// setup multiselect - if needed
@@ -440,6 +479,10 @@ section {
 							if (modules[iid[1]]['variables'][key] == '')
 								return;
 						}
+						
+						//update URL
+						update_url();
+						
 						window[iid[1] + "_draw"]();
 						//init_svg_conversion();
 					}
@@ -456,6 +499,40 @@ section {
 		}
 		modules[m]['count']++;
 	}
+	
+	
+	function update_url(){
+	    var modules_out = {};
+		for (var m in modules){
+		    if (m == "dashboard") {
+		        continue;
+		    }
+		    if (modules[m]['visible'] && Object.keys(modules[m]['variables']).length > 0){
+		        modules_out[m] = modules[m]['variables'];
+		    }
+		}
+		
+        var key = 'modules';
+	    var value = JSON.stringify(modules_out);
+        key = encodeURI(key); value = encodeURI(value);
+        var kvp = document.location.href.split('&');
+        var i = kvp.length; var x; 
+        while(i--) {
+            x = kvp[i].split('=');
+            if (x[0]==key) {
+                x[1] = value;
+                kvp[i] = x.join('=');
+                break;
+            }
+        }
+    
+        if(i<0) {
+            kvp[kvp.length] = [key,value].join('=');
+        }
+        //update URL without reloading the page
+        window.history.pushState('Update', 'Title', kvp.join('&'));
+    }
+    
 </script>
 
 {% endblock %}

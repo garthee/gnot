@@ -7,7 +7,7 @@ function scatter_draw() {
 		Shape = modules['map_scatter']['variables']['Shape'],
 		mdimension = flight.dimension(function(d){ return [+d[Xaxis], +d[Yaxis], d[Group], d[Shape]];}),
 		mgroup = mdimension.group(),
-		shapes = ['circle', 'square','diamond', 'cross', 'triangle-down', 'triangle-up'],
+		
 		margin = {top: 40, right: 20, bottom: 50, left: 90},
 		width = 960,
 		height = 400,
@@ -53,14 +53,15 @@ function scatter_update() {
 
 	var scatterchart = modules['scatter']['chart'],
 		scatter_data = {},
-		data = modules['scatter']['crossfilter']['group'].all();
+		data = modules['scatter']['crossfilter']['group'].all(),
+		shapes = d3.scale.ordinal().range(['circle', 'square','diamond', 'cross', 'triangle-down', 'triangle-up']);
 	
 	data.forEach(function(d,i){
 		if (d.value > 0) {
 			if (!(d.key[2] in scatter_data)) {
 				scatter_data[d.key[2]] = {key:d.key[2], values:[]};
 			}
-			scatter_data[d.key[2]].values.push({x:d.key[0], y:d.key[1], size:d.value, shape:shape(d.key[2])});
+			scatter_data[d.key[2]].values.push({x:d.key[0], y:d.key[1], size:d.value, shape:shapes(d.key[2])});
 		}
 	});
 	
