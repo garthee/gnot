@@ -65,14 +65,14 @@ var clusters_box = function(){
 
 	var chart = d3.box()
     	.whiskers(iqr(1.5))
-    	.width(width)
+    	.width(10)
     	.height(height);
     
     d3.csv("{{datfile}}", function(error, csv) {
   		var data = {};
 
   		csv.forEach(function(x) {
-    		var clust = x.Result,
+    		var clust = x.Cluster,
         		error = x.Error,
         		d = data[clust];
     		if (!d) d = data[clust] = [error];

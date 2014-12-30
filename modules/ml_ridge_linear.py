@@ -195,28 +195,14 @@ def render(vis, request, info):
                 f.append('{feature:"%s", weight:%.3f}' % (pfield[i + 1], clf.coef_[i]))
             info["weights_data"] = Markup('weights_data=[' + ','.join(f) + '];')
 
-            # preparing popup window for scatter plot column selection
-            info["scatter_fields"] = Markup(''.join(['<li><a>%s</a></li>' % pfield[i] for i in range(0, len(pfield))]))
-            info["scatter_x"] = Markup(pfield[1])
-            info["scatter_y"] = Markup(pfield[0])
-
-            #provenance
-            # 			info["datfile_provenance"] = hashquery + '.provenance.csv'
-            # 			with open(info["datfile_provenance"], 'w') as f:
-            # 				f.write('Sample,Error,%s\n'%(','.join(pfield)))
-            # 				for i in range(len(yhat)):
-            # 					f.write('%d,%.2f,%f,%s\n'%(i,float(Y[i+TrainingSize]-yhat[i]),Y[i+TrainingSize],','.join([str(r) for r in X[i+TrainingSize]])))
-            #
             #provenance
             #0:id,1:prediction result (grouping),2:actual label(shape),3:error,4:y,or features
             info["datfile_provenance"] = hashquery + '.provenance.csv'
-            RES = ['Squared Errors']
             with open(info["datfile_provenance"], 'w') as f:
-                f.write('Sample,Result,Label,Error,%s\n' % (','.join(pfield)))
+                f.write('Error,%s\n' % (','.join(pfield)))
                 for i in range(len(yhat)):
                     e = float(Y[i + TrainingSize] - yhat[i]) ** 2
-                    f.write('%d,%s,%d,%.4f,%f,%s\n' % (
-                    i, RES[0], 0, e, Y[i + TrainingSize], ','.join([str(r) for r in X[i + TrainingSize]])))
+                    f.write('%.4f,%f,%s\n' % (e, Y[i + TrainingSize], ','.join([str(r) for r in X[i + TrainingSize]])))
 
             divs = [
                 '<div class="chart"><div class="title">%s<a href="javascript:reset(%d)" class="reset" style="display: none;">reset</a></div></div>' % (

@@ -69,7 +69,7 @@ class Visulizer(object):
         p = subprocess.check_output(['/bin/ps', '-o', 'comm,pid,user'])
         config["uid"] = hex(hash(p) & 0xffffffff) #32 bit
         
-        config["isProduction"] = isProduction
+        isProduction = config["isProduction"]
 
         self.config = config
 

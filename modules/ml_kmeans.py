@@ -172,21 +172,15 @@ def render(vis, request, info):
                 f.append('{cluster:"%d", distance:%.3f}' % (i, clustmeans[i]))
             info["clust_data"] = Markup('clust_data=[' + ','.join(f) + '];')
 
-            # preparing popup window for scatter plot column selection
-            info["scatter_fields"] = Markup(''.join(['<li><a>%s</a></li>' % pfield[i] for i in range(len(pfield))]))
-            info["scatter_x"] = Markup(pfield[0])
-            info["scatter_y"] = Markup(pfield[1])
-
             #provenance
             #0:id,1:prediction result (grouping),2:actual label(shape),3:error,4:y,or features
             info["datfile_provenance"] = hashquery + '.provenance.csv'
             RES = ['Cluster %d' % (i + 1) for i in range(k)]
             with open(info["datfile_provenance"], 'w') as f:
-                f.write('Sample,Result,Label,Error,Y,%s\n' % (','.join(pfield)))
+                f.write('Cluster,Error,%s\n' % (','.join(pfield)))
                 for i in range(len(cidx)):
                     e = cdists[i][cidx[i]]
-                    f.write(
-                        '%d,%s,%d,%.4f,%f,%s\n' % (i, RES[cidx[i]], 0, e, cidx[i], ','.join([str(r) for r in X[i]])))
+                    f.write('%s,%.4f,%s\n' % (RES[cidx[i]], e, ','.join([str(r) for r in X[i]])))
 
             pfield = ['cluster'] + pfield
             divs = [

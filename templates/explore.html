@@ -311,11 +311,11 @@ section {
 
 				var maxX = d3.max(data, function(d){return d[k];}),
 					minX = d3.min(data, function(d){return d[k];}),
-					dxx = ((maxX-minX)/num_bins),
+					row = flight.dimension(function(d) { return d[k]; }),
+					dxx = (maxX-minX)/Math.min(num_bins, row.group().size()),
 					groupint = function (d) {return Math.floor(d / dxx) * dxx;},
 					xunit = function (start, stop, step) {return (stop-start)/dxx},
-				 	chartID = "#" + keys[j] + "-dchart",
-					row = flight.dimension(function(d) { return d[k]; });
+				 	chartID = "#" + keys[j] + "-dchart";
 					
 				if (types[k] == 1) {
 					group = row.group(function(d) { return groupint(d); });
@@ -333,9 +333,7 @@ section {
 				if (group.size() < 5) {
 					config['DchartTypes'][j] = 'rowChart';
 				}
-				else if (group.size() < 20) {
-					config['DchartTypes'][j] = 'pieChart';
-				}
+				
 				var bar = dc[config['DchartTypes'][j]](chartID);
 			 	return draw_charts(bar, config['DchartTypes'][j], row, group, x, xunit); 
 			};
@@ -377,10 +375,12 @@ section {
 		
 		// load modules based on URL
         var mquery = parseUri(document.location.search).queryKey['modules'];
-    	mquery = JSON.parse(decodeURI(mquery));
-        for (m in mquery){
-            modules[m]['variables'] = mquery[m];
-            $('#ex-' + m).click();
+        if (typeof mquery === 'string' && mquery.length > 0) {
+        	mquery = JSON.parse(decodeURI(mquery));
+            for (m in mquery){
+                modules[m]['variables'] = mquery[m];
+                $('#ex-' + m).click();
+            }
         }
 
         spinner.stop();

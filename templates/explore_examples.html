@@ -201,7 +201,7 @@ While we can make such observations based on time and location, can we generate 
 <a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.d_pickup3+field%3A+%22latitude%22+field%3A+%22longitude%22+limit%3A+1000+k%3A+%225%22">Explore_K-means</a>
 What if we add the day of the week as the third dimension? Since, the range of the day of the week is not similar to the range of latitude and longitude (i.e., they have different units), and we apply Z-score normalization before applying K-means.
 It is as simple as picking Z-score from pre_process option in GNoT. Here, we see a totally different pattern emerging.
-<a href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.d_pickup3+field%3A+%22latitude%22+field%3A+%22longitude%22+field%3A+%22extract%28dow+from+time%29%22+limit%3A+1000+k%3A+%225%22+pre_process%3A+%22Z-Score%22">Explore_K-means2</a>
+<a href="http://ddmg1.csail.mit.edu:4999/render?submit=SUBMIT&query=module%3A+ml_kmeans+table%3A+public.d_pickup3+field%3A+%22latitude%22+field%3A+%22longitude%22+field%3A+%22extract%28dow+from+time%29+as+day%22+limit%3A+1000+k%3A+%225%22+pre_process%3A+%22Z-Score%22">Explore_K-means2</a>
 </p> 
 
 <p>
