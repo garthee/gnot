@@ -1,7 +1,7 @@
 GNoT+
 ====
 Visualize relational data, on the fly!
-GNoT combines powerful JS visualizations to a relational database
+GNoT combines powerful JS visualizations to data in a PostgreSQL (also Redshift, Vertica, Greenplum, etc.), or MySQL database.
 
 Required
 ===
