@@ -1,21 +1,20 @@
 <link href="static/css/chart.css" rel="stylesheet" type="text/css">
 
 {{pca_matrix_divs}}
-<div id="svg-box-features"><span><label><input type="checkbox"> Sort values</label></span></div>
+<div id="svg-box-features"><span><label><input type="checkbox">Sort values</label></span></div>
 <div class="side-container" id="side-container-r">{{results}}</div>
 
 <script src="static/js/chart.histogram.js"></script>
 <script src="static/js/chart.matrix.js"></script>
 <script>
-file_pca_matrix = "{{datfile_matrix}}";
-{{weights_data}}
-chart_matrix();
-chart_histogram();
-$('#svg-box').prepend($('#svg-box-features'));
-$('#svg-box').prepend($('#svg-pca_matrix'));
-
-$('h1').html('Explore Ridge Linear');
-$('#side-container').append($('#side-container-r'));
-
+    file_pca_matrix = "{{datfile_matrix}}";
+    {{weights_data}}
+    chart_matrix();
+    chart_histogram();
+    $('#svg-box').prepend($('#svg-box-features'));
+    $('#svg-box').prepend($('#svg-pca_matrix'));
+    
+    $('h1').html('Explore Ridge Linear');
+    $('#side-container').append($('#side-container-r'));
 </script>
 

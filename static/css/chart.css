@@ -1,23 +1,5 @@
 	
-	g {
-		overflow:hidden;
-	}
-	.scatter:after {
-		content: '↓';
-		margin-left: 6px;
-		color: #08C;
-	}
 	
-	.scatter {
-		color: #08C;
-		cursor: pointer;
-		padding: 4px;
-		border-radius: 4px;
-	}
-	
-	.scatter:hover {
-		background: #F2F2F2;
-	}
 
 	g.cat.labels {
 		text-anchor: end;
@@ -37,50 +19,13 @@
 		display: none;
 	}
 	
-	.axis text {
-		font: 12px;
-	}
-
 	.axis path,.axis line {
 		fill: none;
 		stroke: #000;
 		shape-rendering: crispEdges;
 	}
 	
-	#svg-box-scatter svg {
-		overflow: hidden;
-		height: 400px;
-		width:800px;
-	}
 	
-	
-	.chart {
-		display: inline-block;
-		height: 151px;
-		margin-bottom: 20px;
-		margin-right:10px;
-	}
-	
-	.chart div {
-		padding: 5px;
-	}
-
-	.reset {
-		padding-left: 1em;
-		font-size: smaller;
-		color: #ccc;
-	}
-	
-	.background.bar {
-		fill: #ccc;
-	}
-	
-	.foreground.bar {
-		fill: steelblue;
-	}
-	.foreground.bar.classid0 {
-		fill: #ff7f0e;
-	}
 	.axis path,.axis line {
 		fill: none;
 		stroke: #000;

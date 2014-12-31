@@ -1,6 +1,6 @@
 var chart_histogram = function (){
 	var margin = {top: 20, right: 20, bottom: 80, left: 80},
-		width = 800 - margin.left - margin.right,
+		width = 960 - margin.left - margin.right,
 		height = 300 - margin.top - margin.bottom;
 	
 	var x = d3.scale.ordinal().rangeRoundBands([0, width], .1, 1);

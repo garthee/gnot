@@ -189,7 +189,7 @@ def render(vis, request, info):
                     f.write("feature,%s\n" % (','.join(xfield)))
                     for i in range(len(V)):
                         f.write('PCA_%d,%s\n' % (i + 1, ','.join([str(v) for v in V[i]])))
-                info["pca_matrix_divs"] = Markup('<h2>PCA Components</h2><div id="svg-pca_matrix"></div>')
+                info["pca_matrix_divs"] = Markup('<div id="svg-pca_matrix"></div>')
             else:
                 info["pca_matrix_divs"] = ''
 

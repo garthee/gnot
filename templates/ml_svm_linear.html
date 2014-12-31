@@ -5,28 +5,22 @@
 <div id="svg-box-auroc"></div>
 <div class="side-container" id="side-container-r">{{results}}</div>
 
-
 <script src="static/js/chart.auroc.js"></script>
 <script src="static/js/chart.histogram.js"></script>
 <script src="static/js/chart.matrix.js"></script>
 <script>
-
-
-file_auroc = "{{datfile_auroc}}";
-file_pca_matrix = "{{datfile_matrix}}";
-{{weights_data}}
-
-$('#svg-box').prepend($('#svg-box-auroc'));
-$('#svg-box').prepend($('#svg-box-features'));
-$('#svg-box').prepend($('#svg-pca_matrix'));
-
-$('h1').html('Explore SVM-Linear');
-$('#side-container').append($('#side-container-r'));
-
-
-
-chart_matrix();
-chart_histogram();
-chart_auroc();
-
+    file_auroc = "{{datfile_auroc}}";
+    file_pca_matrix = "{{datfile_matrix}}";
+    {{weights_data}}
+    
+    $('#svg-box').prepend($('#svg-box-auroc'));
+    $('#svg-box').prepend($('#svg-box-features'));
+    $('#svg-box').prepend($('#svg-pca_matrix'));
+    
+    $('h1').html('Explore SVM-Linear');
+    $('#side-container').append($('#side-container-r'));
+    
+    chart_matrix();
+    chart_histogram();
+    chart_auroc();
 </script>

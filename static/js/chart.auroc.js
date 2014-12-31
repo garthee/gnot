@@ -1,6 +1,6 @@
 var chart_auroc = function (){
 	var margin = {top: 20, right: 20, bottom: 30, left: 50},
-		width = 800 - margin.left - margin.right,
+		width = 940 - margin.left - margin.right,
 		height = 400 - margin.top - margin.bottom;
 
 	var x = d3.scale.linear().domain([0,1]).range([0, width]);

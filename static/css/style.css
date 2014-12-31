@@ -179,6 +179,10 @@ q:after {
 	content: "â€�";
 }
 
+g {
+	overflow:hidden;
+}
+
 .day {
 	fill: #fff;
 	stroke: #ccc;

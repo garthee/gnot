@@ -107,7 +107,6 @@ def render(vis, request, info):
         info["message_class"] = "failure"
     else:
         # prepare sql query
-
         if orderBy and len(orderBy) > 0:
             orderbyMessage = ' ordered by %s' % orderBy
             orderBy = ' order by %s' % orderBy
@@ -115,8 +114,8 @@ def render(vis, request, info):
             orderBy = ''
             orderbyMessage = 'ordered randomly'
 
-        sql = "select %s from %s where %s %s %s limit %s offset %s" % (
-        field, table, where, groupBy, orderBy, limit, start)
+        sql = "select %s from %s where %s %s %s limit %s offset %s"\
+                % (field, table, where, groupBy, orderBy, limit, start)
 
         (datfile, reload, result) = export_sql(sql, vis.config, reload, None, view)
 
@@ -184,7 +183,7 @@ def render(vis, request, info):
                     f.write("feature,%s\n" % (','.join(xfield)))
                     for i in range(len(V)):
                         f.write('PCA_%d,%s\n' % (i + 1, ','.join([str(v) for v in V[i]])))
-                info["pca_matrix_divs"] = Markup('<h2>PCA Components</h2><div id="svg-pca_matrix"></div>')
+                info["pca_matrix_divs"] = Markup('<div id="svg-pca_matrix"></div>')
             else:
                 info["pca_matrix_divs"] = ''
 

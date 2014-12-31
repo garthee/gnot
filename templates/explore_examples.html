@@ -59,6 +59,12 @@ You can also check distribution of user_id, and source.
 Distribution of stock,hour of the tweet, and day of the week of the tweet: Multi-Field Module
 </a>
 
+<h2>Contents of Database</h2>
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+explore_relation" />
+What's in the Database: Relation Module
+</a>
+
+
 <h2>Visualizing time series</h2>
 <a target="_blank" href="http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_diff+table%3A+finance.interday_returns2+xField%3A+%22date%28to_date%28date%2C%27YYYYMMDD%27%29%29%22++field%3A+%22avg%28sprtrn%29+as+SP%2Cavg%28RET%29+as+AAPL%22+where%3A+%22ticker%3D%27AAPL%27+and+extract%28year+from+to_date%28date%2C+%27YYYYMMDD%27%29%29%3D2012%22+groupBy%3A+%221%22" />
 AAPL returns compared to SP500 returns : Diff module
@@ -131,14 +137,14 @@ Histogram : average tweet length for few stocks
 
 
 <h2>Machine learning tasks</h2>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_svm_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22class-3%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22cellsize%22+field%3A+%22normal_nucleoli%22+ratio%3A+%220.8%22+pre_process%3A+%22Z-Score%22+regularizer%3A+%2210%22+#">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=SUBMIT&query=module%3A+ml_svm_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22class-3+as+Y%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22cellsize%22+field%3A+%22normal_nucleoli%22+ratio%3A+%220.8%22+pre_process%3A+%22Whitened+PCA%22+regularizer%3A+%2210%22D">
 Example binary classification task on Wisconsin breast cancer dataset (easy task): ML_SVM module 
 </a>
 
-<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_ridge_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellsize%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22adhesion%22+field%3A+%22bare_nuclei%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+regularizer%3A+%22.5%22+pre_process%3A+%22Z-Score%22++orderBy%3A+%22random%28%29%22">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=SUBMIT&query=module%3A+ml_ridge_linear+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellsize+as+Y%22+field%3A+%22cellshape%22+field%3A+%22thickness%22+field%3A+%22adhesion%22+field%3A+%22bare_nuclei%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+regularizer%3A+%22.5%22+pre_process%3A+%22Whitened+PCA%22+orderBy%3A+%22random%28%29%22&modules=%7B%22scatter%22:%7B%22Xaxis%22:%22PCA_1%22,%22Yaxis%22:%22PCA_2%22,%22Group%22:%22all%22,%22Shape%22:%22all%22,%22Size%22:%22Error%22%7D%7D2">
 Example regression task on Wisconsin breast cancer dataset: ML_RIDGE_LINEAR module 
 </a>
-<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellshape%22+field%3A+%22cellsize%22+k%3A+%223%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+field%3A+%22thickness%22">
+<a target="_blank" href="http://ddmg1.csail.mit.edu:4999/render?submit=submit&query=module%3A+ml_kmeans+table%3A+public.breast_cancer_wisconsin+field%3A+%22cellshape%22+field%3A+%22cellsize%22+k%3A+%223%22+field%3A+%22chromatin%22+field%3A+%22mitoses%22+field%3A+%22thickness%22&modules=%7B%22scatter%22:%7B%22Xaxis%22:%22cellsize%22,%22Yaxis%22:%22mitoses%22,%22Group%22:%22Cluster%22,%22Shape%22:%22all%22,%22Size%22:%22Error%22%7D%7D">
 Example clustering task on Wisconsin breast cancer dataset: ML_K-Means module 
 </a>
 
