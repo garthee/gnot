@@ -24,6 +24,17 @@
 {% block body %}{% endblock %}
 
     <!-- visual search -->
+    
+    
+    <div id="search-box-top-container">
+     	<form id="form_module_tables" name="module_tables" action="render" method="get" target="_self">
+        <div id="search_box_container"></div>
+        <input id="form-submit" class="submit-button" type="submit" value="SUBMIT" name="submit" tabindex="12">
+        <div id="search_query">&nbsp;</div>
+    	<input id="query-input" type="hidden" name="query" value="">
+    	</form>
+    </div>
+    
     <script src="/static/js/dependencies.js"></script>
     <script src="/static/js/visualsearch.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore.js"></script>
@@ -35,15 +46,6 @@
       <link href="static/css/visualsearch.css" media="screen" rel="stylesheet" type="text/css" />
     <!--<![endif]-->
     <script type="text/javascript" src="static/js/search-box.js"></script>
-    
-    <div id="search-box-top-container">
-     	<form id="form_module_tables" name="module_tables" action="render" method="get" target="_self">
-        <div id="search_box_container"></div>
-        <input id="form-submit" class="submit-button" type="submit" value="SUBMIT" name="submit" tabindex="12">
-        <div id="search_query">&nbsp;</div>
-    	<input id="query-input" type="hidden" name="query" value="">
-    	</form>
-    </div>
     
     <style>
         .VS-search .search_facet input {

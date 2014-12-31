@@ -16,9 +16,6 @@ try:
 except:
     from urlparse import urlparse
 
-isProduction = False
-
-
 # our webserver implementation
 class Visulizer(object):
 
@@ -68,8 +65,6 @@ class Visulizer(object):
 
         p = subprocess.check_output(['/bin/ps', '-o', 'comm,pid,user'])
         config["uid"] = hex(hash(p) & 0xffffffff) #32 bit
-        
-        isProduction = config["isProduction"]
 
         self.config = config
 
@@ -180,4 +175,4 @@ if __name__ == '__main__':
     from werkzeug.serving import run_simple
     # disable debugger if put in operation
     app = create_app()
-    run_simple(app.config['web_host'], app.config['web_port'], app, use_debugger=(not isProduction), use_reloader=True, threaded=True)
+    run_simple(app.config['web_host'], app.config['web_port'], app, use_debugger=(not app.config['isProduction']), use_reloader=True, threaded=True)
