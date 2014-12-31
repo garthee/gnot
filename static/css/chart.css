@@ -1,66 +1,42 @@
-	
-	
+g.cat.labels {
+	text-anchor: end;
+}
 
-	g.cat.labels {
-		text-anchor: end;
-	}
-	
-	g.labels text:hover {
-		fill: red;
-		cursor: pointer;
-	}
+g.labels text:hover {
+	fill: red;
+	cursor: pointer;
+}
 
-	.bar {
-		fill: steelblue;
-		fill-opacity: .9;
-	}
-	
-	#svg-box-features .x.axis path {
-		display: none;
-	}
-	
-	.axis path,.axis line {
-		fill: none;
-		stroke: #000;
-		shape-rendering: crispEdges;
-	}
-	
-	
-	.axis path,.axis line {
-		fill: none;
-		stroke: #000;
-		shape-rendering: crispEdges;
-	}
+.bar {
+	fill: steelblue;
+	fill-opacity: .9;
+}
 
-	.brush rect.extent {
-		fill: steelblue;
-		fill-opacity: .125;
-	}
-	
-	.brush .resize path {
-		fill: #eee;
-		stroke: #666;
-	}
-	
-	.nvd3 .nv-axis.nv-x path.domain {
-		stroke-opacity: 0.75;
-	}
-	
-	.line {
-  		fill: none;
-  		stroke: steelblue;
-  		stroke-width: 1.5px;
-	}
-	.separator {
-  		stroke: #aaa;
-	}
-	.area {
-    	fill: lightsteelblue;
-    	stroke-width: 0;
-	}
-	
-	.chart .title{
-		font-family: 'Josefin Sans', Helvetica, sans-serif;
-		font-size:14px;
-	}
-	
+#svg-box-features .x.axis path {
+	display: none;
+}
+.axis path,.axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+.nvd3 .nv-axis.nv-x path.domain {
+	stroke-opacity: 0.75;
+}
+.line {
+  	fill: none;
+  	stroke: steelblue;
+  	stroke-width: 1.5px;
+}
+.separator {
+  	stroke: #aaa;
+}
+.area {
+	fill: lightsteelblue;
+	stroke-width: 0;
+}
+
+.chart .title{
+	font-family: 'Josefin Sans', Helvetica, sans-serif;
+	font-size:14px;
+}
