@@ -25,9 +25,29 @@ jQuery.noConflict();
 	
 	 
 	$("#form_module_tables").submit(function() {
-		window.visualSearch.searchBox.disableFacets();
-		$('#query-input').val(window.visualSearch.searchBox.value());
-		return true;
+		
+		var choice = window.visualSearch.searchBox.value();
+		if (choice.indexOf('module') < 0){
+		    var $query = $('#search_query');
+		    $query.stop().animate({opacity : 1}, {duration: 300, queue: false});
+		    $query.html('<span style="color:#F00">Please pick a module to visualize!.</span>');
+	          clearTimeout(window.queryHideDelay);
+	          window.queryHideDelay = setTimeout(function() {
+	            $query.animate({
+	              opacity : 0
+	            }, {
+	              duration: 30000,
+	              queue: false
+	            });
+	          }, 2000);
+		    return false;
+		}
+		else{
+		    window.visualSearch.searchBox.disableFacets();
+		    $('#query-input').val();    
+		    return true;
+		}
+		
 	});
 	
 	Array.prototype.diff = function(a) {
