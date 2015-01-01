@@ -3,6 +3,13 @@ GNoT+
 Visualize relational data, on the fly!
 GNoT combines powerful JS visualizations to data in a PostgreSQL (also Redshift, Vertica, Greenplum, etc.), or MySQL database.
 
+Demo
+===
+Visualizing Jeopardy data with GNoT: https://www.evernote.com/shard/s4/sh/762f3b3d-e088-48b1-b3f0-372cf31d1831/825167a720abf0dd
+
+More examples:
+http://ddmg1.csail.mit.edu:5000/render?submit=submit&query=module%3A+explore_examples
+
 Required
 ===
 1. Python (2.7+, 3.x supported)
