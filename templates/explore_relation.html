@@ -114,6 +114,8 @@ d3.json("{{datfile}}", function(error, root) {
     node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
     circle.attr("r", function(d) { return d.r * k; });
   }
+  
+  init_svg_conversion();
 });
 
 d3.select(self.frameElement).style("height", diameter + "px");

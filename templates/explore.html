@@ -401,7 +401,7 @@ section {
 					.title(function (d) {return d.value;});
 					break;
 				default:
-					chart.height(150).width(960)
+					chart.height(150).width(group.size() < 40 ? 478 : 960)
 			        .margins({top: 10, right: 10, bottom: 30, left: 50})
 			        .centerBar(true)
 			        .gap(0.5)
