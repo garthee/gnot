@@ -23,28 +23,31 @@ jQuery.noConflict();
 	else
 	 	query = '';
 	
-	 
+	
+	function animate_message(message){
+	    var $query = $('#search_query');
+        $query.stop().animate({opacity : 1}, {duration: 300, queue: false});
+    	    $query.html(message);
+              clearTimeout(window.queryHideDelay);
+              window.queryHideDelay = setTimeout(function() {
+                $query.animate({
+                  opacity : 0
+                }, {
+                  duration: 30000,
+                  queue: false
+                });
+              }, 2000);
+	} 
 	$("#form_module_tables").submit(function() {
 		
 		var choice = window.visualSearch.searchBox.value();
 		if (choice.indexOf('module') < 0){
-		    var $query = $('#search_query');
-		    $query.stop().animate({opacity : 1}, {duration: 300, queue: false});
-		    $query.html('<span style="color:#F00">Please pick a module to visualize!.</span>');
-	          clearTimeout(window.queryHideDelay);
-	          window.queryHideDelay = setTimeout(function() {
-	            $query.animate({
-	              opacity : 0
-	            }, {
-	              duration: 30000,
-	              queue: false
-	            });
-	          }, 2000);
+		    animate_message('<span style="color:#F00">Please pick a module to visualize!.</span>');
 		    return false;
 		}
 		else{
 		    window.visualSearch.searchBox.disableFacets();
-		    $('#query-input').val();    
+		    $('#query-input').val(choice);    
 		    return true;
 		}
 		
@@ -69,19 +72,7 @@ jQuery.noConflict();
 		  placeholder : "Make your choices ... ",
 	      callbacks  : {
 	        search : function(query, searchCollection) {
-	          var $query = $('#search_query');
-			  
-			  $query.stop().animate({opacity : 1}, {duration: 300, queue: false});
-	          $query.html('<span class="raquo">&raquo;</span> Your query is: <b>' + searchCollection.serialize() + '</b>');
-	          clearTimeout(window.queryHideDelay);
-	          window.queryHideDelay = setTimeout(function() {
-	            $query.animate({
-	              opacity : 0
-	            }, {
-	              duration: 30000,
-	              queue: false
-	            });
-	          }, 2000);
+                animate_message('<span class="raquo">&raquo;</span> Your query is: <b>' + searchCollection.serialize() + '</b>');
 	        },
 	        valueMatches : function(category, searchTerm, callback) {
 	        	  var sq = window.visualSearch.searchBox.app.searchQuery.facets();
