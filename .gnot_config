@@ -7,7 +7,7 @@
 "db_database":"db",
 "db_scope":" table_schema='public' ",
 "db_schema":"public",
- "web_host":"host_url", 
+ "web_host":"0.0.0.0", 
  "web_port": 5000,
  "isProduction": 0
 }
