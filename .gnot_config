@@ -8,5 +8,6 @@
 "db_scope":" table_schema='public' ",
 "db_schema":"public",
  "web_host":"host_url", 
- "web_port": 5000
+ "web_port": 5000,
+ "isProduction": 0
 }
