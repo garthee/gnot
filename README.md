@@ -10,7 +10,6 @@ Demo
 
 Required
 ===
-Anaconda based setup is recommended.
 1. Python (2.7+, 3.x supported)
 2. werkzeug and jinja2 (available in PIP)
 3. ML SVM module also requires sklearn (available in PIP). Sklearn requires numpy and scipy.
