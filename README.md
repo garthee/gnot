@@ -10,15 +10,19 @@ Demo
 
 Required
 ===
+Anaconda based setup is recommended.
 1. Python (2.7+, 3.x supported)
 2. werkzeug and jinja2 (available in PIP)
 3. ML SVM module also requires sklearn (available in PIP). Sklearn requires numpy and scipy.
+
 
 Setup
 ====
 1. Install werkzeug python library (werkzeug.pocoo.org), and other required libraries. Alternatively use Anaconda setup.
 2. Move .gnot_config to user home directory and edit the parameters.
 3. Start the webserver (python webserver.py) from gnot directory.
+
+If you have trouble accessing, see https://github.com/garthee/gnot/issues/2
 
 Module Development
 ====
