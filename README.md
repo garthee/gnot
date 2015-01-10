@@ -17,7 +17,7 @@ Required
 
 Setup
 ====
-1. Install werkzeug python library (werkzeug.pocoo.org), and other required libraries. Alternatively use Anaconda setup.
+1. Install werkzeug python library (werkzeug.pocoo.org), and other required libraries. Alternatively use <a href="https://store.continuum.io/cshop/anaconda/">Anaconda</a>.
 2. Move .gnot_config to user home directory and edit the parameters.
 3. Start the webserver (python webserver.py) from gnot directory.
 
